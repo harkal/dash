@@ -79,7 +79,7 @@
  *  TREE STRUCTURE
  *  ===========================================
  * 
- *  DASH NETWORK (ROOT)
+ *  EBAKUS NETWORK (ROOT)
  *      -> NETWORK GLOBOLS
  *          -> SWITCHES, SETTINGS
  *      -> CATEGORIES

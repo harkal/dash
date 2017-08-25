@@ -59,9 +59,9 @@ Whenever a masternode comes online or a client is syncing, they will send this m
 
 | Field Size | Field Name | Data type | Description |
 | ---------- | ----------- | --------- | -------- |
-| 41 | vin | CTxIn | The unspent output which is holding 1000 DASH
+| 41 | vin | CTxIn | The unspent output which is holding 1000 EBAKUS
 | # | addr | CService | IPv4 address of the masternode
-| 33-65 | pubKeyCollateralAddress | CPubKey | CPubKey of the main 1000 DASH unspent output
+| 33-65 | pubKeyCollateralAddress | CPubKey | CPubKey of the main 1000 EBAKUS unspent output
 | 33-65 | pubKeyMasternode | CPubKey | CPubKey of the secondary signing key (For all other messaging other than announce message)
 | 71-73 | sig | char[] | Signature of this message (verifiable via pubKeyCollateralAddress)
 | 8 | sigTime | int64_t | Time which the signature was created

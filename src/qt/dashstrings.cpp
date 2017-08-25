@@ -113,7 +113,7 @@ QT_TRANSLATE_NOOP("ebakus-core", ""
 "confirmation on average within n blocks (default: %u)"),
 QT_TRANSLATE_NOOP("ebakus-core", ""
 "InstantSend doesn't support sending values that high yet. Transactions are "
-"currently limited to %1 DASH."),
+"currently limited to %1 EBAKUS."),
 QT_TRANSLATE_NOOP("ebakus-core", ""
 "InstantSend requires inputs with at least %d confirmations, you might need "
 "to wait a few minutes and try again."),
@@ -217,10 +217,10 @@ QT_TRANSLATE_NOOP("ebakus-core", ""
 "Unable to locate enough PrivateSend denominated funds for this transaction."),
 QT_TRANSLATE_NOOP("ebakus-core", ""
 "Unable to locate enough PrivateSend non-denominated funds for this "
-"transaction that are not equal 1000 DASH."),
+"transaction that are not equal 1000 EBAKUS."),
 QT_TRANSLATE_NOOP("ebakus-core", ""
 "Unable to locate enough funds for this transaction that are not equal 1000 "
-"DASH."),
+"EBAKUS."),
 QT_TRANSLATE_NOOP("ebakus-core", ""
 "Unsupported argument -socks found. Setting SOCKS version isn't possible "
 "anymore, only SOCKS5 proxies are supported."),
@@ -377,7 +377,7 @@ QT_TRANSLATE_NOOP("ebakus-core", "Invalid port detected in masternode.conf"),
 QT_TRANSLATE_NOOP("ebakus-core", "Invalid script detected."),
 QT_TRANSLATE_NOOP("ebakus-core", "KeePassHttp id for the established association"),
 QT_TRANSLATE_NOOP("ebakus-core", "KeePassHttp key for AES encrypted communication with KeePass"),
-QT_TRANSLATE_NOOP("ebakus-core", "Keep N DASH anonymized (default: %u)"),
+QT_TRANSLATE_NOOP("ebakus-core", "Keep N EBAKUS anonymized (default: %u)"),
 QT_TRANSLATE_NOOP("ebakus-core", "Keep at most <n> unconnectable transactions in memory (default: %u)"),
 QT_TRANSLATE_NOOP("ebakus-core", "Keep the transaction memory pool below <n> megabytes (default: %u)"),
 QT_TRANSLATE_NOOP("ebakus-core", "Last PrivateSend was too recent."),

@@ -104,7 +104,7 @@ use old versions of Upstart and do not supply the start-stop-daemon utility.
 Copy ebakusd.init to /etc/init.d/ebakusd. Test by running `service ebakusd start`.
 
 Using this script, you can adjust the path and flags to the ebakusd program by
-setting the DASHD and FLAGS environment variables in the file
+setting the EBAKUSD and FLAGS environment variables in the file
 /etc/sysconfig/ebakusd. You can also use the DAEMONOPTS environment variable here.
 
 4e) Mac OS X
