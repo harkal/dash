@@ -42,7 +42,7 @@ QT_TRANSLATE_NOOP("dash-core", ""
 "notation for IPv6. This option can be specified multiple times (default: "
 "bind to all interfaces)"),
 QT_TRANSLATE_NOOP("dash-core", ""
-"Cannot obtain a lock on data directory %s. Dash Core is probably already "
+"Cannot obtain a lock on data directory %s. Ebakus Core is probably already "
 "running."),
 QT_TRANSLATE_NOOP("dash-core", ""
 "Create new files with system default permissions, instead of umask 077 (only "
@@ -51,7 +51,7 @@ QT_TRANSLATE_NOOP("dash-core", ""
 "Delete all wallet transactions and only recover those parts of the "
 "blockchain through -rescan on startup"),
 QT_TRANSLATE_NOOP("dash-core", ""
-"Disable all Dash specific functionality (Masternodes, PrivateSend, "
+"Disable all Ebakus specific functionality (Masternodes, PrivateSend, "
 "InstantSend, Governance) (0-1, default: %u)"),
 QT_TRANSLATE_NOOP("dash-core", ""
 "Discover own IP addresses (default: 1 when listening and no -externalip or -"
@@ -149,7 +149,7 @@ QT_TRANSLATE_NOOP("dash-core", ""
 "Output debugging information (default: %u, supplying <category> is optional)"),
 QT_TRANSLATE_NOOP("dash-core", ""
 "Please check that your computer's date and time are correct! If your clock "
-"is wrong Dash Core will not work properly."),
+"is wrong Ebakus Core will not work properly."),
 QT_TRANSLATE_NOOP("dash-core", ""
 "PrivateSend uses exact denominated amounts to send funds, you might simply "
 "need to anonymize some more coins."),
@@ -212,7 +212,7 @@ QT_TRANSLATE_NOOP("dash-core", ""
 "Tries to keep outbound traffic under the given target (in MiB per 24h), 0 = "
 "no limit (default: %d)"),
 QT_TRANSLATE_NOOP("dash-core", ""
-"Unable to bind to %s on this computer. Dash Core is probably already running."),
+"Unable to bind to %s on this computer. Ebakus Core is probably already running."),
 QT_TRANSLATE_NOOP("dash-core", ""
 "Unable to locate enough PrivateSend denominated funds for this transaction."),
 QT_TRANSLATE_NOOP("dash-core", ""
@@ -313,7 +313,7 @@ QT_TRANSLATE_NOOP("dash-core", "Connect to KeePassHttp on port <port> (default: 
 QT_TRANSLATE_NOOP("dash-core", "Connect to a node to retrieve peer addresses, and disconnect"),
 QT_TRANSLATE_NOOP("dash-core", "Connection options:"),
 QT_TRANSLATE_NOOP("dash-core", "Copyright (C) 2009-%i The Bitcoin Core Developers"),
-QT_TRANSLATE_NOOP("dash-core", "Copyright (C) 2014-%i The Dash Core Developers"),
+QT_TRANSLATE_NOOP("dash-core", "Copyright (C) 2014-%i The Dash Core developers"),
 QT_TRANSLATE_NOOP("dash-core", "Corrupted block database detected"),
 QT_TRANSLATE_NOOP("dash-core", "Could not parse masternode.conf"),
 QT_TRANSLATE_NOOP("dash-core", "Debugging/Testing options:"),
@@ -336,7 +336,7 @@ QT_TRANSLATE_NOOP("dash-core", "Error initializing wallet database environment %
 QT_TRANSLATE_NOOP("dash-core", "Error loading block database"),
 QT_TRANSLATE_NOOP("dash-core", "Error loading wallet.dat"),
 QT_TRANSLATE_NOOP("dash-core", "Error loading wallet.dat: Wallet corrupted"),
-QT_TRANSLATE_NOOP("dash-core", "Error loading wallet.dat: Wallet requires newer version of Dash Core"),
+QT_TRANSLATE_NOOP("dash-core", "Error loading wallet.dat: Wallet requires newer version of Ebakus Core"),
 QT_TRANSLATE_NOOP("dash-core", "Error opening block database"),
 QT_TRANSLATE_NOOP("dash-core", "Error reading from database, shutting down."),
 QT_TRANSLATE_NOOP("dash-core", "Error"),
@@ -359,7 +359,7 @@ QT_TRANSLATE_NOOP("dash-core", "Incompatible mode."),
 QT_TRANSLATE_NOOP("dash-core", "Incompatible version."),
 QT_TRANSLATE_NOOP("dash-core", "Incorrect or no genesis block found. Wrong datadir for network?"),
 QT_TRANSLATE_NOOP("dash-core", "Information"),
-QT_TRANSLATE_NOOP("dash-core", "Initialization sanity check failed. Dash Core is shutting down."),
+QT_TRANSLATE_NOOP("dash-core", "Initialization sanity check failed. Ebakus Core is shutting down."),
 QT_TRANSLATE_NOOP("dash-core", "Input is not valid."),
 QT_TRANSLATE_NOOP("dash-core", "InstantSend options:"),
 QT_TRANSLATE_NOOP("dash-core", "Insufficient funds."),
@@ -508,7 +508,7 @@ QT_TRANSLATE_NOOP("dash-core", "Verifying wallet..."),
 QT_TRANSLATE_NOOP("dash-core", "Very low number of keys left: %d"),
 QT_TRANSLATE_NOOP("dash-core", "Wallet %s resides outside data directory %s"),
 QT_TRANSLATE_NOOP("dash-core", "Wallet is locked."),
-QT_TRANSLATE_NOOP("dash-core", "Wallet needed to be rewritten: restart Dash Core to complete"),
+QT_TRANSLATE_NOOP("dash-core", "Wallet needed to be rewritten: restart Ebakus Core to complete"),
 QT_TRANSLATE_NOOP("dash-core", "Wallet options:"),
 QT_TRANSLATE_NOOP("dash-core", "Wallet window title"),
 QT_TRANSLATE_NOOP("dash-core", "Warning"),

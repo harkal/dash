@@ -104,7 +104,7 @@ namespace boost {
 
 using namespace std;
 
-//Dash only features
+//Ebakus only features
 bool fMasterNode = false;
 bool fLiteMode = false;
 /**
@@ -271,7 +271,7 @@ bool LogAcceptCategory(const char* category)
             const vector<string>& categories = mapMultiArgs["-debug"];
             ptrCategory.reset(new set<string>(categories.begin(), categories.end()));
             // thread_specific_ptr automatically deletes the set when the thread ends.
-            // "dash" is a composite category enabling all Dash-related debug output
+            // "dash" is a composite category enabling all Ebakus-related debug output
             if(ptrCategory->count(string("dash"))) {
                 ptrCategory->insert(string("privatesend"));
                 ptrCategory->insert(string("instantsend"));

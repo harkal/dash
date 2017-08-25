@@ -51,7 +51,7 @@
 using namespace std;
 
 #if defined(NDEBUG)
-# error "Dash Core cannot be compiled without assertions."
+# error "Ebakus Core cannot be compiled without assertions."
 #endif
 
 /**
