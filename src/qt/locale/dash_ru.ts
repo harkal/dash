@@ -3963,7 +3963,7 @@ https://www.transifex.com/projects/p/dash/</translation>
     </message>
     <message>
         <source>Unable to locate enough funds for this transaction that are not equal 1000 DASH.</source>
-        <translation>Не удалось обнаружить достаточных для выполнения этой транзакции средств, отличающихся от 1000DRK.</translation>
+        <translation>Не удалось обнаружить достаточных для выполнения этой транзакции средств, отличающихся от 1000EBK.</translation>
     </message>
     <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>

@@ -846,15 +846,15 @@ Indirizzo: %4
     </message>
     <message>
         <source>This option is the quickest and will cost about ~0.025 DASH to anonymize 1000 DASH</source>
-        <translation>Questa opzione è la più veloce e ti costerà ~0.025DRK circa per anonimizzare 1000DRK</translation>
+        <translation>Questa opzione è la più veloce e ti costerà ~0.025EBK circa per anonimizzare 1000EBK</translation>
     </message>
     <message>
         <source>This option is moderately fast and will cost about 0.05 DASH to anonymize 1000 DASH</source>
-        <translation>Questa opzione è moderatamente veloce e costerà 0.05DRK circa per anonimizzare 1000DRK</translation>
+        <translation>Questa opzione è moderatamente veloce e costerà 0.05EBK circa per anonimizzare 1000EBK</translation>
     </message>
     <message>
         <source>0.1 DASH per 1000 DASH you anonymize.</source>
-        <translation>0.1DRK ogni 1000DRK anonimizzati.</translation>
+        <translation>0.1EBK ogni 1000EBK anonimizzati.</translation>
     </message>
     <message>
         <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
