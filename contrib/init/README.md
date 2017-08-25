@@ -1,11 +1,11 @@
 Sample configuration files for:
 
-SystemD: dashd.service
-Upstart: dashd.conf
-OpenRC:  dashd.openrc
-         dashd.openrcconf
-CentOS:  dashd.init
-OS X:    org.dash.dashd.plist
+SystemD: ebakusd.service
+Upstart: ebakusd.conf
+OpenRC:  ebakusd.openrc
+         ebakusd.openrcconf
+CentOS:  ebakusd.init
+OS X:    org.ebakus.ebakusd.plist
 
 have been made available to assist packagers in creating node packages here.
 

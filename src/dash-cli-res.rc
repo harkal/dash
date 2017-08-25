@@ -17,13 +17,13 @@ BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
             VALUE "CompanyName",        "Ebakus"
-            VALUE "FileDescription",    "dash-cli (JSON-RPC client for Ebakus Core)"
+            VALUE "FileDescription",    "ebakus-cli (JSON-RPC client for Ebakus Core)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
-            VALUE "InternalName",       "dash-cli"
+            VALUE "InternalName",       "ebakus-cli"
             VALUE "LegalCopyright",     COPYRIGHT_STR
             VALUE "LegalTrademarks1",   "Distributed under the MIT software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
-            VALUE "OriginalFilename",   "dash-cli.exe"
-            VALUE "ProductName",        "dash-cli"
+            VALUE "OriginalFilename",   "ebakus-cli.exe"
+            VALUE "ProductName",        "ebakus-cli"
             VALUE "ProductVersion",     VER_PRODUCTVERSION_STR
         END
     END

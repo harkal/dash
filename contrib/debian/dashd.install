@@ -1,2 +1,2 @@
-usr/local/bin/dashd usr/bin
-usr/local/bin/dash-cli usr/bin
+usr/local/bin/ebakusd usr/bin
+usr/local/bin/ebakus-cli usr/bin

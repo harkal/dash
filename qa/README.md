@@ -31,9 +31,9 @@ Possible options:
 
 ```
   -h, --help            show this help message and exit
-  --nocleanup           Leave dashds and test.* datadir on exit or error
-  --noshutdown          Don't stop dashds after the test execution
-  --srcdir=SRCDIR       Source directory containing dashd/dash-cli
+  --nocleanup           Leave ebakusds and test.* datadir on exit or error
+  --noshutdown          Don't stop ebakusds after the test execution
+  --srcdir=SRCDIR       Source directory containing ebakusd/ebakus-cli
                         (default: ../../src)
   --tmpdir=TMPDIR       Root directory for datadirs
   --tracerpc            Print out all RPC calls as they are made
@@ -58,7 +58,7 @@ to recover with:
 
 ```bash
 rm -rf cache
-killall dashd
+killall ebakusd
 ```
 
 Writing tests

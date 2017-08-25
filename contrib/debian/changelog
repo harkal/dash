@@ -236,7 +236,7 @@ bitcoin (0.5.3-natty0) natty; urgency=low
 
   * New upstream release.
 
- -- Luke Dashjr <luke+bitcoin+deb@dashjr.org>  Tue, 10 Jan 2012 15:57:00 -0500
+ -- Luke Dashjr <luke+bitcoin+deb@ebakusjr.org>  Tue, 10 Jan 2012 15:57:00 -0500
 
 bitcoin (0.5.2-natty1) natty; urgency=low
 
@@ -251,7 +251,7 @@ bitcoin (0.5.2-natty0) natty; urgency=low
 
   * New upstream release.
 
- -- Luke Dashjr <luke+bitcoin+deb@dashjr.org>  Fri, 16 Dec 2011 17:57:00 -0500
+ -- Luke Dashjr <luke+bitcoin+deb@ebakusjr.org>  Fri, 16 Dec 2011 17:57:00 -0500
 
 bitcoin (0.5.1-natty0) natty; urgency=low
 
@@ -393,7 +393,7 @@ bitcoin (0.3.21~dfsg-1) unstable; urgency=low
     longer needed.
   * Link against unversioned berkeleydb. Update NEWS and README.Debian
     accordingly (and improve wording while at it).
-    Closes: Bug#621425. Thanks to Ondřej Surý.
+    Closes: Bug#621425. Thanks to Ond??ej Sur??.
   * This release also implicitly updates linkage against libcrypto++,
     which closes: bug#626953, #627024.
   * Disable linkage against not yet Debian packaged MiniUPnP.

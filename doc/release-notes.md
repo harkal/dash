@@ -1,6 +1,6 @@
 Ebakus Core version 0.12.1 is now available from:
 
-  <https://www.dash.org/downloads/>
+  <https://www.ebakus.org/downloads/>
 
 
 
@@ -106,10 +106,10 @@ Ebakus Core tree 0.12.0.x was a fork of Bitcoin Core tree 0.10.
 
 These release are considered obsolete. Old changelogs can be found here:
 
-- [v0.12.0](release-notes/dash/release-notes-0.12.0.md) released ???/??/2015
-- [v0.11.2](release-notes/dash/release-notes-0.11.2.md) released Mar/25/2015
-- [v0.11.1](release-notes/dash/release-notes-0.11.1.md) released Feb/10/2015
-- [v0.11.0](release-notes/dash/release-notes-0.11.0.md) released Jan/15/2015
-- [v0.10.x](release-notes/dash/release-notes-0.10.0.md) released Sep/25/2014
-- [v0.9.x](release-notes/dash/release-notes-0.9.0.md) released Mar/13/2014
+- [v0.12.0](release-notes/ebakus/release-notes-0.12.0.md) released ???/??/2015
+- [v0.11.2](release-notes/ebakus/release-notes-0.11.2.md) released Mar/25/2015
+- [v0.11.1](release-notes/ebakus/release-notes-0.11.1.md) released Feb/10/2015
+- [v0.11.0](release-notes/ebakus/release-notes-0.11.0.md) released Jan/15/2015
+- [v0.10.x](release-notes/ebakus/release-notes-0.10.0.md) released Sep/25/2014
+- [v0.9.x](release-notes/ebakus/release-notes-0.9.0.md) released Mar/13/2014
 

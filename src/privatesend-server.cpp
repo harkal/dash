@@ -893,7 +893,7 @@ void ThreadCheckPrivateSendServer()
     fOneThread = true;
 
     // Make this thread recognisable as the PrivateSend thread
-    RenameThread("dash-ps-server");
+    RenameThread("ebakus-ps-server");
 
     unsigned int nTick = 0;
 

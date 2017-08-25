@@ -343,19 +343,19 @@ static const CRPCCommand vRPCCommands[] =
 #endif
 
     /* Ebakus features */
-    { "dash",               "masternode",             &masternode,             true  },
-    { "dash",               "masternodelist",         &masternodelist,         true  },
-    { "dash",               "masternodebroadcast",    &masternodebroadcast,    true  },
-    { "dash",               "gobject",                &gobject,                true  },
-    { "dash",               "getgovernanceinfo",      &getgovernanceinfo,      true  },
-    { "dash",               "getsuperblockbudget",    &getsuperblockbudget,    true  },
-    { "dash",               "voteraw",                &voteraw,                true  },
-    { "dash",               "mnsync",                 &mnsync,                 true  },
-    { "dash",               "spork",                  &spork,                  true  },
-    { "dash",               "getpoolinfo",            &getpoolinfo,            true  },
-    { "dash",               "sentinelping",           &sentinelping,           true  },
+    { "ebakus",               "masternode",             &masternode,             true  },
+    { "ebakus",               "masternodelist",         &masternodelist,         true  },
+    { "ebakus",               "masternodebroadcast",    &masternodebroadcast,    true  },
+    { "ebakus",               "gobject",                &gobject,                true  },
+    { "ebakus",               "getgovernanceinfo",      &getgovernanceinfo,      true  },
+    { "ebakus",               "getsuperblockbudget",    &getsuperblockbudget,    true  },
+    { "ebakus",               "voteraw",                &voteraw,                true  },
+    { "ebakus",               "mnsync",                 &mnsync,                 true  },
+    { "ebakus",               "spork",                  &spork,                  true  },
+    { "ebakus",               "getpoolinfo",            &getpoolinfo,            true  },
+    { "ebakus",               "sentinelping",           &sentinelping,           true  },
 #ifdef ENABLE_WALLET
-    { "dash",               "privatesend",            &privatesend,            false },
+    { "ebakus",               "privatesend",            &privatesend,            false },
 
     /* Wallet */
     { "wallet",             "keepass",                &keepass,                true },
@@ -579,7 +579,7 @@ std::vector<std::string> CRPCTable::listCommands() const
 
 std::string HelpExampleCli(const std::string& methodname, const std::string& args)
 {
-    return "> dash-cli " + methodname + " " + args + "\n";
+    return "> ebakus-cli " + methodname + " " + args + "\n";
 }
 
 std::string HelpExampleRpc(const std::string& methodname, const std::string& args)

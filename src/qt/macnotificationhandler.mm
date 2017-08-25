@@ -13,7 +13,7 @@
 - (NSString *)__bundleIdentifier
 {
     if (self == [NSBundle mainBundle]) {
-        return @"org.dash.Ebakus-Qt";
+        return @"org.ebakus.Ebakus-Qt";
     } else {
         return [self __bundleIdentifier];
     }

@@ -1,7 +1,7 @@
 Ebakus Core 0.12.1
 =====================
 
-This is the official reference wallet for Ebakus digital currency and comprises the backbone of the Ebakus peer-to-peer network. You can [download Ebakus Core](https://www.dash.org/downloads/) or [build it yourself](#building) using the guides below.
+This is the official reference wallet for Ebakus digital currency and comprises the backbone of the Ebakus peer-to-peer network. You can [download Ebakus Core](https://www.ebakus.org/downloads/) or [build it yourself](#building) using the guides below.
 
 Running
 ---------------------
@@ -11,12 +11,12 @@ The following are some helpful notes on how to run Ebakus on your native platfor
 
 Unpack the files into a directory and run:
 
-- `bin/dash-qt` (GUI) or
-- `bin/dashd` (headless)
+- `bin/ebakus-qt` (GUI) or
+- `bin/ebakusd` (headless)
 
 ### Windows
 
-Unpack the files into a directory, and then run dash-qt.exe.
+Unpack the files into a directory, and then run ebakus-qt.exe.
 
 ### OS X
 
@@ -24,10 +24,10 @@ Drag Ebakus-Qt to your applications folder, and then run Ebakus-Qt.
 
 ### Need Help?
 
-* See the [Ebakus documentation](https://dashpay.atlassian.net/wiki/display/DOC)
+* See the [Ebakus documentation](https://ebakuspay.atlassian.net/wiki/display/DOC)
 for help and more information.
-* Ask for help on [#dashpay](http://webchat.freenode.net?channels=dashpay) on Freenode. If you don't have an IRC client use [webchat here](http://webchat.freenode.net?channels=dashpay).
-* Ask for help on the [DashTalk](https://dashtalk.org/) forums.
+* Ask for help on [#ebakuspay](http://webchat.freenode.net?channels=ebakuspay) on Freenode. If you don't have an IRC client use [webchat here](http://webchat.freenode.net?channels=ebakuspay).
+* Ask for help on the [DashTalk](https://ebakustalk.org/) forums.
 
 Building
 ---------------------
@@ -57,8 +57,8 @@ The Ebakus Core repo's [root README](/README.md) contains relevant information o
 - [Dnsseed Policy](dnsseed-policy.md)
 
 ### Resources
-* Discuss on the [DashTalk](https://dashtalk.org/) forums, in the Development & Technical Discussion board.
-* Discuss on [#dashpay](http://webchat.freenode.net/?channels=dashpay) on Freenode. If you don't have an IRC client use [webchat here](http://webchat.freenode.net/?channels=dashpay).
+* Discuss on the [DashTalk](https://ebakustalk.org/) forums, in the Development & Technical Discussion board.
+* Discuss on [#ebakuspay](http://webchat.freenode.net/?channels=ebakuspay) on Freenode. If you don't have an IRC client use [webchat here](http://webchat.freenode.net/?channels=ebakuspay).
 
 ### Miscellaneous
 - [Assets Attribution](assets-attribution.md)

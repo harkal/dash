@@ -17,13 +17,13 @@ BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
             VALUE "CompanyName",        "Ebakus"
-            VALUE "FileDescription",    "dashd (Ebakus node with a JSON-RPC server)"
+            VALUE "FileDescription",    "ebakusd (Ebakus node with a JSON-RPC server)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
-            VALUE "InternalName",       "dashd"
+            VALUE "InternalName",       "ebakusd"
             VALUE "LegalCopyright",     COPYRIGHT_STR
             VALUE "LegalTrademarks1",   "Distributed under the MIT software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
-            VALUE "OriginalFilename",   "dashd.exe"
-            VALUE "ProductName",        "dashd"
+            VALUE "OriginalFilename",   "ebakusd.exe"
+            VALUE "ProductName",        "ebakusd"
             VALUE "ProductVersion",     VER_PRODUCTVERSION_STR
         END
     END
