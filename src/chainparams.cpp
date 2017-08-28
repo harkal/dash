@@ -163,10 +163,7 @@ public:
                     printf("block.hashMerkleRoot = %s\n", genesis.hashMerkleRoot.ToString().c_str());
             }
 
-        vSeeds.push_back(CDNSSeedData("ebakus.org", "dnsseed.ebakus.org"));
-        vSeeds.push_back(CDNSSeedData("ebakusdot.io", "dnsseed.ebakusdot.io"));
-        vSeeds.push_back(CDNSSeedData("masternode.io", "dnsseed.masternode.io"));
-        vSeeds.push_back(CDNSSeedData("ebakuspay.io", "dnsseed.ebakuspay.io"));
+        vSeeds.push_back(CDNSSeedData("ebakus.org", "192.168.1.39"));
 
         // Ebakus addresses start with 'X'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,76);
@@ -273,8 +270,7 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("ebakusdot.io",  "testnet-seed.ebakusdot.io"));
-        vSeeds.push_back(CDNSSeedData("masternode.io", "test.dnsseed.masternode.io"));
+        vSeeds.push_back(CDNSSeedData("ebakus.org", "192.168.1.39"));
 
         // Testnet Ebakus addresses start with 'y'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,140);
