@@ -850,7 +850,7 @@ bool CNetAddr::IsValid() const
 
 bool CNetAddr::IsRoutable() const
 {
-     Be more relaxed in testnet to allow for more elaborate test environments
+    // Be more relaxed in testnet to allow for more elaborate test environments
     if (Params().NetworkIDString() == CBaseChainParams::TESTNET) {
         return IsValid();
     } else {
