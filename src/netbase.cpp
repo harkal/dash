@@ -16,6 +16,8 @@
 #include "util.h"
 #include "utilstrencodings.h"
 
+#include "chainparams.h"
+
 #include <atomic>
 
 #ifndef WIN32
@@ -848,7 +850,12 @@ bool CNetAddr::IsValid() const
 
 bool CNetAddr::IsRoutable() const
 {
-    return IsValid() && !(IsRFC1918() || IsRFC2544() || IsRFC3927() || IsRFC4862() || IsRFC6598() || IsRFC5737() || (IsRFC4193() && !IsTor()) || IsRFC4843() || IsLocal());
+     Be more relaxed in testnet to allow for more elaborate test environments
+    if (Params().NetworkIDString() == CBaseChainParams::TESTNET) {
+        return IsValid();
+    } else {
+        return IsValid() && !(IsRFC1918() || IsRFC2544() || IsRFC3927() || IsRFC4862() || IsRFC6598() || IsRFC5737() || (IsRFC4193() && !IsTor()) || IsRFC4843() || IsLocal());
+    }
 }
 
 enum Network CNetAddr::GetNetwork() const
