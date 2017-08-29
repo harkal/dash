@@ -406,7 +406,7 @@ bool CMasternodeBroadcast::Create(CTxIn txin, CService service, CKey keyCollater
     mnbRet = CMasternodeBroadcast(service, txin, pubKeyCollateralAddressNew, pubKeyMasternodeNew, PROTOCOL_VERSION);
 
     if (!mnbRet.IsValidNetAddr())
-        return Log(strprintf("Invalid IP address, masternode=%s", txin.prevout.ToStringShort()));
+        return Log(strprintf("Invalid IP address, masternode=%s addr=%s", txin.prevout.ToStringShort(), mnbRet.addr.ToString()));
 
     mnbRet.lastPing = mnp;
     if (!mnbRet.Sign(keyCollateralAddressNew))

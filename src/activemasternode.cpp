@@ -261,7 +261,7 @@ void CActiveMasternode::ManageStateRemote()
             return;
         }
         if(nState != ACTIVE_MASTERNODE_STARTED) {
-            LogPrintf("CActiveMasternode::ManageStateRemote -- STARTED!\n");
+            LogPrintf("CActiveMasternode::ManageStateRemote -- STARTED! (address=%s)\n", infoMn.addr.ToString());
             vin = infoMn.vin;
             service = infoMn.addr;
             fPingerEnabled = true;
