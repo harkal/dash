@@ -300,6 +300,9 @@ struct CMutableTransaction
     std::vector<CTxOut> vout;
     uint32_t nLockTime;
 
+    // Ebakus transaction
+
+
     CMutableTransaction();
     CMutableTransaction(const CTransaction& tx);
 
