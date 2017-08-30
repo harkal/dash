@@ -5,6 +5,7 @@
 #include "hash.h"
 #include "utilstrencodings.h"
 #include "test/test_ebakus.h"
+#include "crypto/sha3.h"
 
 #include <vector>
 
@@ -45,6 +46,16 @@ BOOST_AUTO_TEST_CASE(murmurhash3)
     T(0xb4698def, 0x00000000, "001122334455667788");
 
 #undef T
+}
+
+BOOST_AUTO_TEST_CASE(sha3)
+{
+    unsigned char hash[32];
+    CSHA3 sha3();
+    sha3.Write("harry", 5);
+    sha3.Finalize(hash);
+
+    BOOST_CHECK_EQUAL("harry", 0x86bc54bc9502a97cbfedcb5723a4135a40089b4e194e57e598347f5d1bcea9ac);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
