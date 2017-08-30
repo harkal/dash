@@ -50,12 +50,16 @@ BOOST_AUTO_TEST_CASE(murmurhash3)
 
 BOOST_AUTO_TEST_CASE(sha3)
 {
-    unsigned char hash[32];
-    CSHA3 sha3();
-    sha3.Write("harry", 5);
-    sha3.Finalize(hash);
+    vector<unsigned char> hash =
+    CSHA3()
+        .Write(reinterpret_cast <const unsigned char*>("harry"), 5)
+        .Finalize();
 
-    BOOST_CHECK_EQUAL("harry", 0x86bc54bc9502a97cbfedcb5723a4135a40089b4e194e57e598347f5d1bcea9ac);
+    auto expected = ParseHex("0x86bc54bc9502a97cbfedcb5723a4135a40089b4e194e57e598347f5d1bcea9ac");
+    BOOST_CHECK_EQUAL_COLLECTIONS(hash.begin(),
+                                  hash.end(),
+                                  expected.begin(),
+                                  expected.end());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

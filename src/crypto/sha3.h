@@ -8,6 +8,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#include <vector>
+
 #include "crypto/sph_keccak.h"
 
 class CSHA3
@@ -18,6 +20,7 @@ public:
     CSHA3();
     CSHA3& Write(const unsigned char* data, size_t len);
     void Finalize(unsigned char hash[OUTPUT_SIZE]);
+    std::vector<unsigned char> Finalize();
     CSHA3& Reset();
 
 private:
