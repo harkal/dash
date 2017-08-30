@@ -2,21 +2,21 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "crypto/sha3.h"
+#include "crypto/keccak256.h"
 #include "crypto/common.h"
 
-CSHA3::CSHA3()
+CKeccak256::CKeccak256()
 {
     sph_keccak256_init(&cc);
 }
 
-CSHA3& CSHA3::Write(const unsigned char* data, size_t len)
+CKeccak256& CKeccak256::Write(const unsigned char* data, size_t len)
 {
     sph_keccak256(&cc, data, len);
     return *this;
 }
 
-void CSHA3::Finalize(unsigned char hash[OUTPUT_SIZE])
+void CKeccak256::Finalize(unsigned char hash[OUTPUT_SIZE])
 {
     uint64_t _h[4];
 
@@ -28,20 +28,20 @@ void CSHA3::Finalize(unsigned char hash[OUTPUT_SIZE])
     WriteBE64(hash + 24, _h[0]);
 }
 
-std::vector<unsigned char> CSHA3::Finalize()
+std::vector<unsigned char> CKeccak256::Finalize()
 {
     unsigned char hash[OUTPUT_SIZE];
     Finalize(hash);
     std::vector<unsigned char> ret;
 
     ret.reserve(OUTPUT_SIZE);
-    for(int i = 0 ; i < OUTPUT_SIZE ; ++i)
+    for(size_t i = 0 ; i < OUTPUT_SIZE ; ++i)
         ret.push_back(hash[i]);
 
     return ret;
 }
 
-CSHA3& CSHA3::Reset()
+CKeccak256& CKeccak256::Reset()
 {
     sph_keccak256_init(&cc);
     return *this;
