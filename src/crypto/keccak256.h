@@ -8,19 +8,21 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <vector>
-
 #include "crypto/sph_keccak.h"
+#include "../common.h"
 
 class CKeccak256
 {
+    using Byte = common::Byte;
+    using Bytes = common::Bytes;
+
 public:
     static const size_t OUTPUT_SIZE = 32;
 
     CKeccak256();
-    CKeccak256& Write(const unsigned char* data, size_t len);
-    void Finalize(unsigned char hash[OUTPUT_SIZE]);
-    std::vector<unsigned char> Finalize();
+    CKeccak256& Write(const Byte* data, size_t len);
+    void Finalize(Byte hash[OUTPUT_SIZE]);
+    Bytes Finalize();
     CKeccak256& Reset();
 
 private:

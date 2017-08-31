@@ -10,13 +10,13 @@ CKeccak256::CKeccak256()
     sph_keccak256_init(&cc);
 }
 
-CKeccak256& CKeccak256::Write(const unsigned char* data, size_t len)
+CKeccak256& CKeccak256::Write(const Byte* data, size_t len)
 {
     sph_keccak256(&cc, data, len);
     return *this;
 }
 
-void CKeccak256::Finalize(unsigned char hash[OUTPUT_SIZE])
+void CKeccak256::Finalize(Byte hash[OUTPUT_SIZE])
 {
     uint64_t _h[4];
 
@@ -28,7 +28,7 @@ void CKeccak256::Finalize(unsigned char hash[OUTPUT_SIZE])
     WriteBE64(hash + 24, _h[0]);
 }
 
-std::vector<unsigned char> CKeccak256::Finalize()
+common::Bytes CKeccak256::Finalize()
 {
     unsigned char hash[OUTPUT_SIZE];
     Finalize(hash);

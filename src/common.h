@@ -8,12 +8,13 @@
 #include <unordered_set>
 #include <functional>
 #include <string>
+
 #include <boost/multiprecision/cpp_int.hpp>
 
 namespace common {
-    using byte = unsigned char;
-    using bytes = std::vector<byte>;
-    extern bytes const NullBytes;
+    using Byte = unsigned char;
+    using Bytes = std::vector<Byte>;
+    extern Bytes const NullBytes;
 
     // Primitive data types
     using bigint = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<>>;
@@ -37,7 +38,7 @@ namespace common {
     using StringHashMap = std::unordered_map<std::string, std::string>;
 
     // Strings
-    using strings = std::vector<std::string>;
+    using Strings = std::vector<std::string>;
     extern std::string const EmptyString;
 }
 

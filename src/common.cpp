@@ -3,5 +3,5 @@
 
 namespace common {
     std::string const EmptyString;
-    bytes const NullBytes;
+    Bytes const NullBytes;
 }
