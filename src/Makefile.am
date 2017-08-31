@@ -313,7 +313,9 @@ crypto_libbitcoin_crypto_a_SOURCES = \
   crypto/sha512.cpp \
   crypto/sha512.h \
   crypto/keccak256.cpp \
-  crypto/keccak256.h
+  crypto/keccak256.h \
+  crypto/hash.cpp \
+  crypto/hash.h 
 
 # x11
 crypto_libbitcoin_crypto_a_SOURCES += \
