@@ -14,6 +14,7 @@
 #include "serialize.h"
 #include "uint256.h"
 #include "version.h"
+#include "crypto/hash.h"
 
 #include <stdint.h>
 #include <string>
@@ -315,8 +316,8 @@ class CInv
 {
 public:
     CInv();
-    CInv(int typeIn, const uint256& hashIn);
-    CInv(const std::string& strType, const uint256& hashIn);
+    CInv(int typeIn, const H256& hashIn);
+    CInv(const std::string& strType, const H256& hashIn);
 
     ADD_SERIALIZE_METHODS;
 
@@ -336,7 +337,7 @@ public:
     // TODO: make private (improves encapsulation)
 public:
     int type;
-    uint256 hash;
+    H256 hash;
 };
 
 enum {

@@ -172,7 +172,7 @@ public: // Types
     };
 
 
-    typedef std::map<uint256, CGovernanceObject> object_m_t;
+    typedef std::map<H256, CGovernanceObject> object_m_t;
 
     typedef object_m_t::iterator object_m_it;
 
@@ -374,15 +374,15 @@ public:
     int GetCachedBlockHeight() { return nCachedBlockHeight; }
 
     // Accessors for thread-safe access to maps
-    bool HaveObjectForHash(uint256 nHash);
+    bool HaveObjectForHash(H256 nHash);
 
-    bool HaveVoteForHash(uint256 nHash);
+    bool HaveVoteForHash(H256 nHash);
 
     int GetVoteCount() const;
 
-    bool SerializeObjectForHash(uint256 nHash, CDataStream& ss);
+    bool SerializeObjectForHash(H256 nHash, CDataStream& ss);
 
-    bool SerializeVoteForHash(uint256 nHash, CDataStream& ss);
+    bool SerializeVoteForHash(H256 nHash, CDataStream& ss);
 
     void AddPostponedObject(const CGovernanceObject& govobj)
     {
@@ -390,7 +390,7 @@ public:
         mapPostponedObjects.insert(std::make_pair(govobj.GetHash(), govobj));
     }
 
-    void AddSeenGovernanceObject(uint256 nHash, int status);
+    void AddSeenGovernanceObject(H256 nHash, int status);
 
     void AddSeenVote(uint256 nHash, int status);
 
@@ -425,7 +425,7 @@ public:
     int RequestGovernanceObjectVotes(const std::vector<CNode*>& vNodesCopy);
 
 private:
-    void RequestGovernanceObject(CNode* pfrom, const uint256& nHash, bool fUseFilter = false);
+    void RequestGovernanceObject(CNode* pfrom, const H256& nHash, bool fUseFilter = false);
 
     void AddInvalidVote(const CGovernanceVote& vote)
     {
@@ -440,12 +440,12 @@ private:
     bool ProcessVote(CNode* pfrom, const CGovernanceVote& vote, CGovernanceException& exception);
 
     /// Called to indicate a requested object has been received
-    bool AcceptObjectMessage(const uint256& nHash);
+    bool AcceptObjectMessage(const H256& nHash);
 
     /// Called to indicate a requested vote has been received
-    bool AcceptVoteMessage(const uint256& nHash);
+    bool AcceptVoteMessage(const H256& nHash);
 
-    static bool AcceptMessage(const uint256& nHash, hash_s_t& setHash);
+    static bool AcceptMessage(const H256& nHash, hash_s_t& setHash);
 
     void CheckOrphanVotes(CGovernanceObject& govobj, CGovernanceException& exception);
 

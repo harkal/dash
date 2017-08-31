@@ -89,7 +89,7 @@ namespace {
      * Memory used: 1.7MB
      */
     boost::scoped_ptr<CRollingBloomFilter> recentRejects;
-    uint256 hashRecentRejectsChainTip;
+    H256 hashRecentRejectsChainTip;
 
     /** Blocks that are in flight, and that are in the queue to be downloaded. Protected by cs_main. */
     struct QueuedBlock {
@@ -117,7 +117,7 @@ namespace {
 struct CBlockReject {
     unsigned char chRejectCode;
     string strRejectReason;
-    uint256 hashBlock;
+    H256 hashBlock;
 };
 
 /**
@@ -856,7 +856,7 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                             // they must either disconnect and retry or request the full block.
                             // Thus, the protocol spec specified allows for us to provide duplicate txn here,
                             // however we MUST always provide at least what the remote peer needs
-                            typedef std::pair<unsigned int, uint256> PairType;
+                            typedef std::pair<unsigned int, H256> PairType;
                             BOOST_FOREACH(PairType& pair, merkleBlock.vMatchedTxn)
                                 connman.PushMessage(pfrom, NetMsgType::TX, block.vtx[pair.first]);
                         }

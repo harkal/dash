@@ -6,6 +6,7 @@
 #define BITCOIN_BLOOM_H
 
 #include "serialize.h"
+#include "crypto/hash.h"
 
 #include <vector>
 
@@ -82,11 +83,11 @@ public:
 
     void insert(const std::vector<unsigned char>& vKey);
     void insert(const COutPoint& outpoint);
-    void insert(const uint256& hash);
+    void insert(const H256& hash);
 
     bool contains(const std::vector<unsigned char>& vKey) const;
     bool contains(const COutPoint& outpoint) const;
-    bool contains(const uint256& hash) const;
+    bool contains(const H256& hash) const;
 
     void clear();
     void reset(unsigned int nNewTweak);
@@ -122,9 +123,9 @@ public:
     CRollingBloomFilter(unsigned int nElements, double nFPRate);
 
     void insert(const std::vector<unsigned char>& vKey);
-    void insert(const uint256& hash);
+    void insert(const H256& hash);
     bool contains(const std::vector<unsigned char>& vKey) const;
-    bool contains(const uint256& hash) const;
+    bool contains(const H256& hash) const;
 
     void reset();
 

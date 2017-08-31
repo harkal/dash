@@ -48,11 +48,11 @@ public:
 
     static CHash Random() { CHash ret; ret.Randomize(); return ret; }
 
-    Bytes AsBytes() const { return Bytes(mData(), mData() + N); }
+    Bytes AsBytes() const { return Bytes(mData.begin(), mData.end()); }
 
     void SetNull() { mData.fill(0); }
     bool IsNull() const {
-        for (int i = 0 ; i < N ; i++) if (mData[i] != 0)
+        for (unsigned int i = 0 ; i < N ; i++) if (mData[i] != 0)
             return false;
         return true;
     }

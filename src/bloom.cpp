@@ -79,10 +79,9 @@ void CBloomFilter::insert(const COutPoint& outpoint)
     insert(data);
 }
 
-void CBloomFilter::insert(const uint256& hash)
+void CBloomFilter::insert(const H256& hash)
 {
-    vector<unsigned char> data(hash.begin(), hash.end());
-    insert(data);
+    insert(hash.AsBytes());
 }
 
 bool CBloomFilter::contains(const vector<unsigned char>& vKey) const
@@ -109,10 +108,9 @@ bool CBloomFilter::contains(const COutPoint& outpoint) const
     return contains(data);
 }
 
-bool CBloomFilter::contains(const uint256& hash) const
+bool CBloomFilter::contains(const H256& hash) const
 {
-    vector<unsigned char> data(hash.begin(), hash.end());
-    return contains(data);
+    return contains(hash.AsBytes());
 }
 
 void CBloomFilter::clear()
@@ -243,10 +241,9 @@ void CRollingBloomFilter::insert(const std::vector<unsigned char>& vKey)
     }
 }
 
-void CRollingBloomFilter::insert(const uint256& hash)
+void CRollingBloomFilter::insert(const H256& hash)
 {
-    vector<unsigned char> data(hash.begin(), hash.end());
-    insert(data);
+    insert(hash.AsBytes());
 }
 
 bool CRollingBloomFilter::contains(const std::vector<unsigned char>& vKey) const
@@ -257,10 +254,9 @@ bool CRollingBloomFilter::contains(const std::vector<unsigned char>& vKey) const
     return b1.contains(vKey);
 }
 
-bool CRollingBloomFilter::contains(const uint256& hash) const
+bool CRollingBloomFilter::contains(const H256& hash) const
 {
-    vector<unsigned char> data(hash.begin(), hash.end());
-    return contains(data);
+    return contains(hash.AsBytes());
 }
 
 void CRollingBloomFilter::reset()
