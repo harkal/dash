@@ -42,7 +42,7 @@ CGovernanceObject::CGovernanceObject()
     LoadData();
 }
 
-CGovernanceObject::CGovernanceObject(uint256 nHashParentIn, int nRevisionIn, int64_t nTimeIn, uint256 nCollateralHashIn, std::string strDataIn)
+CGovernanceObject::CGovernanceObject(H256 nHashParentIn, int nRevisionIn, int64_t nTimeIn, H256 nCollateralHashIn, std::string strDataIn)
 : cs(),
   nObjectType(GOVERNANCE_OBJECT_UNKNOWN),
   nHashParent(nHashParentIn),
@@ -275,7 +275,7 @@ int CGovernanceObject::GetObjectSubtype()
     return -1;
 }
 
-uint256 CGovernanceObject::GetHash() const
+H256 CGovernanceObject::GetHash() const
 {
     // CREATE HASH OF ALL IMPORTANT PIECES OF DATA
 
@@ -287,7 +287,7 @@ uint256 CGovernanceObject::GetHash() const
     ss << vinMasternode;
     ss << vchSig;
     // fee_tx is left out on purpose
-    uint256 h1 = ss.GetHash();
+    H256 h1 = ss.GetHash();
 
     DBG( printf("CGovernanceObject::GetHash %i %li %s\n", nRevision, nTime, strData.c_str()); );
 
@@ -503,10 +503,10 @@ bool CGovernanceObject::IsCollateralValid(std::string& strError, bool& fMissingC
     strError = "";
     fMissingConfirmations = false;
     CAmount nMinFee = GetMinCollateralFee();
-    uint256 nExpectedHash = GetHash();
+    H256 nExpectedHash = GetHash();
 
     CTransaction txCollateral;
-    uint256 nBlockHash;
+    H256 nBlockHash;
 
     // RETRIEVE TRANSACTION IN QUESTION
 
@@ -565,7 +565,7 @@ bool CGovernanceObject::IsCollateralValid(std::string& strError, bool& fMissingC
 
     AssertLockHeld(cs_main);
     int nConfirmationsIn = instantsend.GetConfirmations(nCollateralHash);
-    if (nBlockHash != uint256()) {
+    if (nBlockHash != H256()) {
         BlockMap::iterator mi = mapBlockIndex.find(nBlockHash);
         if (mi != mapBlockIndex.end() && (*mi).second) {
             CBlockIndex* pindex = (*mi).second;

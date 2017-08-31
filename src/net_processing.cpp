@@ -52,8 +52,8 @@ struct COrphanTx {
     CTransaction tx;
     NodeId fromPeer;
 };
-map<uint256, COrphanTx> mapOrphanTransactions GUARDED_BY(cs_main);
-map<uint256, set<uint256> > mapOrphanTransactionsByPrev GUARDED_BY(cs_main);;
+map<H256, COrphanTx> mapOrphanTransactions GUARDED_BY(cs_main);
+map<H256, set<H256> > mapOrphanTransactionsByPrev GUARDED_BY(cs_main);;
 void EraseOrphansFor(NodeId peer) EXCLUSIVE_LOCKS_REQUIRED(cs_main);
 
 // Internal stuff
@@ -142,7 +142,7 @@ struct CNodeState {
     //! The best known block we know this peer has announced.
     CBlockIndex *pindexBestKnownBlock;
     //! The hash of the last unknown block this peer has announced.
-    uint256 hashLastUnknownBlock;
+    H256 hashLastUnknownBlock;
     //! The last full block we both have.
     CBlockIndex *pindexLastCommonBlock;
     //! The best header we have sent our peer.
@@ -267,7 +267,7 @@ void FinalizeNode(NodeId nodeid, bool& fUpdateConnectionTime) {
 
 // Requires cs_main.
 // Returns a bool indicating whether we requested this block.
-bool MarkBlockAsReceived(const uint256& hash) {
+bool MarkBlockAsReceived(const H256& hash) {
     map<H256, pair<NodeId, list<QueuedBlock>::iterator> >::iterator itInFlight = mapBlocksInFlight.find(hash);
     if (itInFlight != mapBlocksInFlight.end()) {
         CNodeState *state = State(itInFlight->second.first);
@@ -290,7 +290,7 @@ bool MarkBlockAsReceived(const uint256& hash) {
 }
 
 // Requires cs_main.
-void MarkBlockAsInFlight(NodeId nodeid, const uint256& hash, const Consensus::Params& consensusParams, CBlockIndex *pindex = NULL) {
+void MarkBlockAsInFlight(NodeId nodeid, const H256& hash, const Consensus::Params& consensusParams, CBlockIndex *pindex = NULL) {
     CNodeState *state = State(nodeid);
     assert(state != NULL);
 
@@ -327,7 +327,7 @@ void ProcessBlockAvailability(NodeId nodeid) {
 }
 
 /** Update tracking information about which blocks a peer is assumed to have. */
-void UpdateBlockAvailability(NodeId nodeid, const uint256 &hash) {
+void UpdateBlockAvailability(NodeId nodeid, const H256 &hash) {
     CNodeState *state = State(nodeid);
     assert(state != NULL);
 
@@ -503,7 +503,7 @@ void UnregisterNodeSignals(CNodeSignals& nodeSignals)
 
 bool AddOrphanTx(const CTransaction& tx, NodeId peer) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
-    uint256 hash = tx.GetHash();
+    H256 hash = tx.GetHash();
     if (mapOrphanTransactions.count(hash))
         return false;
 
@@ -531,14 +531,14 @@ bool AddOrphanTx(const CTransaction& tx, NodeId peer) EXCLUSIVE_LOCKS_REQUIRED(c
     return true;
 }
 
-void static EraseOrphanTx(uint256 hash) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
+void static EraseOrphanTx(H256 hash) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 {
-    map<uint256, COrphanTx>::iterator it = mapOrphanTransactions.find(hash);
+    map<H256, COrphanTx>::iterator it = mapOrphanTransactions.find(hash);
     if (it == mapOrphanTransactions.end())
         return;
     BOOST_FOREACH(const CTxIn& txin, it->second.tx.vin)
     {
-        map<uint256, set<uint256> >::iterator itPrev = mapOrphanTransactionsByPrev.find(txin.prevout.hash);
+        map<H256, set<H256> >::iterator itPrev = mapOrphanTransactionsByPrev.find(txin.prevout.hash);
         if (itPrev == mapOrphanTransactionsByPrev.end())
             continue;
         itPrev->second.erase(hash);
@@ -551,10 +551,10 @@ void static EraseOrphanTx(uint256 hash) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
 void EraseOrphansFor(NodeId peer)
 {
     int nErased = 0;
-    map<uint256, COrphanTx>::iterator iter = mapOrphanTransactions.begin();
+    map<H256, COrphanTx>::iterator iter = mapOrphanTransactions.begin();
     while (iter != mapOrphanTransactions.end())
     {
-        map<uint256, COrphanTx>::iterator maybeErase = iter++; // increment to avoid iterator becoming invalid
+        map<H256, COrphanTx>::iterator maybeErase = iter++; // increment to avoid iterator becoming invalid
         if (maybeErase->second.fromPeer == peer)
         {
             EraseOrphanTx(maybeErase->second.tx.GetHash());
@@ -571,8 +571,8 @@ unsigned int LimitOrphanTxSize(unsigned int nMaxOrphans) EXCLUSIVE_LOCKS_REQUIRE
     while (mapOrphanTransactions.size() > nMaxOrphans)
     {
         // Evict a random orphan:
-        uint256 randomhash = GetRandHash();
-        map<uint256, COrphanTx>::iterator it = mapOrphanTransactions.lower_bound(randomhash);
+        H256 randomhash = GetRandHash();
+        map<H256, COrphanTx>::iterator it = mapOrphanTransactions.lower_bound(randomhash);
         if (it == mapOrphanTransactions.end())
             it = mapOrphanTransactions.begin();
         EraseOrphanTx(it->first);
@@ -756,19 +756,19 @@ static void RelayAddress(const CAddress& addr, bool fReachable, CConnman& connma
     // Relay to a limited number of other nodes
     // Use deterministic randomness to send to the same nodes for 24 hours
     // at a time so the addrKnowns of the chosen nodes prevent repeats
-    static uint256 hashSalt;
+    static H256 hashSalt;
     if (hashSalt.IsNull())
         hashSalt = GetRandHash();
     uint64_t hashAddr = addr.GetHash();
-    uint256 hashRand = ArithToUint256(UintToArith256(hashSalt) ^ (hashAddr<<32) ^ ((GetTime()+hashAddr)/(24*60*60)));
+    H256 hashRand = ArithToUint256(UintToArith256(hashSalt) ^ (hashAddr<<32) ^ ((GetTime()+hashAddr)/(24*60*60)));
     hashRand = Hash(BEGIN(hashRand), END(hashRand));
-    std::multimap<uint256, CNode*> mapMix;
+    std::multimap<H256, CNode*> mapMix;
 
     auto sortfunc = [&mapMix, &hashRand](CNode* pnode) {
         if (pnode->nVersion >= CADDR_TIME_VERSION) {
             unsigned int nPointer;
             memcpy(&nPointer, &pnode, sizeof(nPointer));
-            uint256 hashKey = ArithToUint256(UintToArith256(hashRand) ^ nPointer);
+            H256 hashKey = ArithToUint256(UintToArith256(hashRand) ^ nPointer);
             hashKey = Hash(BEGIN(hashKey), END(hashKey));
             mapMix.emplace(hashKey, pnode);
         }

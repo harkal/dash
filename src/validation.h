@@ -133,13 +133,13 @@ static const unsigned int MAX_BLOCKS_TO_ANNOUNCE = 8;
 
 struct BlockHasher
 {
-    size_t operator()(const uint256& hash) const { return hash.GetCheapHash(); }
+    size_t operator()(const H256& hash) const { return hash.GetCheapHash(); }
 };
 
 extern CScript COINBASE_FLAGS;
 extern CCriticalSection cs_main;
 extern CTxMemPool mempool;
-typedef boost::unordered_map<uint256, CBlockIndex*, BlockHasher> BlockMap;
+typedef boost::unordered_map<H256, CBlockIndex*, BlockHasher> BlockMap;
 extern BlockMap mapBlockIndex;
 extern uint64_t nLastBlockTx;
 extern uint64_t nLastBlockSize;
@@ -160,10 +160,10 @@ extern CFeeRate minRelayTxFee;
 extern bool fAlerts;
 extern bool fEnableReplacement;
 
-extern std::map<uint256, int64_t> mapRejectedBlocks;
+extern std::map<H256, int64_t> mapRejectedBlocks;
 
 /** Block hash whose ancestors we will assume to have valid scripts without checking them. */
-extern uint256 hashAssumeValid;
+extern H256 hashAssumeValid;
 
 /** Best header we've seen so far (used for getheaders queries' starting points). */
 extern CBlockIndex *pindexBestHeader;
@@ -253,7 +253,7 @@ bool IsInitialBlockDownload();
  */
 std::string GetWarnings(const std::string& strFor);
 /** Retrieve a transaction (from memory pool, or from disk, if possible) */
-bool GetTransaction(const uint256 &hash, CTransaction &tx, const Consensus::Params& params, uint256 &hashBlock, bool fAllowSlow = false);
+bool GetTransaction(const H256 &hash, CTransaction &tx, const Consensus::Params& params, H256 &hashBlock, bool fAllowSlow = false);
 /** Find the best known block, and make it the tip of the block chain */
 bool ActivateBestChain(CValidationState& state, const CChainParams& chainparams, const CBlock* pblock = NULL);
 
@@ -284,7 +284,7 @@ void FindFilesToPrune(std::set<int>& setFilesToPrune, uint64_t nPruneAfterHeight
 void UnlinkPrunedFiles(std::set<int>& setFilesToPrune);
 
 /** Create a new block index entry for a given block hash */
-CBlockIndex * InsertBlockIndex(uint256 hash);
+CBlockIndex * InsertBlockIndex(H256 hash);
 /** Flush all state, indexes and buffers to disk. */
 void FlushStateToDisk();
 /** Prune block files and flush state to disk. */
@@ -334,7 +334,7 @@ struct CTimestampIndexIteratorKey {
 
 struct CTimestampIndexKey {
     unsigned int timestamp;
-    uint256 blockHash;
+    H256 blockHash;
 
     size_t GetSerializeSize(int nType, int nVersion) const {
         return 36;
@@ -350,7 +350,7 @@ struct CTimestampIndexKey {
         blockHash.Unserialize(s, nType, nVersion);
     }
 
-    CTimestampIndexKey(unsigned int time, uint256 hash) {
+    CTimestampIndexKey(unsigned int time, H256 hash) {
         timestamp = time;
         blockHash = hash;
     }
@@ -368,7 +368,7 @@ struct CTimestampIndexKey {
 struct CAddressUnspentKey {
     unsigned int type;
     uint160 hashBytes;
-    uint256 txhash;
+    H256 txhash;
     size_t index;
 
     size_t GetSerializeSize(int nType, int nVersion) const {
@@ -389,7 +389,7 @@ struct CAddressUnspentKey {
         index = ser_readdata32(s);
     }
 
-    CAddressUnspentKey(unsigned int addressType, uint160 addressHash, uint256 txid, size_t indexValue) {
+    CAddressUnspentKey(unsigned int addressType, uint160 addressHash, H256 txid, size_t indexValue) {
         type = addressType;
         hashBytes = addressHash;
         txhash = txid;
@@ -448,7 +448,7 @@ struct CAddressIndexKey {
     uint160 hashBytes;
     int blockHeight;
     unsigned int txindex;
-    uint256 txhash;
+    H256 txhash;
     size_t index;
     bool spending;
 
@@ -480,7 +480,7 @@ struct CAddressIndexKey {
     }
 
     CAddressIndexKey(unsigned int addressType, uint160 addressHash, int height, int blockindex,
-                     uint256 txid, size_t indexValue, bool isSpending) {
+                     H256 txid, size_t indexValue, bool isSpending) {
         type = addressType;
         hashBytes = addressHash;
         blockHeight = height;
@@ -707,7 +707,7 @@ public:
     ScriptError GetScriptError() const { return error; }
 };
 
-bool GetTimestampIndex(const unsigned int &high, const unsigned int &low, std::vector<uint256> &hashes);
+bool GetTimestampIndex(const unsigned int &high, const unsigned int &low, std::vector<H256> &hashes);
 bool GetSpentIndex(CSpentIndexKey &key, CSpentIndexValue &value);
 bool GetAddressIndex(uint160 addressHash, int type,
                      std::vector<std::pair<CAddressIndexKey, CAmount> > &addressIndex,
@@ -845,7 +845,7 @@ int32_t ComputeBlockVersion(const CBlockIndex* pindexPrev, const Consensus::Para
  * Return true if hash can be found in chainActive at nBlockHeight height.
  * Fills hashRet with found hash, if no nBlockHeight is specified - chainActive.Height() is used.
  */
-bool GetBlockHash(uint256& hashRet, int nBlockHeight = -1);
+bool GetBlockHash(H256& hashRet, int nBlockHeight = -1);
 
 /** Reject codes greater or equal to this can be returned by AcceptToMemPool
  * for transactions, to signal internal conditions. They cannot and should not
