@@ -28,15 +28,13 @@ void CKeccak256::Finalize(Byte hash[OUTPUT_SIZE])
     WriteBE64(hash + 24, _h[0]);
 }
 
-common::Bytes CKeccak256::Finalize()
+H256 CKeccak256::Finalize()
 {
-    unsigned char hash[OUTPUT_SIZE];
-    Finalize(hash);
-    std::vector<unsigned char> ret;
+    Byte hash[OUTPUT_SIZE];
 
-    ret.reserve(OUTPUT_SIZE);
-    for(size_t i = 0 ; i < OUTPUT_SIZE ; ++i)
-        ret.push_back(hash[i]);
+    Finalize(hash);
+
+    H256 ret(hash);
 
     return ret;
 }

@@ -10,7 +10,7 @@
 #include "utilstrencodings.h"
 #include "crypto/common.h"
 
-uint256 CBlockHeader::GetHash() const
+H256 CBlockHeader::GetHash() const
 {
     return HashX11(BEGIN(nVersion), END(nNonce));
 }

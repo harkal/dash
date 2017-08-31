@@ -93,11 +93,11 @@ namespace {
 
     /** Blocks that are in flight, and that are in the queue to be downloaded. Protected by cs_main. */
     struct QueuedBlock {
-        uint256 hash;
+        H256 hash;
         CBlockIndex* pindex;     //!< Optional.
         bool fValidatedHeaders;  //!< Whether this block has validated headers at the time of request.
     };
-    map<uint256, pair<NodeId, list<QueuedBlock>::iterator> > mapBlocksInFlight;
+    map<H256, pair<NodeId, list<QueuedBlock>::iterator> > mapBlocksInFlight;
 
     /** Number of preferable block download peers. */
     int nPreferredDownload = 0;
@@ -268,7 +268,7 @@ void FinalizeNode(NodeId nodeid, bool& fUpdateConnectionTime) {
 // Requires cs_main.
 // Returns a bool indicating whether we requested this block.
 bool MarkBlockAsReceived(const uint256& hash) {
-    map<uint256, pair<NodeId, list<QueuedBlock>::iterator> >::iterator itInFlight = mapBlocksInFlight.find(hash);
+    map<H256, pair<NodeId, list<QueuedBlock>::iterator> >::iterator itInFlight = mapBlocksInFlight.find(hash);
     if (itInFlight != mapBlocksInFlight.end()) {
         CNodeState *state = State(itInFlight->second.first);
         state->nBlocksInFlightValidHeaders -= itInFlight->second.second->fValidatedHeaders;

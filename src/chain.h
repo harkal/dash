@@ -101,7 +101,7 @@ class CBlockIndex
 {
 public:
     //! pointer to the hash of the block, if any. Memory is owned by this CBlockIndex
-    const uint256* phashBlock;
+    const H256* phashBlock;
 
     //! pointer to the index of the predecessor of this block
     CBlockIndex* pprev;
@@ -138,7 +138,7 @@ public:
 
     //! block header
     int nVersion;
-    uint256 hashMerkleRoot;
+    H256 hashMerkleRoot;
     unsigned int nTime;
     unsigned int nBits;
     unsigned int nNonce;
@@ -162,7 +162,7 @@ public:
         nSequenceId = 0;
 
         nVersion       = 0;
-        hashMerkleRoot = uint256();
+        hashMerkleRoot.SetNull();
         nTime          = 0;
         nBits          = 0;
         nNonce         = 0;
@@ -215,7 +215,7 @@ public:
         return block;
     }
 
-    uint256 GetBlockHash() const
+    H256 GetBlockHash() const
     {
         return *phashBlock;
     }
@@ -284,17 +284,17 @@ public:
 class CDiskBlockIndex : public CBlockIndex
 {
 public:
-    uint256 hash;
-    uint256 hashPrev;
+    H256 hash;
+    H256 hashPrev;
 
     CDiskBlockIndex() {
-        hash = uint256();
-        hashPrev = uint256();
+        hash = H256();
+        hashPrev = H256();
     }
 
     explicit CDiskBlockIndex(const CBlockIndex* pindex) : CBlockIndex(*pindex) {
-        hash = (hash == uint256() ? pindex->GetBlockHash() : hash);
-        hashPrev = (pprev ? pprev->GetBlockHash() : uint256());
+        hash = (hash == H256() ? pindex->GetBlockHash() : hash);
+        hashPrev = (pprev ? pprev->GetBlockHash() : H256());
     }
 
     ADD_SERIALIZE_METHODS;
@@ -325,9 +325,9 @@ public:
         READWRITE(nNonce);
     }
 
-    uint256 GetBlockHash() const
+    H256 GetBlockHash() const
     {
-        if(hash != uint256()) return hash;
+        if(!hash.IsNull()) return hash;
         // should never really get here, keeping this as a fallback
         CBlockHeader block;
         block.nVersion        = nVersion;

@@ -212,7 +212,6 @@ struct CMutableTransaction;
  */
 class CTransaction
 {
-    using namespace common;
 private:
     /** Memory only. */
     const uint256 hash;
@@ -241,7 +240,7 @@ public:
     const H256      mSender;
     const H256      mReceiver;
     const CAmount   mAmount;
-    const Bytes     data;
+    const Bytes     mData;
 
     /** Construct a CTransaction that qualifies as IsNull() */
     CTransaction();
@@ -310,7 +309,10 @@ struct CMutableTransaction
     uint32_t nLockTime;
 
     // Ebakus transaction
-
+    H256      mSender;
+    H256      mReceiver;
+    CAmount   mAmount;
+    Bytes     mData;
 
     CMutableTransaction();
     CMutableTransaction(const CTransaction& tx);
@@ -324,6 +326,7 @@ struct CMutableTransaction
         READWRITE(vin);
         READWRITE(vout);
         READWRITE(nLockTime);
+        READWRITE(mSender);
     }
 
     /** Compute the hash of this CMutableTransaction. This is computed on the

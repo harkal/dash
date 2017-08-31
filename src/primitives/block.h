@@ -22,8 +22,8 @@ class CBlockHeader
 public:
     // header
     int32_t nVersion;
-    uint256 hashPrevBlock;
-    uint256 hashMerkleRoot;
+    H256 hashPrevBlock;
+    H256 hashMerkleRoot;
     uint32_t nTime;
     uint32_t nBits;
     uint32_t nNonce;
@@ -131,11 +131,11 @@ public:
  */
 struct CBlockLocator
 {
-    std::vector<uint256> vHave;
+    std::vector<H256> vHave;
 
     CBlockLocator() {}
 
-    CBlockLocator(const std::vector<uint256>& vHaveIn)
+    CBlockLocator(const std::vector<H256>& vHaveIn)
     {
         vHave = vHaveIn;
     }

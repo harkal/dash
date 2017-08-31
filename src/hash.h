@@ -9,6 +9,7 @@
 
 #include "crypto/ripemd160.h"
 #include "crypto/sha256.h"
+#include "crypto/hash.h"
 #include "prevector.h"
 #include "serialize.h"
 #include "uint256.h"
@@ -280,7 +281,7 @@ void BIP32Hash(const ChainCode &chainCode, unsigned int nChild, unsigned char he
 
 /* ----------- Ebakus Hash ------------------------------------------------ */
 template<typename T1>
-inline uint256 HashX11(const T1 pbegin, const T1 pend)
+inline H256 HashX11(const T1 pbegin, const T1 pend)
 
 {
     sph_blake512_context     ctx_blake;
@@ -342,7 +343,7 @@ inline uint256 HashX11(const T1 pbegin, const T1 pend)
     sph_echo512 (&ctx_echo, static_cast<const void*>(&hash[9]), 64);
     sph_echo512_close(&ctx_echo, static_cast<void*>(&hash[10]));
 
-    return hash[10].trim256();
+    return H256(hash[10].trim256());
 }
 
 #endif // BITCOIN_HASH_H

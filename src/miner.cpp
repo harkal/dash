@@ -321,7 +321,7 @@ CBlockTemplate* CreateNewBlock(const CChainParams& chainparams, const CScript& s
 void IncrementExtraNonce(CBlock* pblock, const CBlockIndex* pindexPrev, unsigned int& nExtraNonce)
 {
     // Update nExtraNonce
-    static uint256 hashPrevBlock;
+    static H256 hashPrevBlock;
     if (hashPrevBlock != pblock->hashPrevBlock)
     {
         nExtraNonce = 0;

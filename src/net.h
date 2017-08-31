@@ -17,6 +17,7 @@
 #include "streams.h"
 #include "sync.h"
 #include "uint256.h"
+#include "common.h"
 #include "util.h"
 #include "threadinterrupt.h"
 
@@ -723,7 +724,7 @@ protected:
     mapMsgCmdSize mapRecvBytesPerMsgCmd;
 
 public:
-    uint256 hashContinue;
+    H256 hashContinue;
     int nStartingHeight;
 
     // flood relay

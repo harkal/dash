@@ -10,19 +10,17 @@
 
 #include "crypto/sph_keccak.h"
 #include "../common.h"
+#include "hash.h"
 
 class CKeccak256
 {
-    using Byte = common::Byte;
-    using Bytes = common::Bytes;
-
 public:
     static const size_t OUTPUT_SIZE = 32;
 
     CKeccak256();
     CKeccak256& Write(const Byte* data, size_t len);
     void Finalize(Byte hash[OUTPUT_SIZE]);
-    Bytes Finalize();
+    H256 Finalize();
     CKeccak256& Reset();
 
 private:
