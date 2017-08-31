@@ -212,7 +212,7 @@ CGovernanceVote::CGovernanceVote()
       vchSig()
 {}
 
-CGovernanceVote::CGovernanceVote(CTxIn vinMasternodeIn, uint256 nParentHashIn, vote_signal_enum_t eVoteSignalIn, vote_outcome_enum_t eVoteOutcomeIn)
+CGovernanceVote::CGovernanceVote(CTxIn vinMasternodeIn, H256 nParentHashIn, vote_signal_enum_t eVoteSignalIn, vote_outcome_enum_t eVoteOutcomeIn)
     : fValid(true),
       fSynced(false),
       nVoteSignal(eVoteSignalIn),

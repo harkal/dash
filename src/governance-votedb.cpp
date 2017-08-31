@@ -25,7 +25,7 @@ void CGovernanceObjectVoteFile::AddVote(const CGovernanceVote& vote)
     ++nMemoryVotes;
 }
 
-bool CGovernanceObjectVoteFile::HasVote(const uint256& nHash) const
+bool CGovernanceObjectVoteFile::HasVote(const H256& nHash) const
 {
     vote_m_cit it = mapVoteIndex.find(nHash);
     if(it == mapVoteIndex.end()) {
@@ -34,7 +34,7 @@ bool CGovernanceObjectVoteFile::HasVote(const uint256& nHash) const
     return true;
 }
 
-bool CGovernanceObjectVoteFile::GetVote(const uint256& nHash, CGovernanceVote& vote) const
+bool CGovernanceObjectVoteFile::GetVote(const H256& nHash, CGovernanceVote& vote) const
 {
     vote_m_cit it = mapVoteIndex.find(nHash);
     if(it == mapVoteIndex.end()) {
@@ -83,7 +83,7 @@ void CGovernanceObjectVoteFile::RebuildIndex()
     vote_l_it it = listVotes.begin();
     while(it != listVotes.end()) {
         CGovernanceVote& vote = *it;
-        uint256 nHash = vote.GetHash();
+        H256 nHash = vote.GetHash();
         if(mapVoteIndex.find(nHash) == mapVoteIndex.end()) {
             mapVoteIndex[nHash] = it;
             ++nMemoryVotes;

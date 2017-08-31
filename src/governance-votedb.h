@@ -29,7 +29,7 @@ public: // Types
 
     typedef vote_l_t::const_iterator vote_l_cit;
 
-    typedef std::map<uint256,vote_l_it> vote_m_t;
+    typedef std::map<H256,vote_l_it> vote_m_t;
 
     typedef vote_m_t::iterator vote_m_it;
 
@@ -57,12 +57,12 @@ public:
     /**
      * Return true if the vote with this hash is currently cached in memory
      */
-    bool HasVote(const uint256& nHash) const;
+    bool HasVote(const H256& nHash) const;
 
     /**
      * Retrieve a vote cached in memory
      */
-    bool GetVote(const uint256& nHash, CGovernanceVote& vote) const;
+    bool GetVote(const H256& nHash, CGovernanceVote& vote) const;
 
     int GetVoteCount() {
         return nMemoryVotes;

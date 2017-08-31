@@ -95,14 +95,14 @@ private:
     bool fSynced; //if we've sent this to our peers
     int nVoteSignal; // see VOTE_ACTIONS above
     CTxIn vinMasternode;
-    uint256 nParentHash;
+    H256 nParentHash;
     int nVoteOutcome; // see VOTE_OUTCOMES above
     int64_t nTime;
     std::vector<unsigned char> vchSig;
 
 public:
     CGovernanceVote();
-    CGovernanceVote(CTxIn vinMasternodeIn, uint256 nParentHashIn, vote_signal_enum_t eVoteSignalIn, vote_outcome_enum_t eVoteOutcomeIn);
+    CGovernanceVote(CTxIn vinMasternodeIn, H256 nParentHashIn, vote_signal_enum_t eVoteSignalIn, vote_outcome_enum_t eVoteOutcomeIn);
 
     bool IsValid() const { return fValid; }
 
@@ -114,7 +114,7 @@ public:
 
     vote_outcome_enum_t GetOutcome() const  { return vote_outcome_enum_t(nVoteOutcome); }
 
-    const uint256& GetParentHash() const { return nParentHash; }
+    const H256& GetParentHash() const { return nParentHash; }
 
     void SetTime(int64_t nTimeIn) { nTime = nTimeIn; }
 
@@ -138,7 +138,7 @@ public:
     *   GET UNIQUE HASH WITH DETERMINISTIC VALUE OF THIS SPECIFIC VOTE
     */
 
-    uint256 GetHash() const
+    H256 GetHash() const
     {
         CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
         ss << vinMasternode;
@@ -174,7 +174,7 @@ public:
     *   on funding a specific project for example.
     *   We do not include a time because it will be updated each time the vote is updated, changing the hash
     */
-    uint256 GetTypeHash() const
+    H256 GetTypeHash() const
     {
         // CALCULATE HOW TO STORE VOTE IN governance.mapVotes
 

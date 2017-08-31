@@ -574,7 +574,7 @@ extern bool fRelayTxes;
 extern std::map<CInv, CDataStream> mapRelay;
 extern std::deque<std::pair<int64_t, CInv> > vRelayExpiration;
 extern CCriticalSection cs_mapRelay;
-extern limitedmap<uint256, int64_t> mapAlreadyAskedFor;
+extern limitedmap<H256, int64_t> mapAlreadyAskedFor;
 
 /** Subversion as sent to the P2P network in `version` messages */
 extern std::string strSubVersion;
@@ -731,7 +731,7 @@ public:
     std::vector<CAddress> vAddrToSend;
     CRollingBloomFilter addrKnown;
     bool fGetAddr;
-    std::set<uint256> setKnown;
+    std::set<H256> setKnown;
     int64_t nNextAddrSend;
     int64_t nNextLocalAddrSend;
 
@@ -739,7 +739,7 @@ public:
     CRollingBloomFilter filterInventoryKnown;
     std::vector<CInv> vInventoryToSend;
     CCriticalSection cs_inventory;
-    std::set<uint256> setAskFor;
+    std::set<H256> setAskFor;
     std::multimap<int64_t, CInv> mapAskFor;
     int64_t nNextInvSend;
     // Used for headers announcements - unfiltered blocks to relay

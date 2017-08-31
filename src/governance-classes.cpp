@@ -101,7 +101,7 @@ CAmount ParsePaymentAmount(const std::string& strAmount)
 *   Add Governance Object
 */
 
-bool CGovernanceTriggerManager::AddNewTrigger(uint256 nHash)
+bool CGovernanceTriggerManager::AddNewTrigger(H256 nHash)
 {
     DBG( cout << "CGovernanceTriggerManager::AddNewTrigger: Start" << endl; );
     AssertLockHeld(governance.cs);
@@ -470,7 +470,7 @@ CSuperblock()
 {}
 
 CSuperblock::
-CSuperblock(uint256& nHash)
+CSuperblock(H256& nHash)
     : nGovObjHash(nHash),
       nEpochStart(0),
       nStatus(SEEN_OBJECT_UNKNOWN),

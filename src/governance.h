@@ -178,17 +178,17 @@ public: // Types
 
     typedef object_m_t::const_iterator object_m_cit;
 
-    typedef CacheMap<uint256, CGovernanceObject*> object_ref_cache_t;
+    typedef CacheMap<H256, CGovernanceObject*> object_ref_cache_t;
 
-    typedef std::map<uint256, CGovernanceVote> vote_m_t;
+    typedef std::map<H256, CGovernanceVote> vote_m_t;
 
     typedef vote_m_t::iterator vote_m_it;
 
     typedef vote_m_t::const_iterator vote_m_cit;
 
-    typedef CacheMap<uint256, CGovernanceVote> vote_cache_t;
+    typedef CacheMap<H256, CGovernanceVote> vote_cache_t;
 
-    typedef CacheMultiMap<uint256, vote_time_pair_t> vote_mcache_t;
+    typedef CacheMultiMap<H256, vote_time_pair_t> vote_mcache_t;
 
     typedef object_m_t::size_type size_type;
 
@@ -200,19 +200,19 @@ public: // Types
 
     typedef std::map<COutPoint, int> txout_int_m_t;
 
-    typedef std::set<uint256> hash_s_t;
+    typedef std::set<H256> hash_s_t;
 
     typedef hash_s_t::iterator hash_s_it;
 
     typedef hash_s_t::const_iterator hash_s_cit;
 
-    typedef std::map<uint256, object_info_pair_t> object_info_m_t;
+    typedef std::map<H256, object_info_pair_t> object_info_m_t;
 
     typedef object_info_m_t::iterator object_info_m_it;
 
     typedef object_info_m_t::const_iterator object_info_m_cit;
 
-    typedef std::map<uint256, int64_t> hash_time_m_t;
+    typedef std::map<H256, int64_t> hash_time_m_t;
 
     typedef hash_time_m_t::iterator hash_time_m_it;
 
@@ -247,7 +247,7 @@ private:
 
     hash_time_m_t mapWatchdogObjects;
 
-    uint256 nHashWatchdogCurrent;
+    H256 nHashWatchdogCurrent;
 
     int64_t nTimeWatchdogCurrent;
 
@@ -300,16 +300,16 @@ public:
      */
     bool ConfirmInventoryRequest(const CInv& inv);
 
-    void Sync(CNode* node, const uint256& nProp, const CBloomFilter& filter);
+    void Sync(CNode* node, const H256& nProp, const CBloomFilter& filter);
 
     void ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);
 
     void DoMaintenance();
 
-    CGovernanceObject *FindGovernanceObject(const uint256& nHash);
+    CGovernanceObject *FindGovernanceObject(const H256& nHash);
 
-    std::vector<CGovernanceVote> GetMatchingVotes(const uint256& nParentHash);
-    std::vector<CGovernanceVote> GetCurrentVotes(const uint256& nParentHash, const CTxIn& mnCollateralOutpointFilter);
+    std::vector<CGovernanceVote> GetMatchingVotes(const H256& nParentHash);
+    std::vector<CGovernanceVote> GetCurrentVotes(const H256& nParentHash, const CTxIn& mnCollateralOutpointFilter);
     std::vector<CGovernanceObject*> GetAllNewerThan(int64_t nMoreThanTime);
 
     bool IsBudgetPaymentBlock(int nBlockHeight);
@@ -329,7 +329,7 @@ public:
         mapObjects.clear();
         mapErasedGovernanceObjects.clear();
         mapWatchdogObjects.clear();
-        nHashWatchdogCurrent = uint256();
+        nHashWatchdogCurrent = H256();
         nTimeWatchdogCurrent = 0;
         mapVoteToObject.Clear();
         mapInvalidVotes.Clear();
@@ -392,7 +392,7 @@ public:
 
     void AddSeenGovernanceObject(H256 nHash, int status);
 
-    void AddSeenVote(uint256 nHash, int status);
+    void AddSeenVote(H256 nHash, int status);
 
     void MasternodeRateUpdate(const CGovernanceObject& govobj);
 

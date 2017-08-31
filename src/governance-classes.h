@@ -43,14 +43,14 @@ class CGovernanceTriggerManager
     friend class CGovernanceManager;
 
 private:
-    typedef std::map<uint256, CSuperblock_sptr> trigger_m_t;
+    typedef std::map<H256, CSuperblock_sptr> trigger_m_t;
     typedef trigger_m_t::iterator trigger_m_it;
     typedef trigger_m_t::const_iterator trigger_m_cit;
 
     trigger_m_t mapTrigger;
 
     std::vector<CSuperblock_sptr> GetActiveTriggers();
-    bool AddNewTrigger(uint256 nHash);
+    bool AddNewTrigger(H256 nHash);
     void CleanAndRemove();
 
 public:
@@ -146,7 +146,7 @@ public:
 class CSuperblock : public CGovernanceObject
 {
 private:
-    uint256 nGovObjHash;
+    H256 nGovObjHash;
 
     int nEpochStart;
     int nStatus;
@@ -157,7 +157,7 @@ private:
 public:
 
     CSuperblock();
-    CSuperblock(uint256& nHash);
+    CSuperblock(H256& nHash);
 
     static bool IsValidBlockHeight(int nBlockHeight);
     static CAmount GetPaymentsLimit(int nBlockHeight);

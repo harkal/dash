@@ -55,9 +55,9 @@ private:
     std::map<CNetAddr, CMasternodeVerification> mWeAskedForVerification;
 
     // these maps are used for masternode recovery from MASTERNODE_NEW_START_REQUIRED state
-    std::map<uint256, std::pair< int64_t, std::set<CNetAddr> > > mMnbRecoveryRequests;
-    std::map<uint256, std::vector<CMasternodeBroadcast> > mMnbRecoveryGoodReplies;
-    std::list< std::pair<CService, uint256> > listScheduledMnbRequestConnections;
+    std::map<H256, std::pair< int64_t, std::set<CNetAddr> > > mMnbRecoveryRequests;
+    std::map<H256, std::vector<CMasternodeBroadcast> > mMnbRecoveryGoodReplies;
+    std::list< std::pair<CService, H256> > listScheduledMnbRequestConnections;
 
     /// Set when masternodes are added, cleared when CGovernanceManager is notified
     bool fMasternodesAdded;
@@ -65,7 +65,7 @@ private:
     /// Set when masternodes are removed, cleared when CGovernanceManager is notified
     bool fMasternodesRemoved;
 
-    std::vector<uint256> vecDirtyGovernanceObjectHashes;
+    std::vector<H256> vecDirtyGovernanceObjectHashes;
 
     int64_t nLastWatchdogVoteTime;
 
@@ -73,11 +73,11 @@ private:
 
 public:
     // Keep track of all broadcasts I've seen
-    std::map<uint256, std::pair<int64_t, CMasternodeBroadcast> > mapSeenMasternodeBroadcast;
+    std::map<H256, std::pair<int64_t, CMasternodeBroadcast> > mapSeenMasternodeBroadcast;
     // Keep track of all pings I've seen
-    std::map<uint256, CMasternodePing> mapSeenMasternodePing;
+    std::map<H256, CMasternodePing> mapSeenMasternodePing;
     // Keep track of all verifications I've seen
-    std::map<uint256, CMasternodeVerification> mapSeenMasternodeVerification;
+    std::map<H256, CMasternodeVerification> mapSeenMasternodeVerification;
     // keep track of dsq count to prevent masternodes from gaming darksend queue
     int64_t nDsqCount;
 
@@ -119,7 +119,7 @@ public:
 
     /// Ask (source) node for mnb
     void AskForMN(CNode *pnode, const CTxIn &vin);
-    void AskForMnb(CNode *pnode, const uint256 &hash);
+    void AskForMnb(CNode *pnode, const H256 &hash);
 
     /// Check all Masternodes
     void Check();
@@ -171,7 +171,7 @@ public:
     CMasternode* GetMasternodeByRank(int nRank, int nBlockHeight, int nMinProtocol=0, bool fOnlyActive=true);
 
     void ProcessMasternodeConnections();
-    std::pair<CService, std::set<uint256> > PopScheduledMnbRequestConnection();
+    std::pair<CService, std::set<H256> > PopScheduledMnbRequestConnection();
 
     void ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv);
 
@@ -191,29 +191,29 @@ public:
     void UpdateMasternodeList(CMasternodeBroadcast mnb);
     /// Perform complete check and only then update list and maps
     bool CheckMnbAndUpdateMasternodeList(CNode* pfrom, CMasternodeBroadcast mnb, int& nDos);
-    bool IsMnbRecoveryRequested(const uint256& hash) { return mMnbRecoveryRequests.count(hash); }
+    bool IsMnbRecoveryRequested(const H256& hash) { return mMnbRecoveryRequests.count(hash); }
 
     void UpdateLastPaid(const CBlockIndex* pindex);
     bool UpdateLastDsq(const CTxIn& vin);
 
-    void AddDirtyGovernanceObjectHash(const uint256& nHash)
+    void AddDirtyGovernanceObjectHash(const H256& nHash)
     {
         LOCK(cs);
         vecDirtyGovernanceObjectHashes.push_back(nHash);
     }
 
-    std::vector<uint256> GetAndClearDirtyGovernanceObjectHashes()
+    std::vector<H256> GetAndClearDirtyGovernanceObjectHashes()
     {
         LOCK(cs);
-        std::vector<uint256> vecTmp = vecDirtyGovernanceObjectHashes;
+        std::vector<H256> vecTmp = vecDirtyGovernanceObjectHashes;
         vecDirtyGovernanceObjectHashes.clear();
         return vecTmp;;
     }
 
     bool IsWatchdogActive();
     void UpdateWatchdogVoteTime(const CTxIn& vin);
-    bool AddGovernanceVote(const CTxIn& vin, uint256 nGovernanceObjectHash);
-    void RemoveGovernanceObject(uint256 nGovernanceObjectHash);
+    bool AddGovernanceVote(const CTxIn& vin, H256 nGovernanceObjectHash);
+    void RemoveGovernanceObject(H256 nGovernanceObjectHash);
 
     void CheckMasternode(const CTxIn& vin, bool fForce = false);
     void CheckMasternode(const CPubKey& pubKeyMasternode, bool fForce = false);
