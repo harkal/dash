@@ -132,7 +132,7 @@ private:
     int nObjectType;
 
     /// parent object, 0 is root
-    uint256 nHashParent;
+    H256 nHashParent;
 
     /// object revision in the system
     int nRevision;
@@ -144,7 +144,7 @@ private:
     int64_t nDeletionTime;
 
     /// fee-tx
-    uint256 nCollateralHash;
+    H256 nCollateralHash;
 
     /// Data field - can be used for anything
     std::string strData;
@@ -192,7 +192,7 @@ private:
 public:
     CGovernanceObject();
 
-    CGovernanceObject(uint256 nHashParentIn, int nRevisionIn, int64_t nTime, uint256 nCollateralHashIn, std::string strDataIn);
+    CGovernanceObject(H256 nHashParentIn, int nRevisionIn, int64_t nTime, H256 nCollateralHashIn, std::string strDataIn);
 
     CGovernanceObject(const CGovernanceObject& other);
 
@@ -212,7 +212,7 @@ public:
         return nObjectType;
     }
 
-    const uint256& GetCollateralHash() const {
+    const H256& GetCollateralHash() const {
         return nCollateralHash;
     }
 
@@ -281,7 +281,7 @@ public:
 
     void Relay();
 
-    uint256 GetHash() const;
+    H256 GetHash() const;
 
     // GET VOTE COUNT FOR SIGNAL
 
