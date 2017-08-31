@@ -591,7 +591,7 @@ fi
 if test x$use_boost = xyes; then
 
 dnl Check for boost libs
-AX_BOOST_BASE
+AX_BOOST_BASE(1.65.0)
 AX_BOOST_SYSTEM
 AX_BOOST_FILESYSTEM
 AX_BOOST_PROGRAM_OPTIONS
