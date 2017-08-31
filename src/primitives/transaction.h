@@ -11,6 +11,8 @@
 #include "serialize.h"
 #include "uint256.h"
 #include "crypto/hash.h"
+#include "common.h"
+
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */
 class COutPoint
@@ -210,6 +212,7 @@ struct CMutableTransaction;
  */
 class CTransaction
 {
+    using namespace common;
 private:
     /** Memory only. */
     const uint256 hash;
@@ -235,10 +238,10 @@ public:
     const std::vector<CTxOut> vout;
     const uint32_t nLockTime;
 
-    const h256 mSender;
-    const h256 mReceiver;
-    const CAmount mAmount;
-
+    const H256      mSender;
+    const H256      mReceiver;
+    const CAmount   mAmount;
+    const Bytes     data;
 
     /** Construct a CTransaction that qualifies as IsNull() */
     CTransaction();

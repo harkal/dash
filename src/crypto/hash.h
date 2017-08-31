@@ -6,6 +6,7 @@
 #define HASH_H
 
 #include <array>
+#include <../common.h>
 
 template <unsigned N>
 class CHash
@@ -15,17 +16,17 @@ public:
 
     void clear() { mData.fill(0); }
 private:
-    std::array<unsigned char, N> mData;
+    std::array<common::Byte, N> mData;
 };
 
 // Define hash types
-using h2048 = CHash<256>;
-using h1024 = CHash<128>;
-using h520  = CHash<65>;
-using h512  = CHash<64>;
-using h256  = CHash<32>;
-using h160  = CHash<20>;
-using h128  = CHash<16>;
-using h64   = CHash<8>;
+using H2048 = CHash<256>;
+using H1024 = CHash<128>;
+using H520  = CHash<65>;
+using H512  = CHash<64>;
+using H256  = CHash<32>;
+using H160  = CHash<20>;
+using H128  = CHash<16>;
+using H64   = CHash<8>;
 
 #endif // HASH_H
