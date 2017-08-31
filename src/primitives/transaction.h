@@ -10,6 +10,7 @@
 #include "script/script.h"
 #include "serialize.h"
 #include "uint256.h"
+#include "crypto/hash.h"
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */
 class COutPoint
@@ -233,6 +234,11 @@ public:
     const std::vector<CTxIn> vin;
     const std::vector<CTxOut> vout;
     const uint32_t nLockTime;
+
+    const h256 mSender;
+    const h256 mReceiver;
+    const CAmount mAmount;
+
 
     /** Construct a CTransaction that qualifies as IsNull() */
     CTransaction();
