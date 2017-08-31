@@ -17,7 +17,7 @@
 #include "streams.h"
 #include "sync.h"
 #include "uint256.h"
-#include "common.h"
+#include "crypto/hash.h"
 #include "util.h"
 #include "threadinterrupt.h"
 
@@ -744,7 +744,7 @@ public:
     int64_t nNextInvSend;
     // Used for headers announcements - unfiltered blocks to relay
     // Also protected by cs_inventory
-    std::vector<uint256> vBlockHashesToAnnounce;
+    std::vector<H256> vBlockHashesToAnnounce;
 
     // Block and TXN accept times
     std::atomic<int64_t> nLastBlockTime;
@@ -872,7 +872,7 @@ public:
         }
     }
 
-    void PushBlockHash(const uint256 &hash)
+    void PushBlockHash(const H256 &hash)
     {
         LOCK(cs_inventory);
         vBlockHashesToAnnounce.push_back(hash);

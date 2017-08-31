@@ -66,7 +66,7 @@ namespace {
      * messages or ban them when processing happens afterwards. Protected by
      * cs_main.
      */
-    map<uint256, NodeId> mapBlockSource;
+    map<H256, NodeId> mapBlockSource;
 
     /**
      * Filter for transactions that were recently rejected by
@@ -624,7 +624,7 @@ void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CB
 
     if (!fInitialDownload) {
         // Find the hashes of all blocks that weren't previously in the best chain.
-        std::vector<uint256> vHashes;
+        std::vector<H256> vHashes;
         const CBlockIndex *pindexToAnnounce = pindexNew;
         while (pindexToAnnounce != pindexFork) {
             vHashes.push_back(pindexToAnnounce->GetBlockHash());
@@ -638,7 +638,7 @@ void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CB
         // Relay inventory, but don't relay old inventory during initial block download.
         connman->ForEachNode([nNewHeight, &vHashes](CNode* pnode) {
             if (nNewHeight > (pnode->nStartingHeight != -1 ? pnode->nStartingHeight - 2000 : 0)) {
-                BOOST_REVERSE_FOREACH(const uint256& hash, vHashes) {
+                BOOST_REVERSE_FOREACH(const H256& hash, vHashes) {
                     pnode->PushBlockHash(hash);
                 }
             }
@@ -651,8 +651,8 @@ void PeerLogicValidation::UpdatedBlockTip(const CBlockIndex *pindexNew, const CB
 void PeerLogicValidation::BlockChecked(const CBlock& block, const CValidationState& state) {
     LOCK(cs_main);
 
-    const uint256 hash(block.GetHash());
-    std::map<uint256, NodeId>::iterator it = mapBlockSource.find(hash);
+    const H256 hash(block.GetHash());
+    std::map<H256, NodeId>::iterator it = mapBlockSource.find(hash);
 
     int nDoS = 0;
     if (state.IsInvalid(nDoS)) {

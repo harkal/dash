@@ -332,7 +332,7 @@ UniValue verifytxoutproof(const UniValue& params, bool fHelp)
 
     UniValue res(UniValue::VARR);
 
-    vector<uint256> vMatch;
+    vector<H256> vMatch;
     if (merkleBlock.txn.ExtractMatches(vMatch) != merkleBlock.header.hashMerkleRoot)
         return res;
 
@@ -341,7 +341,7 @@ UniValue verifytxoutproof(const UniValue& params, bool fHelp)
     if (!mapBlockIndex.count(merkleBlock.header.GetHash()) || !chainActive.Contains(mapBlockIndex[merkleBlock.header.GetHash()]))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block not found in chain");
 
-    BOOST_FOREACH(const uint256& hash, vMatch)
+    BOOST_FOREACH(const H256& hash, vMatch)
         res.push_back(hash.GetHex());
     return res;
 }

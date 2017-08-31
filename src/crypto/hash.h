@@ -36,6 +36,8 @@ public:
     bool operator == (CHash const &o) const { return mData == o.mData; }
     bool operator != (CHash const &o) const { return mData != o.mData; }
 
+    friend inline bool operator<(const CHash& a, const CHash& b) { return memcmp(a.mData.data(), b.mData.data(), N) < 0; }
+
     void Randomize(boost::random_device)
     {
         static boost::random_device rdev;
