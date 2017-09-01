@@ -513,7 +513,7 @@ static bool rest_getutxos(HTTPRequest* req, const std::string& strURIPart)
 
         for (size_t i = 0; i < vOutPoints.size(); i++) {
             CCoins coins;
-            uint256 hash = vOutPoints[i].hash;
+            H256 hash = vOutPoints[i].hash;
             if (view.GetCoins(hash, coins)) {
                 mempool.pruneSpent(hash, coins);
                 if (coins.IsAvailable(vOutPoints[i].n)) {

@@ -61,7 +61,7 @@ public:
         READWRITE(nSentinelVersion);
     }
 
-    uint256 GetHash() const
+    H256 GetHash() const
     {
         CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
         ss << vin;
@@ -333,7 +333,7 @@ public:
         READWRITE(lastPing);
     }
 
-    uint256 GetHash() const
+    H256 GetHash() const
     {
         CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
         ss << vin;
@@ -387,7 +387,7 @@ public:
         READWRITE(vchSig2);
     }
 
-    uint256 GetHash() const
+    H256 GetHash() const
     {
         CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
         ss << vin1;

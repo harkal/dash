@@ -70,6 +70,8 @@ public:
         return ReadLE64(mData.data());
     }
 
+    uint64_t GetHash(const CHash<N>& salt) const;
+
     std::string GetHex() const;
     void SetHex(const char* psz);
     void SetHex(const std::string& str);

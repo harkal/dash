@@ -48,7 +48,7 @@ private:
         ssObj << strMagicMessage; // specific magic message for this type of object
         ssObj << FLATDATA(Params().MessageStart()); // network specific magic number
         ssObj << objToSave;
-        uint256 hash = Hash(ssObj.begin(), ssObj.end());
+        H256 hash = Hash(ssObj.begin(), ssObj.end());
         ssObj << hash;
 
         // open output file, and associate with CAutoFile
@@ -88,13 +88,13 @@ private:
 
         // use file size to size memory buffer
         int fileSize = boost::filesystem::file_size(pathDB);
-        int dataSize = fileSize - sizeof(uint256);
+        int dataSize = fileSize - sizeof(H256);
         // Don't try to resize to a negative number if file is small
         if (dataSize < 0)
             dataSize = 0;
         std::vector<unsigned char> vchData;
         vchData.resize(dataSize);
-        uint256 hashIn;
+        H256 hashIn;
 
         // read data and checksum from file
         try {
@@ -110,7 +110,7 @@ private:
         CDataStream ssObj(vchData, SER_DISK, CLIENT_VERSION);
 
         // verify stored checksum matches input data
-        uint256 hashTmp = Hash(ssObj.begin(), ssObj.end());
+        H256 hashTmp = Hash(ssObj.begin(), ssObj.end());
         if (hashIn != hashTmp)
         {
             error("%s: Checksum mismatch, data corrupted", __func__);

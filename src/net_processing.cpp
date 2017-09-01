@@ -953,8 +953,8 @@ void static ProcessGetData(CNode* pfrom, const Consensus::Params& consensusParam
                     LOCK(cs_mapMasternodeBlocks);
                     if (mi != mapBlockIndex.end() && mnpayments.mapMasternodeBlocks.count(mi->second->nHeight)) {
                         BOOST_FOREACH(CMasternodePayee& payee, mnpayments.mapMasternodeBlocks[mi->second->nHeight].vecPayees) {
-                            std::vector<uint256> vecVoteHashes = payee.GetVoteHashes();
-                            BOOST_FOREACH(uint256& hash, vecVoteHashes) {
+                            std::vector<H256> vecVoteHashes = payee.GetVoteHashes();
+                            BOOST_FOREACH(H256& hash, vecVoteHashes) {
                                 if(mnpayments.HasVerifiedPaymentVote(hash)) {
                                     CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
                                     ss.reserve(1000);
@@ -1242,7 +1242,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         // Relay alerts
         {
             LOCK(cs_mapAlerts);
-            BOOST_FOREACH(PAIRTYPE(const uint256, CAlert)& item, mapAlerts)
+            BOOST_FOREACH(PAIRTYPE(const H256, CAlert)& item, mapAlerts)
                 item.second.RelayTo(pfrom, connman);
         }
 
@@ -1448,7 +1448,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
     else if (strCommand == NetMsgType::GETBLOCKS)
     {
         CBlockLocator locator;
-        uint256 hashStop;
+        H256 hashStop;
         vRecv >> locator >> hashStop;
 
         LOCK(cs_main);
@@ -1492,7 +1492,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
     else if (strCommand == NetMsgType::GETHEADERS)
     {
         CBlockLocator locator;
-        uint256 hashStop;
+        H256 hashStop;
         vRecv >> locator >> hashStop;
 
         LOCK(cs_main);
@@ -1548,8 +1548,8 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             return true;
         }
 
-        vector<uint256> vWorkQueue;
-        vector<uint256> vEraseQueue;
+        vector<H256> vWorkQueue;
+        vector<H256> vEraseQueue;
         CTransaction tx;
         CTxLockRequest txLockRequest;
         CDarksendBroadcastTx dstx;
@@ -1579,7 +1579,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                 return false;
             }
         } else if (strCommand == NetMsgType::DSTX) {
-            uint256 hashTx = tx.GetHash();
+            H256 hashTx = tx.GetHash();
             if(CPrivateSend::GetDSTX(hashTx)) {
                 LogPrint("privatesend", "DSTX -- Already have %s, skipping...\n", hashTx.ToString());
                 return true; // not an error
@@ -1643,14 +1643,14 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             set<NodeId> setMisbehaving;
             for (unsigned int i = 0; i < vWorkQueue.size(); i++)
             {
-                map<uint256, set<uint256> >::iterator itByPrev = mapOrphanTransactionsByPrev.find(vWorkQueue[i]);
+                map<H256, set<H256> >::iterator itByPrev = mapOrphanTransactionsByPrev.find(vWorkQueue[i]);
                 if (itByPrev == mapOrphanTransactionsByPrev.end())
                     continue;
-                for (set<uint256>::iterator mi = itByPrev->second.begin();
+                for (set<H256>::iterator mi = itByPrev->second.begin();
                      mi != itByPrev->second.end();
                      ++mi)
                 {
-                    const uint256& orphanHash = *mi;
+                    const H256& orphanHash = *mi;
                     const CTransaction& orphanTx = mapOrphanTransactions[orphanHash].tx;
                     NodeId fromPeer = mapOrphanTransactions[orphanHash].fromPeer;
                     bool fMissingInputs2 = false;
@@ -1690,7 +1690,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
                 }
             }
 
-            BOOST_FOREACH(uint256 hash, vEraseQueue)
+            BOOST_FOREACH(H256 hash, vEraseQueue)
                 EraseOrphanTx(hash);
         }
         else if (fMissingInputs)
@@ -1778,7 +1778,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         CBlockIndex *pindexLast = NULL;
         {
         LOCK(cs_main);
-        uint256 hashLastBlock;
+        H256 hashLastBlock;
         for (const CBlockHeader& header : headers) {
             if (!hashLastBlock.IsNull() && header.hashPrevBlock != hashLastBlock) {
                 Misbehaving(pfrom->GetId(), 20);
@@ -1810,7 +1810,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             // TODO: optimize: if pindexLast is an ancestor of chainActive.Tip or pindexBestHeader, continue
             // from there instead.
             LogPrint("net", "more getheaders (%d) to end to peer=%d (startheight:%d)\n", pindexLast->nHeight, pfrom->id, pfrom->nStartingHeight);
-            connman.PushMessage(pfrom, NetMsgType::GETHEADERS, chainActive.GetLocator(pindexLast), uint256());
+            connman.PushMessage(pfrom, NetMsgType::GETHEADERS, chainActive.GetLocator(pindexLast), H256());
         }
 
         bool fCanDirectFetch = CanDirectFetch(chainparams.GetConsensus());
@@ -1877,7 +1877,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         // Such an unrequested block may still be processed, subject to the
         // conditions in AcceptBlock().
         bool forceProcessing = pfrom->fWhitelisted && !IsInitialBlockDownload();
-        const uint256 hash(block.GetHash());
+        const H256 hash(block.GetHash());
         {
             LOCK(cs_main);
             // Also always process if we requested the block explicitly, as we may
@@ -1923,10 +1923,10 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         }
         LOCK2(cs_main, pfrom->cs_filter);
 
-        std::vector<uint256> vtxid;
+        std::vector<H256> vtxid;
         mempool.queryHashes(vtxid);
         vector<CInv> vInv;
-        BOOST_FOREACH(uint256& hash, vtxid) {
+        BOOST_FOREACH(H256& hash, vtxid) {
             CInv inv(MSG_TX, hash);
             if (pfrom->pfilter) {
                 CTransaction tx;
@@ -2029,7 +2029,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
         CAlert alert;
         vRecv >> alert;
 
-        uint256 alertHash = alert.GetHash();
+        H256 alertHash = alert.GetHash();
         if (pfrom->setKnown.count(alertHash) == 0)
         {
             if (alert.ProcessAlert(chainparams.AlertKey()))
@@ -2122,7 +2122,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 
                 if (strMsg == NetMsgType::BLOCK || strMsg == NetMsgType::TX)
                 {
-                    uint256 hash;
+                    H256 hash;
                     vRecv >> hash;
                     ss << ": hash " << hash.ToString();
                 }
@@ -2227,7 +2227,7 @@ bool ProcessMessages(CNode* pfrom, CConnman& connman, std::atomic<bool>& interru
 
         // Checksum
         CDataStream& vRecv = msg.vRecv;
-        uint256 hash = Hash(vRecv.begin(), vRecv.begin() + nMessageSize);
+        H256 hash = Hash(vRecv.begin(), vRecv.begin() + nMessageSize);
         if (memcmp(hash.begin(), hdr.pchChecksum, CMessageHeader::CHECKSUM_SIZE) != 0)
         {
             LogPrintf("%s(%s, %u bytes): CHECKSUM ERROR expected %s was %s\n", __func__,
@@ -2393,7 +2393,7 @@ bool SendMessages(CNode* pto, CConnman& connman, std::atomic<bool>& interruptMsg
                 if (pindexStart->pprev)
                     pindexStart = pindexStart->pprev;
                 LogPrint("net", "initial getheaders (%d) to peer=%d (startheight:%d)\n", pindexStart->nHeight, pto->id, pto->nStartingHeight);
-                connman.PushMessage(pto, NetMsgType::GETHEADERS, chainActive.GetLocator(pindexStart), uint256());
+                connman.PushMessage(pto, NetMsgType::GETHEADERS, chainActive.GetLocator(pindexStart), H256());
             }
         }
 
@@ -2427,7 +2427,7 @@ bool SendMessages(CNode* pto, CConnman& connman, std::atomic<bool>& interruptMsg
                 // Try to find first header that our peer doesn't have, and
                 // then send all headers past that one.  If we come across any
                 // headers that aren't on chainActive, give up.
-                BOOST_FOREACH(const uint256 &hash, pto->vBlockHashesToAnnounce) {
+                BOOST_FOREACH(const H256 &hash, pto->vBlockHashesToAnnounce) {
                     BlockMap::iterator mi = mapBlockIndex.find(hash);
                     assert(mi != mapBlockIndex.end());
                     CBlockIndex *pindex = mi->second;
@@ -2475,7 +2475,7 @@ bool SendMessages(CNode* pto, CConnman& connman, std::atomic<bool>& interruptMsg
                 // The last entry in vBlockHashesToAnnounce was our tip at some point
                 // in the past.
                 if (!pto->vBlockHashesToAnnounce.empty()) {
-                    const uint256 &hashToAnnounce = pto->vBlockHashesToAnnounce.back();
+                    const H256 &hashToAnnounce = pto->vBlockHashesToAnnounce.back();
                     BlockMap::iterator mi = mapBlockIndex.find(hashToAnnounce);
                     assert(mi != mapBlockIndex.end());
                     CBlockIndex *pindex = mi->second;
@@ -2536,10 +2536,10 @@ bool SendMessages(CNode* pto, CConnman& connman, std::atomic<bool>& interruptMsg
                 if (inv.type == MSG_TX && !fSendTrickle)
                 {
                     // 1/4 of tx invs blast to all immediately
-                    static uint256 hashSalt;
+                    static H256 hashSalt;
                     if (hashSalt.IsNull())
                         hashSalt = GetRandHash();
-                    uint256 hashRand = ArithToUint256(UintToArith256(inv.hash) ^ UintToArith256(hashSalt));
+                    H256 hashRand = ArithToUint256(UintToArith256(inv.hash) ^ UintToArith256(hashSalt));
                     hashRand = Hash(BEGIN(hashRand), END(hashRand));
                     bool fTrickleWait = ((UintToArith256(hashRand) & 3) != 0);
 

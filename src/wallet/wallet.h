@@ -729,7 +729,7 @@ public:
         vecAnonymizableTallyCachedNonDenom.clear();
     }
 
-    std::map<uint256, CWalletTx> mapWallet;
+    std::map<H256, CWalletTx> mapWallet;
     std::list<CAccountingEntry> laccentries;
 
     typedef std::pair<CWalletTx*, CAccountingEntry*> TxPair;
@@ -737,7 +737,7 @@ public:
     TxItems wtxOrdered;
 
     int64_t nOrderPosNext;
-    std::map<uint256, int> mapRequestCount;
+    std::map<H256, int> mapRequestCount;
 
     std::map<CTxDestination, CAddressBookData> mapAddressBook;
 
@@ -950,20 +950,20 @@ public:
 
     bool DelAddressBook(const CTxDestination& address);
 
-    bool UpdatedTransaction(const uint256 &hashTx);
+    bool UpdatedTransaction(const H256 &hashTx);
 
-    void Inventory(const uint256 &hash)
+    void Inventory(const H256 &hash)
     {
         {
             LOCK(cs_wallet);
-            std::map<uint256, int>::iterator mi = mapRequestCount.find(hash);
+            std::map<H256, int>::iterator mi = mapRequestCount.find(hash);
             if (mi != mapRequestCount.end())
                 (*mi).second++;
         }
     }
 
     void GetScriptForMining(boost::shared_ptr<CReserveScript> &script);
-    void ResetRequestCount(const uint256 &hash)
+    void ResetRequestCount(const H256 &hash)
     {
         LOCK(cs_wallet);
         mapRequestCount[hash] = 0;
@@ -987,7 +987,7 @@ public:
     int GetVersion() { LOCK(cs_wallet); return nWalletVersion; }
 
     //! Get wallet transactions that conflict with given transaction (spend same outputs)
-    std::set<uint256> GetConflicts(const uint256& txid) const;
+    std::set<H256> GetConflicts(const H256& txid) const;
 
     //! Flush wallet (bitdb flush)
     void Flush(bool shutdown=false);
@@ -1008,7 +1008,7 @@ public:
      * Wallet transaction added, removed or updated.
      * @note called with lock cs_wallet held.
      */
-    boost::signals2::signal<void (CWallet *wallet, const uint256 &hashTx,
+    boost::signals2::signal<void (CWallet *wallet, const H256 &hashTx,
             ChangeType status)> NotifyTransactionChanged;
 
     /** Show progress e.g. for rescan */
@@ -1023,7 +1023,7 @@ public:
     void SetBroadcastTransactions(bool broadcast) { fBroadcastTransactions = broadcast; }
 
     /* Mark a transaction (and it in-wallet descendants) as abandoned so its inputs may be respent. */
-    bool AbandonTransaction(const uint256& hashTx);
+    bool AbandonTransaction(const H256& hashTx);
 
     /**
      * HD Wallet Functions

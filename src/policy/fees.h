@@ -7,6 +7,7 @@
 
 #include "amount.h"
 #include "uint256.h"
+#include "crypto/hash.h"
 
 #include <map>
 #include <string>
@@ -232,7 +233,7 @@ public:
     void processTransaction(const CTxMemPoolEntry& entry, bool fCurrentEstimate);
 
     /** Remove a transaction from the mempool tracking stats*/
-    void removeTx(uint256 hash);
+    void removeTx(H256 hash);
 
     /** Is this transaction likely included in a block because of its fee?*/
     bool isFeeDataPoint(const CFeeRate &fee, double pri);
@@ -277,7 +278,7 @@ private:
     };
 
     // map of txids to information about that transaction
-    std::map<uint256, TxStatsInfo> mapMemPoolTxs;
+    std::map<H256, TxStatsInfo> mapMemPoolTxs;
 
     /** Classes to track historical data on transaction confirmations */
     TxConfirmStats feeStats, priStats;

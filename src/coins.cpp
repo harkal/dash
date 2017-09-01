@@ -41,19 +41,19 @@ bool CCoins::Spend(uint32_t nPos)
     return true;
 }
 
-bool CCoinsView::GetCoins(const uint256 &txid, CCoins &coins) const { return false; }
-bool CCoinsView::HaveCoins(const uint256 &txid) const { return false; }
-uint256 CCoinsView::GetBestBlock() const { return uint256(); }
-bool CCoinsView::BatchWrite(CCoinsMap &mapCoins, const uint256 &hashBlock) { return false; }
+bool CCoinsView::GetCoins(const H256 &txid, CCoins &coins) const { return false; }
+bool CCoinsView::HaveCoins(const H256 &txid) const { return false; }
+H256 CCoinsView::GetBestBlock() const { return H256(); }
+bool CCoinsView::BatchWrite(CCoinsMap &mapCoins, const H256 &hashBlock) { return false; }
 bool CCoinsView::GetStats(CCoinsStats &stats) const { return false; }
 
 
 CCoinsViewBacked::CCoinsViewBacked(CCoinsView *viewIn) : base(viewIn) { }
-bool CCoinsViewBacked::GetCoins(const uint256 &txid, CCoins &coins) const { return base->GetCoins(txid, coins); }
-bool CCoinsViewBacked::HaveCoins(const uint256 &txid) const { return base->HaveCoins(txid); }
-uint256 CCoinsViewBacked::GetBestBlock() const { return base->GetBestBlock(); }
+bool CCoinsViewBacked::GetCoins(const H256 &txid, CCoins &coins) const { return base->GetCoins(txid, coins); }
+bool CCoinsViewBacked::HaveCoins(const H256 &txid) const { return base->HaveCoins(txid); }
+H256 CCoinsViewBacked::GetBestBlock() const { return base->GetBestBlock(); }
 void CCoinsViewBacked::SetBackend(CCoinsView &viewIn) { base = &viewIn; }
-bool CCoinsViewBacked::BatchWrite(CCoinsMap &mapCoins, const uint256 &hashBlock) { return base->BatchWrite(mapCoins, hashBlock); }
+bool CCoinsViewBacked::BatchWrite(CCoinsMap &mapCoins, const H256 &hashBlock) { return base->BatchWrite(mapCoins, hashBlock); }
 bool CCoinsViewBacked::GetStats(CCoinsStats &stats) const { return base->GetStats(stats); }
 
 CCoinsKeyHasher::CCoinsKeyHasher() : salt(GetRandHash()) {}
@@ -69,7 +69,7 @@ size_t CCoinsViewCache::DynamicMemoryUsage() const {
     return memusage::DynamicUsage(cacheCoins) + cachedCoinsUsage;
 }
 
-CCoinsMap::const_iterator CCoinsViewCache::FetchCoins(const uint256 &txid) const {
+CCoinsMap::const_iterator CCoinsViewCache::FetchCoins(const H256 &txid) const {
     CCoinsMap::iterator it = cacheCoins.find(txid);
     if (it != cacheCoins.end())
         return it;
@@ -87,7 +87,7 @@ CCoinsMap::const_iterator CCoinsViewCache::FetchCoins(const uint256 &txid) const
     return ret;
 }
 
-bool CCoinsViewCache::GetCoins(const uint256 &txid, CCoins &coins) const {
+bool CCoinsViewCache::GetCoins(const H256 &txid, CCoins &coins) const {
     CCoinsMap::const_iterator it = FetchCoins(txid);
     if (it != cacheCoins.end()) {
         coins = it->second.coins;
@@ -96,7 +96,7 @@ bool CCoinsViewCache::GetCoins(const uint256 &txid, CCoins &coins) const {
     return false;
 }
 
-CCoinsModifier CCoinsViewCache::ModifyCoins(const uint256 &txid) {
+CCoinsModifier CCoinsViewCache::ModifyCoins(const H256 &txid) {
     assert(!hasModifier);
     std::pair<CCoinsMap::iterator, bool> ret = cacheCoins.insert(std::make_pair(txid, CCoinsCacheEntry()));
     size_t cachedCoinUsage = 0;
@@ -117,7 +117,7 @@ CCoinsModifier CCoinsViewCache::ModifyCoins(const uint256 &txid) {
     return CCoinsModifier(*this, ret.first, cachedCoinUsage);
 }
 
-CCoinsModifier CCoinsViewCache::ModifyNewCoins(const uint256 &txid) {
+CCoinsModifier CCoinsViewCache::ModifyNewCoins(const H256 &txid) {
     assert(!hasModifier);
     std::pair<CCoinsMap::iterator, bool> ret = cacheCoins.insert(std::make_pair(txid, CCoinsCacheEntry()));
     ret.first->second.coins.Clear();
@@ -126,7 +126,7 @@ CCoinsModifier CCoinsViewCache::ModifyNewCoins(const uint256 &txid) {
     return CCoinsModifier(*this, ret.first, 0);
 }
 
-const CCoins* CCoinsViewCache::AccessCoins(const uint256 &txid) const {
+const CCoins* CCoinsViewCache::AccessCoins(const H256 &txid) const {
     CCoinsMap::const_iterator it = FetchCoins(txid);
     if (it == cacheCoins.end()) {
         return NULL;
@@ -135,7 +135,7 @@ const CCoins* CCoinsViewCache::AccessCoins(const uint256 &txid) const {
     }
 }
 
-bool CCoinsViewCache::HaveCoins(const uint256 &txid) const {
+bool CCoinsViewCache::HaveCoins(const H256 &txid) const {
     CCoinsMap::const_iterator it = FetchCoins(txid);
     // We're using vtx.empty() instead of IsPruned here for performance reasons,
     // as we only care about the case where a transaction was replaced entirely
@@ -144,22 +144,22 @@ bool CCoinsViewCache::HaveCoins(const uint256 &txid) const {
     return (it != cacheCoins.end() && !it->second.coins.vout.empty());
 }
 
-bool CCoinsViewCache::HaveCoinsInCache(const uint256 &txid) const {
+bool CCoinsViewCache::HaveCoinsInCache(const H256 &txid) const {
     CCoinsMap::const_iterator it = cacheCoins.find(txid);
     return it != cacheCoins.end();
 }
 
-uint256 CCoinsViewCache::GetBestBlock() const {
+H256 CCoinsViewCache::GetBestBlock() const {
     if (hashBlock.IsNull())
         hashBlock = base->GetBestBlock();
     return hashBlock;
 }
 
-void CCoinsViewCache::SetBestBlock(const uint256 &hashBlockIn) {
+void CCoinsViewCache::SetBestBlock(const H256 &hashBlockIn) {
     hashBlock = hashBlockIn;
 }
 
-bool CCoinsViewCache::BatchWrite(CCoinsMap &mapCoins, const uint256 &hashBlockIn) {
+bool CCoinsViewCache::BatchWrite(CCoinsMap &mapCoins, const H256 &hashBlockIn) {
     assert(!hasModifier);
     for (CCoinsMap::iterator it = mapCoins.begin(); it != mapCoins.end();) {
         if (it->second.flags & CCoinsCacheEntry::DIRTY) { // Ignore non-dirty entries (optimization).
@@ -211,7 +211,7 @@ bool CCoinsViewCache::Flush() {
     return fOk;
 }
 
-void CCoinsViewCache::Uncache(const uint256& hash)
+void CCoinsViewCache::Uncache(const H256& hash)
 {
     CCoinsMap::iterator it = cacheCoins.find(hash);
     if (it != cacheCoins.end() && it->second.flags == 0) {

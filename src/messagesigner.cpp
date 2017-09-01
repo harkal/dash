@@ -39,12 +39,12 @@ bool CMessageSigner::VerifyMessage(const CPubKey pubkey, const std::vector<unsig
     return CHashSigner::VerifyHash(ss.GetHash(), pubkey, vchSig, strErrorRet);
 }
 
-bool CHashSigner::SignHash(const uint256& hash, const CKey key, std::vector<unsigned char>& vchSigRet)
+bool CHashSigner::SignHash(const H256& hash, const CKey key, std::vector<unsigned char>& vchSigRet)
 {
     return key.SignCompact(hash, vchSigRet);
 }
 
-bool CHashSigner::VerifyHash(const uint256& hash, const CPubKey pubkey, const std::vector<unsigned char>& vchSig, std::string& strErrorRet)
+bool CHashSigner::VerifyHash(const H256& hash, const CPubKey pubkey, const std::vector<unsigned char>& vchSig, std::string& strErrorRet)
 {
     CPubKey pubkeyFromSig;
     if(!pubkeyFromSig.RecoverCompact(hash, vchSig)) {

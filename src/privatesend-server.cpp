@@ -335,7 +335,7 @@ void CPrivateSendServer::CommitFinalTransaction()
     if(!fMasterNode) return; // check and relay final tx only on masternode
 
     CTransaction finalTransaction = CTransaction(finalMutableTransaction);
-    uint256 hashTx = finalTransaction.GetHash();
+    H256 hashTx = finalTransaction.GetHash();
 
     LogPrint("privatesend", "CPrivateSendServer::CommitFinalTransaction -- finalTransaction=%s", finalTransaction.ToString());
 

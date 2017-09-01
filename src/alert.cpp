@@ -25,7 +25,7 @@
 
 using namespace std;
 
-map<uint256, CAlert> mapAlerts;
+map<H256, CAlert> mapAlerts;
 CCriticalSection cs_mapAlerts;
 
 void CUnsignedAlert::SetNull()
@@ -95,7 +95,7 @@ bool CAlert::IsNull() const
     return (nExpiration == 0);
 }
 
-uint256 CAlert::GetHash() const
+H256 CAlert::GetHash() const
 {
     return Hash(this->vchMsg.begin(), this->vchMsg.end());
 }
@@ -179,12 +179,12 @@ bool CAlert::CheckSignature(const std::vector<unsigned char>& alertKey) const
     return true;
 }
 
-CAlert CAlert::getAlertByHash(const uint256 &hash)
+CAlert CAlert::getAlertByHash(const H256 &hash)
 {
     CAlert retval;
     {
         LOCK(cs_mapAlerts);
-        map<uint256, CAlert>::iterator mi = mapAlerts.find(hash);
+        map<H256, CAlert>::iterator mi = mapAlerts.find(hash);
         if(mi != mapAlerts.end())
             retval = mi->second;
     }
@@ -223,7 +223,7 @@ bool CAlert::ProcessAlert(const std::vector<unsigned char>& alertKey, bool fThre
     {
         LOCK(cs_mapAlerts);
         // Cancel previous alerts
-        for (map<uint256, CAlert>::iterator mi = mapAlerts.begin(); mi != mapAlerts.end();)
+        for (map<H256, CAlert>::iterator mi = mapAlerts.begin(); mi != mapAlerts.end();)
         {
             const CAlert& alert = (*mi).second;
             if (Cancels(alert))
@@ -243,7 +243,7 @@ bool CAlert::ProcessAlert(const std::vector<unsigned char>& alertKey, bool fThre
         }
 
         // Check if this alert has been cancelled
-        BOOST_FOREACH(PAIRTYPE(const uint256, CAlert)& item, mapAlerts)
+        BOOST_FOREACH(PAIRTYPE(const H256, CAlert)& item, mapAlerts)
         {
             const CAlert& alert = item.second;
             if (alert.Cancels(*this))

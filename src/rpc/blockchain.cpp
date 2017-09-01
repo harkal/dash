@@ -26,7 +26,7 @@
 
 using namespace std;
 
-extern void TxToJSON(const CTransaction& tx, const uint256 hashBlock, UniValue& entry);
+extern void TxToJSON(const CTransaction& tx, const H256 hashBlock, UniValue& entry);
 void ScriptPubKeyToJSON(const CScript& scriptPubKey, UniValue& out, bool fIncludeHex);
 
 double GetDifficulty(const CBlockIndex* blockindex)
@@ -106,7 +106,7 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
         if(txDetails)
         {
             UniValue objTx(UniValue::VOBJ);
-            TxToJSON(tx, uint256(), objTx);
+            TxToJSON(tx, H256(), objTx);
             txs.push_back(objTx);
         }
         else
@@ -187,7 +187,7 @@ UniValue mempoolToJSON(bool fVerbose = false)
         UniValue o(UniValue::VOBJ);
         BOOST_FOREACH(const CTxMemPoolEntry& e, mempool.mapTx)
         {
-            const uint256& hash = e.GetTx().GetHash();
+            const H256& hash = e.GetTx().GetHash();
             UniValue info(UniValue::VOBJ);
             info.push_back(Pair("size", (int)e.GetTxSize()));
             info.push_back(Pair("fee", ValueFromAmount(e.GetFee())));
@@ -220,11 +220,11 @@ UniValue mempoolToJSON(bool fVerbose = false)
     }
     else
     {
-        vector<uint256> vtxid;
+        vector<H256> vtxid;
         mempool.queryHashes(vtxid);
 
         UniValue a(UniValue::VARR);
-        BOOST_FOREACH(const uint256& hash, vtxid)
+        BOOST_FOREACH(const H256& hash, vtxid)
             a.push_back(hash.ToString());
 
         return a;
@@ -369,7 +369,7 @@ UniValue getblockheader(const UniValue& params, bool fHelp)
     LOCK(cs_main);
 
     std::string strHash = params[0].get_str();
-    uint256 hash(uint256S(strHash));
+    H256 hash(uint256S(strHash));
 
     bool fVerbose = true;
     if (params.size() > 1)
@@ -436,7 +436,7 @@ UniValue getblockheaders(const UniValue& params, bool fHelp)
     LOCK(cs_main);
 
     std::string strHash = params[0].get_str();
-    uint256 hash(uint256S(strHash));
+    H256 hash(uint256S(strHash));
 
     if (mapBlockIndex.count(hash) == 0)
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Block not found");
@@ -521,7 +521,7 @@ UniValue getblock(const UniValue& params, bool fHelp)
     LOCK(cs_main);
 
     std::string strHash = params[0].get_str();
-    uint256 hash(uint256S(strHash));
+    H256 hash(uint256S(strHash));
 
     bool fVerbose = true;
     if (params.size() > 1)
@@ -631,7 +631,7 @@ UniValue gettxout(const UniValue& params, bool fHelp)
     UniValue ret(UniValue::VOBJ);
 
     std::string strHash = params[0].get_str();
-    uint256 hash(uint256S(strHash));
+    H256 hash(uint256S(strHash));
     int n = params[1].get_int();
     bool fMempool = true;
     if (params.size() > 2)
@@ -994,7 +994,7 @@ UniValue invalidateblock(const UniValue& params, bool fHelp)
         );
 
     std::string strHash = params[0].get_str();
-    uint256 hash(uint256S(strHash));
+    H256 hash(uint256S(strHash));
     CValidationState state;
 
     {
@@ -1033,7 +1033,7 @@ UniValue reconsiderblock(const UniValue& params, bool fHelp)
         );
 
     std::string strHash = params[0].get_str();
-    uint256 hash(uint256S(strHash));
+    H256 hash(uint256S(strHash));
     CValidationState state;
 
     {

@@ -190,7 +190,7 @@ private:
 // extracts a TxMemPoolEntry's transaction hash
 struct mempoolentry_txid
 {
-    typedef uint256 result_type;
+    typedef H256 result_type;
     result_type operator() (const CTxMemPoolEntry &entry) const
     {
         return entry.GetTx().GetHash();
@@ -481,8 +481,8 @@ public:
                         std::list<CTransaction>& conflicts, bool fCurrentEstimate = true);
     void clear();
     void _clear(); //lock free
-    void queryHashes(std::vector<uint256>& vtxid);
-    void pruneSpent(const uint256& hash, CCoins &coins);
+    void queryHashes(std::vector<H256>& vtxid);
+    void pruneSpent(const H256& hash, CCoins &coins);
     unsigned int GetTransactionsUpdated() const;
     void AddTransactionsUpdated(unsigned int n);
     /**
@@ -492,9 +492,9 @@ public:
     bool HasNoInputsOf(const CTransaction& tx) const;
 
     /** Affect CreateNewBlock prioritisation of transactions */
-    void PrioritiseTransaction(const uint256 hash, const std::string strHash, double dPriorityDelta, const CAmount& nFeeDelta);
-    void ApplyDeltas(const uint256 hash, double &dPriorityDelta, CAmount &nFeeDelta) const;
-    void ClearPrioritisation(const uint256 hash);
+    void PrioritiseTransaction(const H256 hash, const std::string strHash, double dPriorityDelta, const CAmount& nFeeDelta);
+    void ApplyDeltas(const H256 hash, double &dPriorityDelta, CAmount &nFeeDelta) const;
+    void ClearPrioritisation(const H256 hash);
 
 public:
     /** Remove a set of transactions from the mempool.
@@ -511,7 +511,7 @@ public:
      *  for).  Note: hashesToUpdate should be the set of transactions from the
      *  disconnected block that have been accepted back into the mempool.
      */
-    void UpdateTransactionsFromBlock(const std::vector<uint256> &hashesToUpdate);
+    void UpdateTransactionsFromBlock(const std::vector<H256> &hashesToUpdate);
 
     /** Try to calculate all in-mempool ancestors of entry.
      *  (these are all calculated including the tx itself)
@@ -542,7 +542,7 @@ public:
       *  pvNoSpendsRemaining, if set, will be populated with the list of transactions
       *  which are not in mempool which no longer have any spends in this mempool.
       */
-    void TrimToSize(size_t sizelimit, std::vector<uint256>* pvNoSpendsRemaining=NULL);
+    void TrimToSize(size_t sizelimit, std::vector<H256>* pvNoSpendsRemaining=NULL);
 
     /** Expire all transaction (and their dependencies) in the mempool older than time. Return the number of removed transactions. */
     int Expire(int64_t time);
@@ -559,13 +559,13 @@ public:
         return totalTxSize;
     }
 
-    bool exists(uint256 hash) const
+    bool exists(H256 hash) const
     {
         LOCK(cs);
         return (mapTx.count(hash) != 0);
     }
 
-    bool lookup(uint256 hash, CTransaction& result) const;
+    bool lookup(H256 hash, CTransaction& result) const;
 
     /** Estimate fee rate needed to get into the next nBlocks
      *  If no answer can be given at nBlocks, return an estimate
@@ -611,7 +611,7 @@ private:
     bool UpdateForDescendants(txiter updateIt,
             int maxDescendantsToVisit,
             cacheMap &cachedDescendants,
-            const std::set<uint256> &setExclude);
+            const std::set<H256> &setExclude);
     /** Update ancestors of hash to add/remove it as a descendant transaction. */
     void UpdateAncestorsOf(bool add, txiter hash, setEntries &setAncestors);
     /** For each transaction being removed, update ancestors and any direct children. */
@@ -641,8 +641,8 @@ protected:
 
 public:
     CCoinsViewMemPool(CCoinsView *baseIn, CTxMemPool &mempoolIn);
-    bool GetCoins(const uint256 &txid, CCoins &coins) const;
-    bool HaveCoins(const uint256 &txid) const;
+    bool GetCoins(const H256 &txid, CCoins &coins) const;
+    bool HaveCoins(const H256 &txid) const;
 };
 
 // We want to sort transactions by coin age priority

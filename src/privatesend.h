@@ -318,7 +318,7 @@ private:
 
     // static members
     static std::vector<CAmount> vecStandardDenominations;
-    static std::map<uint256, CDarksendBroadcastTx> mapDSTX;
+    static std::map<H256, CDarksendBroadcastTx> mapDSTX;
 
     static CCriticalSection cs_mapdstx;
 
@@ -349,7 +349,7 @@ public:
     static CAmount GetMaxCollateralAmount() { return COLLATERAL*4; }
 
     static void AddDSTX(const CDarksendBroadcastTx& dstx);
-    static CDarksendBroadcastTx GetDSTX(const uint256& hash);
+    static CDarksendBroadcastTx GetDSTX(const H256& hash);
     static void CheckDSTXes(int nHeight);
 
     static void SyncTransaction(const CTransaction& tx, const CBlock* pblock);

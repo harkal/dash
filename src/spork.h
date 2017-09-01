@@ -39,7 +39,7 @@ static const int64_t SPORK_12_RECONSIDER_BLOCKS_DEFAULT                 = 0;    
 static const int64_t SPORK_13_OLD_SUPERBLOCK_FLAG_DEFAULT               = 4070908800ULL;// OFF
 static const int64_t SPORK_14_REQUIRE_SENTINEL_FLAG_DEFAULT             = 4070908800ULL;// OFF
 
-extern std::map<uint256, CSporkMessage> mapSporks;
+extern std::map<H256, CSporkMessage> mapSporks;
 extern CSporkManager sporkManager;
 
 //
@@ -80,7 +80,7 @@ public:
         READWRITE(vchSig);
     }
 
-    uint256 GetHash() const
+    H256 GetHash() const
     {
         CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
         ss << nSporkID;

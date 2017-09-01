@@ -43,3 +43,26 @@ void CHash<N>::SetHex(const std::string& str)
 {
     SetHex(str.c_str());
 }
+
+template <unsigned N>
+uint64_t CHash<N>::GetHash(const CHash<N>& salt) const
+{
+    uint32_t a, b, c;
+    const uint32_t *pn = (const uint32_t*)mData.data();
+    const uint32_t *salt_pn = (const uint32_t*)salt.mData.data();
+    a = b = c = 0xdeadbeef + WIDTH;
+
+    a += pn[0] ^ salt_pn[0];
+    b += pn[1] ^ salt_pn[1];
+    c += pn[2] ^ salt_pn[2];
+    HashMix(a, b, c);
+    a += pn[3] ^ salt_pn[3];
+    b += pn[4] ^ salt_pn[4];
+    c += pn[5] ^ salt_pn[5];
+    HashMix(a, b, c);
+    a += pn[6] ^ salt_pn[6];
+    b += pn[7] ^ salt_pn[7];
+    HashFinal(a, b, c);
+
+    return ((((uint64_t)b) << 32) | c);
+}

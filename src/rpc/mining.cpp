@@ -299,7 +299,7 @@ UniValue prioritisetransaction(const UniValue& params, bool fHelp)
         );
 
     LOCK(cs_main);
-    uint256 hash = ParseHashStr(params[0].get_str(), "txid");
+    H256 hash = ParseHashStr(params[0].get_str(), "txid");
     CAmount nAmount = params[2].get_int64();
 
     mempool.PrioritiseTransaction(hash, params[0].get_str(), params[1].get_real(), nAmount);
@@ -452,7 +452,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
             if (!DecodeHexBlk(block, dataval.get_str()))
                 throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
-            uint256 hash = block.GetHash();
+            H256 hash = block.GetHash();
             BlockMap::iterator mi = mapBlockIndex.find(hash);
             if (mi != mapBlockIndex.end()) {
                 CBlockIndex *pindex = mi->second;
@@ -589,10 +589,10 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
     UniValue aCaps(UniValue::VARR); aCaps.push_back("proposal");
 
     UniValue transactions(UniValue::VARR);
-    map<uint256, int64_t> setTxIndex;
+    map<H256, int64_t> setTxIndex;
     int i = 0;
     BOOST_FOREACH (const CTransaction& tx, pblock->vtx) {
-        uint256 txHash = tx.GetHash();
+        H256 txHash = tx.GetHash();
         setTxIndex[txHash] = i++;
 
         if (tx.IsCoinBase())
@@ -738,11 +738,11 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 class submitblock_StateCatcher : public CValidationInterface
 {
 public:
-    uint256 hash;
+    H256 hash;
     bool found;
     CValidationState state;
 
-    submitblock_StateCatcher(const uint256 &hashIn) : hash(hashIn), found(false), state() {};
+    submitblock_StateCatcher(const H256 &hashIn) : hash(hashIn), found(false), state() {};
 
 protected:
     virtual void BlockChecked(const CBlock& block, const CValidationState& stateIn) {
@@ -778,7 +778,7 @@ UniValue submitblock(const UniValue& params, bool fHelp)
     if (!DecodeHexBlk(block, params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Block decode failed");
 
-    uint256 hash = block.GetHash();
+    H256 hash = block.GetHash();
     bool fBlockPresent = false;
     {
         LOCK(cs_main);

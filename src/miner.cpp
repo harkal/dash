@@ -458,7 +458,7 @@ void static BitcoinMiner(const CChainParams& chainparams, CConnman& connman)
             {
                 unsigned int nHashesDone = 0;
 
-                uint256 hash;
+                H256 hash;
                 while (true)
                 {
                     hash = pblock->GetHash();

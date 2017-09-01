@@ -42,7 +42,7 @@ class CMasternodePayee
 {
 private:
     CScript scriptPubKey;
-    std::vector<uint256> vecVoteHashes;
+    std::vector<H256> vecVoteHashes;
 
 public:
     CMasternodePayee() :
@@ -50,7 +50,7 @@ public:
         vecVoteHashes()
         {}
 
-    CMasternodePayee(CScript payee, uint256 hashIn) :
+    CMasternodePayee(CScript payee, H256 hashIn) :
         scriptPubKey(payee),
         vecVoteHashes()
     {
@@ -67,8 +67,8 @@ public:
 
     CScript GetPayee() { return scriptPubKey; }
 
-    void AddVoteHash(uint256 hashIn) { vecVoteHashes.push_back(hashIn); }
-    std::vector<uint256> GetVoteHashes() { return vecVoteHashes; }
+    void AddVoteHash(H256 hashIn) { vecVoteHashes.push_back(hashIn); }
+    std::vector<H256> GetVoteHashes() { return vecVoteHashes; }
     int GetVoteCount() { return vecVoteHashes.size(); }
 };
 
@@ -139,7 +139,7 @@ public:
         READWRITE(vchSig);
     }
 
-    uint256 GetHash() const {
+    H256 GetHash() const {
         CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
         ss << *(CScriptBase*)(&payee);
         ss << nBlockHeight;
@@ -176,7 +176,7 @@ private:
     int nCachedBlockHeight;
 
 public:
-    std::map<uint256, CMasternodePaymentVote> mapMasternodePaymentVotes;
+    std::map<H256, CMasternodePaymentVote> mapMasternodePaymentVotes;
     std::map<int, CMasternodeBlockPayees> mapMasternodeBlocks;
     std::map<COutPoint, int> mapMasternodesLastVote;
 
@@ -193,7 +193,7 @@ public:
     void Clear();
 
     bool AddPaymentVote(const CMasternodePaymentVote& vote);
-    bool HasVerifiedPaymentVote(uint256 hashIn);
+    bool HasVerifiedPaymentVote(H256 hashIn);
     bool ProcessBlock(int nBlockHeight);
 
     void Sync(CNode* node);

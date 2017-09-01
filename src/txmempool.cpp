@@ -954,10 +954,10 @@ void CTxMemPool::PrioritiseTransaction(const uint256 hash, const string strHash,
     LogPrintf("PrioritiseTransaction: %s priority += %f, fee += %d\n", strHash, dPriorityDelta, FormatMoney(nFeeDelta));
 }
 
-void CTxMemPool::ApplyDeltas(const uint256 hash, double &dPriorityDelta, CAmount &nFeeDelta) const
+void CTxMemPool::ApplyDeltas(const H256 hash, double &dPriorityDelta, CAmount &nFeeDelta) const
 {
     LOCK(cs);
-    std::map<uint256, std::pair<double, CAmount> >::const_iterator pos = mapDeltas.find(hash);
+    std::map<H256, std::pair<double, CAmount> >::const_iterator pos = mapDeltas.find(hash);
     if (pos == mapDeltas.end())
         return;
     const std::pair<double, CAmount> &deltas = pos->second;
@@ -965,7 +965,7 @@ void CTxMemPool::ApplyDeltas(const uint256 hash, double &dPriorityDelta, CAmount
     nFeeDelta += deltas.second;
 }
 
-void CTxMemPool::ClearPrioritisation(const uint256 hash)
+void CTxMemPool::ClearPrioritisation(const H256 hash)
 {
     LOCK(cs);
     mapDeltas.erase(hash);
@@ -981,7 +981,7 @@ bool CTxMemPool::HasNoInputsOf(const CTransaction &tx) const
 
 CCoinsViewMemPool::CCoinsViewMemPool(CCoinsView *baseIn, CTxMemPool &mempoolIn) : CCoinsViewBacked(baseIn), mempool(mempoolIn) { }
 
-bool CCoinsViewMemPool::GetCoins(const uint256 &txid, CCoins &coins) const {
+bool CCoinsViewMemPool::GetCoins(const H256 &txid, CCoins &coins) const {
     // If an entry in the mempool exists, always return that one, as it's guaranteed to never
     // conflict with the underlying cache, and it cannot have pruned entries (as it contains full)
     // transactions. First checking the underlying cache risks returning a pruned entry instead.
@@ -993,7 +993,7 @@ bool CCoinsViewMemPool::GetCoins(const uint256 &txid, CCoins &coins) const {
     return (base->GetCoins(txid, coins) && !coins.IsPruned());
 }
 
-bool CCoinsViewMemPool::HaveCoins(const uint256 &txid) const {
+bool CCoinsViewMemPool::HaveCoins(const H256 &txid) const {
     return mempool.exists(txid) || base->HaveCoins(txid);
 }
 
@@ -1027,7 +1027,7 @@ int CTxMemPool::Expire(int64_t time) {
     return stage.size();
 }
 
-bool CTxMemPool::addUnchecked(const uint256&hash, const CTxMemPoolEntry &entry, bool fCurrentEstimate)
+bool CTxMemPool::addUnchecked(const H256&hash, const CTxMemPoolEntry &entry, bool fCurrentEstimate)
 {
     LOCK(cs);
     setEntries setAncestors;
@@ -1105,7 +1105,7 @@ void CTxMemPool::trackPackageRemoved(const CFeeRate& rate) {
     }
 }
 
-void CTxMemPool::TrimToSize(size_t sizelimit, std::vector<uint256>* pvNoSpendsRemaining) {
+void CTxMemPool::TrimToSize(size_t sizelimit, std::vector<H256>* pvNoSpendsRemaining) {
     LOCK(cs);
 
     unsigned nTxnRemoved = 0;
