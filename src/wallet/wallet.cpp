@@ -3135,7 +3135,7 @@ bool CWallet::GetBudgetSystemCollateralTX(CTransaction& tx, uint256 hash, CAmoun
     return false;
 }
 
-bool CWallet::GetBudgetSystemCollateralTX(CWalletTx& tx, uint256 hash, CAmount amount, bool fUseInstantSend)
+bool CWallet::GetBudgetSystemCollateralTX(CWalletTx& tx, H256 hash, CAmount amount, bool fUseInstantSend)
 {
     // make our change address
     CReserveKey reservekey(this);

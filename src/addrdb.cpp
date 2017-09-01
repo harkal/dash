@@ -32,7 +32,7 @@ bool CBanDB::Write(const banmap_t& banSet)
     CDataStream ssBanlist(SER_DISK, CLIENT_VERSION);
     ssBanlist << FLATDATA(Params().MessageStart());
     ssBanlist << banSet;
-    uint256 hash = Hash(ssBanlist.begin(), ssBanlist.end());
+    H256 hash = Hash(ssBanlist.begin(), ssBanlist.end());
     ssBanlist << hash;
 
     // open temp output file, and associate with CAutoFile
@@ -71,11 +71,11 @@ bool CBanDB::Read(banmap_t& banSet)
     uint64_t fileSize = boost::filesystem::file_size(pathBanlist);
     uint64_t dataSize = 0;
     // Don't try to resize to a negative number if file is small
-    if (fileSize >= sizeof(uint256))
-        dataSize = fileSize - sizeof(uint256);
+    if (fileSize >= sizeof(H256))
+        dataSize = fileSize - sizeof(H256);
     std::vector<unsigned char> vchData;
     vchData.resize(dataSize);
-    uint256 hashIn;
+    H256 hashIn;
 
     // read data and checksum from file
     try {
@@ -90,7 +90,7 @@ bool CBanDB::Read(banmap_t& banSet)
     CDataStream ssBanlist(vchData, SER_DISK, CLIENT_VERSION);
 
     // verify stored checksum matches input data
-    uint256 hashTmp = Hash(ssBanlist.begin(), ssBanlist.end());
+    H256 hashTmp = Hash(ssBanlist.begin(), ssBanlist.end());
     if (hashIn != hashTmp)
         return error("%s: Checksum mismatch, data corrupted", __func__);
 
@@ -129,7 +129,7 @@ bool CAddrDB::Write(const CAddrMan& addr)
     CDataStream ssPeers(SER_DISK, CLIENT_VERSION);
     ssPeers << FLATDATA(Params().MessageStart());
     ssPeers << addr;
-    uint256 hash = Hash(ssPeers.begin(), ssPeers.end());
+    H256 hash = Hash(ssPeers.begin(), ssPeers.end());
     ssPeers << hash;
 
     // open temp output file, and associate with CAutoFile
@@ -168,11 +168,11 @@ bool CAddrDB::Read(CAddrMan& addr)
     uint64_t fileSize = boost::filesystem::file_size(pathAddr);
     uint64_t dataSize = 0;
     // Don't try to resize to a negative number if file is small
-    if (fileSize >= sizeof(uint256))
-        dataSize = fileSize - sizeof(uint256);
+    if (fileSize >= sizeof(H256))
+        dataSize = fileSize - sizeof(H256);
     std::vector<unsigned char> vchData;
     vchData.resize(dataSize);
-    uint256 hashIn;
+    H256 hashIn;
 
     // read data and checksum from file
     try {
@@ -187,7 +187,7 @@ bool CAddrDB::Read(CAddrMan& addr)
     CDataStream ssPeers(vchData, SER_DISK, CLIENT_VERSION);
 
     // verify stored checksum matches input data
-    uint256 hashTmp = Hash(ssPeers.begin(), ssPeers.end());
+    H256 hashTmp = Hash(ssPeers.begin(), ssPeers.end());
     if (hashIn != hashTmp)
         return error("%s: Checksum mismatch, data corrupted", __func__);
 

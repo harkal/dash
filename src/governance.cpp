@@ -392,8 +392,8 @@ bool CGovernanceManager::UpdateCurrentWatchdog(CGovernanceObject& watchdogNew)
 {
     bool fAccept = false;
 
-    arith_uint256 nHashNew = UintToArith256(watchdogNew.GetHash());
-    arith_uint256 nHashCurrent = UintToArith256(nHashWatchdogCurrent);
+    H256::Arith nHashNew = watchdogNew.GetHash();
+    H256::Arith nHashCurrent = nHashWatchdogCurrent;
 
     int64_t nExpirationDelay = GOVERNANCE_WATCHDOG_EXPIRATION_TIME / 2;
     int64_t nNow = GetTime();
@@ -415,8 +415,7 @@ bool CGovernanceManager::UpdateCurrentWatchdog(CGovernanceObject& watchdogNew)
         nHashWatchdogCurrent = watchdogNew.GetHash();
         nTimeWatchdogCurrent = watchdogNew.GetCreationTime();
         fAccept = true;
-        LogPrint("gobject", "CGovernanceManager::UpdateCurrentWatchdog -- Current watchdog updated to: hash = %s\n",
-                 ArithToUint256(nHashNew).ToString());
+        LogPrint("gobject", "CGovernanceManager::UpdateCurrentWatchdog -- Current watchdog updated to: hash = %s\n", H256(nHashNew).ToString());
     }
 
     return fAccept;
@@ -664,7 +663,7 @@ struct sortProposalsByVotes {
     bool operator()(const std::pair<CGovernanceObject*, int> &left, const std::pair<CGovernanceObject*, int> &right) {
         if (left.second != right.second)
             return (left.second > right.second);
-        return (UintToArith256(left.first->GetCollateralHash()) > UintToArith256(right.first->GetCollateralHash()));
+        return (left.first->GetCollateralHash() > right.first->GetCollateralHash());
     }
 };
 

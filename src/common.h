@@ -50,7 +50,7 @@ inline void toBigEndian(T a, Out& b)
 }
 
 template <class Out, class T>
-inline Out fromBigEndian(Out const& bytes)
+inline Out fromBigEndian(T const& bytes)
 {
     Out ret = (Out)0;
 

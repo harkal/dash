@@ -43,15 +43,15 @@ private:
     int nCachedBlockHeight;
 
     // maps for AlreadyHave
-    std::map<uint256, CTxLockRequest> mapLockRequestAccepted; // tx hash - tx
-    std::map<uint256, CTxLockRequest> mapLockRequestRejected; // tx hash - tx
-    std::map<uint256, CTxLockVote> mapTxLockVotes; // vote hash - vote
-    std::map<uint256, CTxLockVote> mapTxLockVotesOrphan; // vote hash - vote
+    std::map<H256, CTxLockRequest> mapLockRequestAccepted; // tx hash - tx
+    std::map<H256, CTxLockRequest> mapLockRequestRejected; // tx hash - tx
+    std::map<H256, CTxLockVote> mapTxLockVotes; // vote hash - vote
+    std::map<H256, CTxLockVote> mapTxLockVotesOrphan; // vote hash - vote
 
-    std::map<uint256, CTxLockCandidate> mapTxLockCandidates; // tx hash - lock candidate
+    std::map<H256, CTxLockCandidate> mapTxLockCandidates; // tx hash - lock candidate
 
-    std::map<COutPoint, std::set<uint256> > mapVotedOutpoints; // utxo - tx hash set
-    std::map<COutPoint, uint256> mapLockedOutpoints; // utxo - tx hash
+    std::map<COutPoint, std::set<H256> > mapVotedOutpoints; // utxo - tx hash set
+    std::map<COutPoint, H256> mapLockedOutpoints; // utxo - tx hash
 
     //track masternodes who voted with no txreq (for DOS protection)
     std::map<COutPoint, int64_t> mapMasternodeOrphanVotes; // mn outpoint - time
@@ -63,7 +63,7 @@ private:
     bool ProcessTxLockVote(CNode* pfrom, CTxLockVote& vote);
     void ProcessOrphanTxLockVotes();
     bool IsEnoughOrphanVotesForTx(const CTxLockRequest& txLockRequest);
-    bool IsEnoughOrphanVotesForTxAndOutPoint(const uint256& txHash, const COutPoint& outpoint);
+    bool IsEnoughOrphanVotesForTxAndOutPoint(const H256& txHash, const COutPoint& outpoint);
     int64_t GetAverageMasternodeOrphanVoteTime();
 
     void TryToFinalizeLockCandidate(const CTxLockCandidate& txLockCandidate);
@@ -72,7 +72,7 @@ private:
     void UpdateLockedTransaction(const CTxLockCandidate& txLockCandidate);
     bool ResolveConflicts(const CTxLockCandidate& txLockCandidate, int nMaxBlocks);
 
-    bool IsInstantSendReadyToLock(const uint256 &txHash);
+    bool IsInstantSendReadyToLock(const H256 &txHash);
 
 public:
     CCriticalSection cs_instantsend;
@@ -81,30 +81,30 @@ public:
 
     bool ProcessTxLockRequest(const CTxLockRequest& txLockRequest);
 
-    bool AlreadyHave(const uint256& hash);
+    bool AlreadyHave(const H256& hash);
 
     void AcceptLockRequest(const CTxLockRequest& txLockRequest);
     void RejectLockRequest(const CTxLockRequest& txLockRequest);
-    bool HasTxLockRequest(const uint256& txHash);
-    bool GetTxLockRequest(const uint256& txHash, CTxLockRequest& txLockRequestRet);
+    bool HasTxLockRequest(const H256& txHash);
+    bool GetTxLockRequest(const H256& txHash, CTxLockRequest& txLockRequestRet);
 
-    bool GetTxLockVote(const uint256& hash, CTxLockVote& txLockVoteRet);
+    bool GetTxLockVote(const H256& hash, CTxLockVote& txLockVoteRet);
 
-    bool GetLockedOutPointTxHash(const COutPoint& outpoint, uint256& hashRet);
+    bool GetLockedOutPointTxHash(const COutPoint& outpoint, H256& hashRet);
 
     // verify if transaction is currently locked
-    bool IsLockedInstantSendTransaction(const uint256& txHash);
+    bool IsLockedInstantSendTransaction(const H256& txHash);
     // get the actual uber og accepted lock signatures
-    int GetTransactionLockSignatures(const uint256& txHash);
+    int GetTransactionLockSignatures(const H256& txHash);
     // get instantsend confirmations (only)
-    int GetConfirmations(const uint256 &nTXHash);
+    int GetConfirmations(const H256 &nTXHash);
 
     // remove expired entries from maps
     void CheckAndRemove();
     // verify if transaction lock timed out
-    bool IsTxLockRequestTimedOut(const uint256& txHash);
+    bool IsTxLockRequestTimedOut(const H256& txHash);
 
-    void Relay(const uint256& txHash);
+    void Relay(const H256& txHash);
 
     void UpdatedBlockTip(const CBlockIndex *pindex);
     void SyncTransaction(const CTransaction& tx, const CBlock* pblock);
@@ -141,7 +141,7 @@ public:
 class CTxLockVote
 {
 private:
-    uint256 txHash;
+    H256 txHash;
     COutPoint outpoint;
     COutPoint outpointMasternode;
     std::vector<unsigned char> vchMasternodeSignature;
@@ -159,7 +159,7 @@ public:
         nTimeCreated(GetTime())
         {}
 
-    CTxLockVote(const uint256& txHashIn, const COutPoint& outpointIn, const COutPoint& outpointMasternodeIn) :
+    CTxLockVote(const H256& txHashIn, const COutPoint& outpointIn, const COutPoint& outpointMasternodeIn) :
         txHash(txHashIn),
         outpoint(outpointIn),
         outpointMasternode(outpointMasternodeIn),
@@ -178,9 +178,9 @@ public:
         READWRITE(vchMasternodeSignature);
     }
 
-    uint256 GetHash() const;
+    H256 GetHash() const;
 
-    uint256 GetTxHash() const { return txHash; }
+    H256 GetTxHash() const { return txHash; }
     COutPoint GetOutpoint() const { return outpoint; }
     COutPoint GetMasternodeOutpoint() const { return outpointMasternode; }
     int64_t GetTimeCreated() const { return nTimeCreated; }
@@ -236,7 +236,7 @@ public:
     CTxLockRequest txLockRequest;
     std::map<COutPoint, COutPointLock> mapOutPointLocks;
 
-    uint256 GetHash() const { return txLockRequest.GetHash(); }
+    H256 GetHash() const { return txLockRequest.GetHash(); }
 
     void AddOutPointLock(const COutPoint& outpoint);
     bool AddVote(const CTxLockVote& vote);

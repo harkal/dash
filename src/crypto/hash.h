@@ -21,6 +21,8 @@ public:
     // The arithmetic type
     using Arith = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<N * 8, N * 8, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void>>;
 
+    static const unsigned SIZE = N;
+
     CHash() { SetNull(); }
 
     CHash(Arith const &u) { toBigEndian(u, mData); }
@@ -31,12 +33,13 @@ public:
 
     explicit CHash(const Byte *data) { memcpy(mData.data(), data, N); }
 
-    operator Arith () const { return fromBigEndian<Arith>( mData ); }
+    operator Arith() const { return fromBigEndian<Arith>( mData ); }
 
     bool operator == (CHash const &o) const { return mData == o.mData; }
     bool operator != (CHash const &o) const { return mData != o.mData; }
 
     friend inline bool operator<(const CHash& a, const CHash& b) { return memcmp(a.mData.data(), b.mData.data(), N) < 0; }
+    friend inline bool operator>(const CHash& a, const CHash& b) { return memcmp(a.mData.data(), b.mData.data(), N) > 0; }
 
     void Randomize(boost::random_device)
     {
@@ -57,11 +60,28 @@ public:
         return true;
     }
 
+    /** A cheap hash function that just returns 64 bits from the result, it can be
+     * used when the contents are considered uniformly random. It is not appropriate
+     * when the value can easily be influenced from outside as e.g. a network adversary could
+     * provide values to trigger worst-case behavior.
+     */
+    uint64_t GetCheapHash() const
+    {
+        return ReadLE64(mData.data());
+    }
+
     std::string GetHex() const;
     void SetHex(const char* psz);
     void SetHex(const std::string& str);
 
-    std::string ToString() const { return GetHex(); };
+    std::string ToString() const { return GetHex(); }
+
+    typename std::array<Byte, N>::iterator begin() { return mData.begin(); }
+    typename std::array<Byte, N>::iterator end() { return mData.end(); }
+    const typename std::array<Byte, N>::const_iterator begin() const { return mData.begin(); }
+    const typename std::array<Byte, N>::const_iterator end() const { return mData.end(); }
+
+    unsigned int size() const { return N; }
 
     // Serializaton support
     unsigned int GetSerializeSize(int nType, int nVersion) const

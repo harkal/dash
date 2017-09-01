@@ -294,14 +294,14 @@ UniValue getblockhashes(const UniValue& params, bool fHelp)
 
     unsigned int high = params[0].get_int();
     unsigned int low = params[1].get_int();
-    std::vector<uint256> blockHashes;
+    std::vector<H256> blockHashes;
 
     if (!GetTimestampIndex(high, low, blockHashes)) {
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available for block hashes");
     }
 
     UniValue result(UniValue::VARR);
-    for (std::vector<uint256>::const_iterator it=blockHashes.begin(); it!=blockHashes.end(); it++) {
+    for (std::vector<H256>::const_iterator it=blockHashes.begin(); it!=blockHashes.end(); it++) {
         result.push_back(it->GetHex());
     }
 
@@ -879,9 +879,9 @@ UniValue getchaintips(const UniValue& params, bool fHelp)
        known blocks, and successively remove blocks that appear as pprev
        of another block.  */
     std::set<const CBlockIndex*, CompareBlocksByHeight> setTips;
-    BOOST_FOREACH(const PAIRTYPE(const uint256, CBlockIndex*)& item, mapBlockIndex)
+    BOOST_FOREACH(const PAIRTYPE(const H256, CBlockIndex*)& item, mapBlockIndex)
         setTips.insert(item.second);
-    BOOST_FOREACH(const PAIRTYPE(const uint256, CBlockIndex*)& item, mapBlockIndex)
+    BOOST_FOREACH(const PAIRTYPE(const H256, CBlockIndex*)& item, mapBlockIndex)
     {
         const CBlockIndex* pprev = item.second->pprev;
         if (pprev)

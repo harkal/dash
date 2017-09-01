@@ -84,7 +84,7 @@ std::string strSubVersion;
 std::map<CInv, CDataStream> mapRelay;
 std::deque<pair<int64_t, CInv> > vRelayExpiration;
 CCriticalSection cs_mapRelay;
-limitedmap<uint256, int64_t> mapAlreadyAskedFor(MAX_INV_SZ);
+limitedmap<H256, int64_t> mapAlreadyAskedFor(MAX_INV_SZ);
 
 // Signals for message handling
 static CNodeSignals g_signals;
@@ -1825,7 +1825,7 @@ void CConnman::ThreadMnbRequestConnections()
         if (interruptNet)
             return;
 
-        std::pair<CService, std::set<uint256> > p = mnodeman.PopScheduledMnbRequestConnection();
+        std::pair<CService, std::set<H256> > p = mnodeman.PopScheduledMnbRequestConnection();
         if(p.first == CService() || p.second.empty()) continue;
 
         CNode* pnode = NULL;
@@ -1840,9 +1840,9 @@ void CConnman::ThreadMnbRequestConnections()
 
         // compile request vector
         std::vector<CInv> vToFetch;
-        std::set<uint256>::iterator it = p.second.begin();
+        std::set<H256>::iterator it = p.second.begin();
         while(it != p.second.end()) {
-            if(*it != uint256()) {
+            if(*it != H256()) {
                 vToFetch.push_back(CInv(MSG_MASTERNODE_ANNOUNCE, *it));
                 LogPrint("masternode", "ThreadMnbRequestConnections -- asking for mnb %s from addr=%s\n", it->ToString(), p.first.ToString());
             }
@@ -2442,7 +2442,7 @@ void CConnman::RelayTransaction(const CTransaction& tx)
 {
     CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
     ss.reserve(10000);
-    uint256 hash = tx.GetHash();
+    H256 hash = tx.GetHash();
     CTxLockRequest txLockRequest;
     CDarksendBroadcastTx dstx = CPrivateSend::GetDSTX(hash);
     if(dstx) { // MSG_DSTX
@@ -2457,7 +2457,7 @@ void CConnman::RelayTransaction(const CTransaction& tx)
 
 void CConnman::RelayTransaction(const CTransaction& tx, const CDataStream& ss)
 {
-    uint256 hash = tx.GetHash();
+    H256 hash = tx.GetHash();
     int nInv = static_cast<bool>(CPrivateSend::GetDSTX(hash)) ? MSG_DSTX :
                 (instantsend.HasTxLockRequest(hash) ? MSG_TXLOCK_REQUEST : MSG_TX);
     CInv inv(nInv, hash);
@@ -2658,7 +2658,7 @@ CNode::CNode(NodeId idIn, ServiceFlags nLocalServicesIn, int nMyStartingHeightIn
     nRefCount = 0;
     nSendSize = 0;
     nSendOffset = 0;
-    hashContinue = uint256();
+    hashContinue = H256();
     nStartingHeight = -1;
     filterInventoryKnown.reset();
     fGetAddr = false;
@@ -2728,7 +2728,7 @@ void CNode::AskFor(const CInv& inv)
     // We're using mapAskFor as a priority queue,
     // the key is the earliest time the request can be sent
     int64_t nRequestTime;
-    limitedmap<uint256, int64_t>::const_iterator it = mapAlreadyAskedFor.find(inv.hash);
+    limitedmap<H256, int64_t>::const_iterator it = mapAlreadyAskedFor.find(inv.hash);
     if (it != mapAlreadyAskedFor.end())
         nRequestTime = it->second;
     else
@@ -2790,7 +2790,7 @@ void CConnman::EndMessage(CDataStream& strm)
     unsigned int nSize = strm.size() - CMessageHeader::HEADER_SIZE;
     WriteLE32((uint8_t*)&strm[CMessageHeader::MESSAGE_SIZE_OFFSET], nSize);
     // Set the checksum
-    uint256 hash = Hash(strm.begin() + CMessageHeader::HEADER_SIZE, strm.end());
+    H256 hash = Hash(strm.begin() + CMessageHeader::HEADER_SIZE, strm.end());
     memcpy((char*)&strm[CMessageHeader::CHECKSUM_OFFSET], hash.begin(), CMessageHeader::CHECKSUM_SIZE);
 
 }

@@ -31,7 +31,7 @@ public:
     CKeyID(const uint160& in) : uint160(in) {}
 };
 
-typedef uint256 ChainCode;
+typedef H256 ChainCode;
 
 /** An encapsulated public key. */
 class CPubKey
@@ -147,7 +147,7 @@ public:
     }
 
     //! Get the 256-bit hash of this public key.
-    uint256 GetHash() const
+    H256 GetHash() const
     {
         return Hash(vch, vch + size());
     }
@@ -175,7 +175,7 @@ public:
      * Verify a DER signature (~72 bytes).
      * If this public key is not fully valid, the return value will be false.
      */
-    bool Verify(const uint256& hash, const std::vector<unsigned char>& vchSig) const;
+    bool Verify(const H256& hash, const std::vector<unsigned char>& vchSig) const;
 
     /**
      * Check whether a signature is normalized (lower-S).
@@ -183,7 +183,7 @@ public:
     static bool CheckLowS(const std::vector<unsigned char>& vchSig);
 
     //! Recover a public key from a compact signature.
-    bool RecoverCompact(const uint256& hash, const std::vector<unsigned char>& vchSig);
+    bool RecoverCompact(const H256& hash, const std::vector<unsigned char>& vchSig);
 
     //! Turn this public key into an uncompressed public key.
     bool Decompress();

@@ -18,11 +18,11 @@
 class COutPoint
 {
 public:
-    uint256 hash;
+    H256 hash;
     uint32_t n;
 
     COutPoint() { SetNull(); }
-    COutPoint(uint256 hashIn, uint32_t nIn) { hash = hashIn; n = nIn; }
+    COutPoint(H256 hashIn, uint32_t nIn) { hash = hashIn; n = nIn; }
 
     ADD_SERIALIZE_METHODS;
 
@@ -99,7 +99,7 @@ public:
     }
 
     explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
-    CTxIn(uint256 hashPrevTx, uint32_t nOut, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
+    CTxIn(H256 hashPrevTx, uint32_t nOut, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
 
     ADD_SERIALIZE_METHODS;
 
@@ -167,7 +167,7 @@ public:
         return (nValue == -1);
     }
 
-    uint256 GetHash() const;
+    H256 GetHash() const;
 
     CAmount GetDustThreshold(const CFeeRate &minRelayTxFee) const
     {
@@ -214,7 +214,7 @@ class CTransaction
 {
 private:
     /** Memory only. */
-    const uint256 hash;
+    const H256 hash;
     void UpdateHash() const;
 
 public:
@@ -267,7 +267,7 @@ public:
         return vin.empty() && vout.empty();
     }
 
-    const uint256& GetHash() const {
+    const H256& GetHash() const {
         return hash;
     }
 
@@ -332,7 +332,7 @@ struct CMutableTransaction
     /** Compute the hash of this CMutableTransaction. This is computed on the
      * fly, as opposed to GetHash() in CTransaction, which uses a cached result.
      */
-    uint256 GetHash() const;
+    H256 GetHash() const;
 
     std::string ToString() const;
 
@@ -357,8 +357,8 @@ struct CompareInputBIP69
     {
         if (a.prevout.hash == b.prevout.hash) return a.prevout.n < b.prevout.n;
 
-        uint256 hasha = a.prevout.hash;
-        uint256 hashb = b.prevout.hash;
+        H256 hasha = a.prevout.hash;
+        H256 hashb = b.prevout.hash;
 
         typedef std::reverse_iterator<const unsigned char*> rev_it;
         rev_it rita = rev_it(hasha.end());
