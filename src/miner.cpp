@@ -453,7 +453,7 @@ void static BitcoinMiner(const CChainParams& chainparams, CConnman& connman)
             // Search
             //
             int64_t nStart = GetTime();
-            arith_uint256 hashTarget = arith_uint256().SetCompact(pblock->nBits);
+            H256::Arith hashTarget = arith_uint256().SetCompact(pblock->nBits);
             while (true)
             {
                 unsigned int nHashesDone = 0;
@@ -462,7 +462,7 @@ void static BitcoinMiner(const CChainParams& chainparams, CConnman& connman)
                 while (true)
                 {
                     hash = pblock->GetHash();
-                    if (UintToArith256(hash) <= hashTarget)
+                    if ((H256::Arith)hash <= hashTarget)
                     {
                         // Found a solution
                         SetThreadPriority(THREAD_PRIORITY_NORMAL);

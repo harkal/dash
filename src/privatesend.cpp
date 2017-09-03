@@ -143,7 +143,7 @@ std::string CPrivateSendBase::GetStateString() const
 
 // Definitions for static data members
 std::vector<CAmount> CPrivateSend::vecStandardDenominations;
-std::map<uint256, CDarksendBroadcastTx> CPrivateSend::mapDSTX;
+std::map<H256, CDarksendBroadcastTx> CPrivateSend::mapDSTX;
 CCriticalSection CPrivateSend::cs_mapdstx;
 
 void CPrivateSend::InitStandardDenominations()
