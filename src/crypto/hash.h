@@ -15,6 +15,13 @@
 #include "../uint256.h"
 
 template <unsigned N>
+class ArithInteger : public boost::multiprecision::number<boost::multiprecision::cpp_int_backend<N * 8, N * 8, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void>>
+{
+public:
+    ArithInteger& SetCompact(uint32_t nCompact, bool *pfNegative = NULL, bool* pfOverflow = NULL);
+};
+
+template <unsigned N>
 class CHash
 {
 public:
