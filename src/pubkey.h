@@ -24,11 +24,11 @@
  */
 
 /** A reference to a CKey: the Hash160 of its serialized public key */
-class CKeyID : public uint160
+class CKeyID : public H160
 {
 public:
-    CKeyID() : uint160() {}
-    CKeyID(const uint160& in) : uint160(in) {}
+    CKeyID() : H160() {}
+    CKeyID(const H160& in) : H160(in) {}
 };
 
 typedef H256 ChainCode;

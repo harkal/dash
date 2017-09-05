@@ -367,7 +367,7 @@ struct CTimestampIndexKey {
 
 struct CAddressUnspentKey {
     unsigned int type;
-    uint160 hashBytes;
+    H160 hashBytes;
     H256 txhash;
     size_t index;
 
@@ -445,7 +445,7 @@ struct CAddressUnspentValue {
 
 struct CAddressIndexKey {
     unsigned int type;
-    uint160 hashBytes;
+    H160 hashBytes;
     int blockHeight;
     unsigned int txindex;
     H256 txhash;
@@ -479,7 +479,7 @@ struct CAddressIndexKey {
         spending = f;
     }
 
-    CAddressIndexKey(unsigned int addressType, uint160 addressHash, int height, int blockindex,
+    CAddressIndexKey(unsigned int addressType, H160 addressHash, int height, int blockindex,
                      H256 txid, size_t indexValue, bool isSpending) {
         type = addressType;
         hashBytes = addressHash;
@@ -508,7 +508,7 @@ struct CAddressIndexKey {
 
 struct CAddressIndexIteratorKey {
     unsigned int type;
-    uint160 hashBytes;
+    H160 hashBytes;
 
     size_t GetSerializeSize(int nType, int nVersion) const {
         return 21;
@@ -524,7 +524,7 @@ struct CAddressIndexIteratorKey {
         hashBytes.Unserialize(s, nType, nVersion);
     }
 
-    CAddressIndexIteratorKey(unsigned int addressType, uint160 addressHash) {
+    CAddressIndexIteratorKey(unsigned int addressType, H160 addressHash) {
         type = addressType;
         hashBytes = addressHash;
     }
@@ -541,7 +541,7 @@ struct CAddressIndexIteratorKey {
 
 struct CAddressIndexIteratorHeightKey {
     unsigned int type;
-    uint160 hashBytes;
+    H160 hashBytes;
     int blockHeight;
 
     size_t GetSerializeSize(int nType, int nVersion) const {
@@ -560,7 +560,7 @@ struct CAddressIndexIteratorHeightKey {
         blockHeight = ser_readdata32be(s);
     }
 
-    CAddressIndexIteratorHeightKey(unsigned int addressType, uint160 addressHash, int height) {
+    CAddressIndexIteratorHeightKey(unsigned int addressType, H160 addressHash, int height) {
         type = addressType;
         hashBytes = addressHash;
         blockHeight = height;
@@ -709,10 +709,10 @@ public:
 
 bool GetTimestampIndex(const unsigned int &high, const unsigned int &low, std::vector<H256> &hashes);
 bool GetSpentIndex(CSpentIndexKey &key, CSpentIndexValue &value);
-bool GetAddressIndex(uint160 addressHash, int type,
+bool GetAddressIndex(H160 addressHash, int type,
                      std::vector<std::pair<CAddressIndexKey, CAmount> > &addressIndex,
                      int start = 0, int end = 0);
-bool GetAddressUnspent(uint160 addressHash, int type,
+bool GetAddressUnspent(H160 addressHash, int type,
                        std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > &unspentOutputs);
 
 /** Functions for disk access for blocks */

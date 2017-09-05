@@ -425,13 +425,13 @@ private:
     typedef std::map<CMempoolAddressDeltaKey, CMempoolAddressDelta, CMempoolAddressDeltaKeyCompare> addressDeltaMap;
     addressDeltaMap mapAddress;
 
-    typedef std::map<uint256, std::vector<CMempoolAddressDeltaKey> > addressDeltaMapInserted;
+    typedef std::map<H256, std::vector<CMempoolAddressDeltaKey> > addressDeltaMapInserted;
     addressDeltaMapInserted mapAddressInserted;
 
     typedef std::map<CSpentIndexKey, CSpentIndexValue, CSpentIndexKeyCompare> mapSpentIndex;
     mapSpentIndex mapSpent;
 
-    typedef std::map<uint256, std::vector<CSpentIndexKey> > mapSpentIndexInserted;
+    typedef std::map<H256, std::vector<CSpentIndexKey> > mapSpentIndexInserted;
     mapSpentIndexInserted mapSpentInserted;
 
     void UpdateParent(txiter entry, txiter parent, bool add);
@@ -439,7 +439,7 @@ private:
 
 public:
     std::map<COutPoint, CInPoint> mapNextTx;
-    std::map<uint256, std::pair<double, CAmount> > mapDeltas;
+    std::map<H256, std::pair<double, CAmount> > mapDeltas;
 
     /** Create a new CTxMemPool.
      *  minReasonableRelayFee should be a feerate which is, roughly, somewhere
@@ -462,17 +462,17 @@ public:
     // to track size/count of descendant transactions.  First version of
     // addUnchecked can be used to have it call CalculateMemPoolAncestors(), and
     // then invoke the second version.
-    bool addUnchecked(const uint256& hash, const CTxMemPoolEntry &entry, bool fCurrentEstimate = true);
-    bool addUnchecked(const uint256& hash, const CTxMemPoolEntry &entry, setEntries &setAncestors, bool fCurrentEstimate = true);
+    bool addUnchecked(const H256& hash, const CTxMemPoolEntry &entry, bool fCurrentEstimate = true);
+    bool addUnchecked(const H256& hash, const CTxMemPoolEntry &entry, setEntries &setAncestors, bool fCurrentEstimate = true);
 
     void addAddressIndex(const CTxMemPoolEntry &entry, const CCoinsViewCache &view);
-    bool getAddressIndex(std::vector<std::pair<uint160, int> > &addresses,
+    bool getAddressIndex(std::vector<std::pair<H160, int> > &addresses,
                          std::vector<std::pair<CMempoolAddressDeltaKey, CMempoolAddressDelta> > &results);
-    bool removeAddressIndex(const uint256 txhash);
+    bool removeAddressIndex(const H256 txhash);
 
     void addSpentIndex(const CTxMemPoolEntry &entry, const CCoinsViewCache &view);
     bool getSpentIndex(CSpentIndexKey &key, CSpentIndexValue &value);
-    bool removeSpentIndex(const uint256 txhash);
+    bool removeSpentIndex(const H256 txhash);
 
     void remove(const CTransaction &tx, std::list<CTransaction>& removed, bool fRecursive = false);
     void removeForReorg(const CCoinsViewCache *pcoins, unsigned int nMemPoolHeight, int flags);

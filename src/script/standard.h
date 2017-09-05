@@ -19,12 +19,12 @@ class CKeyID;
 class CScript;
 
 /** A reference to a CScript: the Hash160 of its serialization (see script.h) */
-class CScriptID : public uint160
+class CScriptID : public H160
 {
 public:
-    CScriptID() : uint160() {}
+    CScriptID() : H160() {}
     CScriptID(const CScript& in);
-    CScriptID(const uint160& in) : uint160(in) {}
+    CScriptID(const H160& in) : H160(in) {}
 };
 
 static const unsigned int MAX_OP_RETURN_RELAY = 83; //! bytes (+1 for OP_RETURN, +2 for the pushdata opcodes)

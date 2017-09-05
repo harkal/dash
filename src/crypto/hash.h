@@ -38,6 +38,7 @@ public:
     }
 
     explicit CHash(const Byte *data) { memcpy(mData.data(), data, N); }
+    explicit CHash(const std::vector<Byte>& data) { mData(data.begin(), data.end()); }
 
     operator Arith() const { return fromBigEndian<Arith>( mData ); }
 

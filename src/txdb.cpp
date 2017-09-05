@@ -37,22 +37,22 @@ CCoinsViewDB::CCoinsViewDB(size_t nCacheSize, bool fMemory, bool fWipe) : db(Get
 {
 }
 
-bool CCoinsViewDB::GetCoins(const uint256 &txid, CCoins &coins) const {
+bool CCoinsViewDB::GetCoins(const H256 &txid, CCoins &coins) const {
     return db.Read(make_pair(DB_COINS, txid), coins);
 }
 
-bool CCoinsViewDB::HaveCoins(const uint256 &txid) const {
+bool CCoinsViewDB::HaveCoins(const H256 &txid) const {
     return db.Exists(make_pair(DB_COINS, txid));
 }
 
-uint256 CCoinsViewDB::GetBestBlock() const {
-    uint256 hashBestChain;
+H256 CCoinsViewDB::GetBestBlock() const {
+    H256 hashBestChain;
     if (!db.Read(DB_BEST_BLOCK, hashBestChain))
-        return uint256();
+        return H256();
     return hashBestChain;
 }
 
-bool CCoinsViewDB::BatchWrite(CCoinsMap &mapCoins, const uint256 &hashBlock) {
+bool CCoinsViewDB::BatchWrite(CCoinsMap &mapCoins, const H256 &hashBlock) {
     CDBBatch batch(&db.GetObfuscateKey());
     size_t count = 0;
     size_t changed = 0;
@@ -111,7 +111,7 @@ bool CCoinsViewDB::GetStats(CCoinsStats &stats) const {
     CAmount nTotalAmount = 0;
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
-        std::pair<char, uint256> key;
+        std::pair<char, H256> key;
         CCoins coins;
         if (pcursor->GetKey(key) && key.first == DB_COINS) {
             if (pcursor->GetValue(coins)) {
@@ -156,13 +156,13 @@ bool CBlockTreeDB::WriteBatchSync(const std::vector<std::pair<int, const CBlockF
     return WriteBatch(batch, true);
 }
 
-bool CBlockTreeDB::ReadTxIndex(const uint256 &txid, CDiskTxPos &pos) {
+bool CBlockTreeDB::ReadTxIndex(const H256 &txid, CDiskTxPos &pos) {
     return Read(make_pair(DB_TXINDEX, txid), pos);
 }
 
-bool CBlockTreeDB::WriteTxIndex(const std::vector<std::pair<uint256, CDiskTxPos> >&vect) {
+bool CBlockTreeDB::WriteTxIndex(const std::vector<std::pair<H256, CDiskTxPos> >&vect) {
     CDBBatch batch(&GetObfuscateKey());
-    for (std::vector<std::pair<uint256,CDiskTxPos> >::const_iterator it=vect.begin(); it!=vect.end(); it++)
+    for (std::vector<std::pair<H256,CDiskTxPos> >::const_iterator it=vect.begin(); it!=vect.end(); it++)
         batch.Write(make_pair(DB_TXINDEX, it->first), it->second);
     return WriteBatch(batch);
 }
@@ -195,7 +195,7 @@ bool CBlockTreeDB::UpdateAddressUnspentIndex(const std::vector<std::pair<CAddres
     return WriteBatch(batch);
 }
 
-bool CBlockTreeDB::ReadAddressUnspentIndex(uint160 addressHash, int type,
+bool CBlockTreeDB::ReadAddressUnspentIndex(H160 addressHash, int type,
                                            std::vector<std::pair<CAddressUnspentKey, CAddressUnspentValue> > &unspentOutputs) {
 
     boost::scoped_ptr<CDBIterator> pcursor(NewIterator());
@@ -235,7 +235,7 @@ bool CBlockTreeDB::EraseAddressIndex(const std::vector<std::pair<CAddressIndexKe
     return WriteBatch(batch);
 }
 
-bool CBlockTreeDB::ReadAddressIndex(uint160 addressHash, int type,
+bool CBlockTreeDB::ReadAddressIndex(H160 addressHash, int type,
                                     std::vector<std::pair<CAddressIndexKey, CAmount> > &addressIndex,
                                     int start, int end) {
 
@@ -275,7 +275,7 @@ bool CBlockTreeDB::WriteTimestampIndex(const CTimestampIndexKey &timestampIndex)
     return WriteBatch(batch);
 }
 
-bool CBlockTreeDB::ReadTimestampIndex(const unsigned int &high, const unsigned int &low, std::vector<uint256> &hashes) {
+bool CBlockTreeDB::ReadTimestampIndex(const unsigned int &high, const unsigned int &low, std::vector<H256> &hashes) {
 
     boost::scoped_ptr<CDBIterator> pcursor(NewIterator());
 
@@ -311,12 +311,12 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 {
     boost::scoped_ptr<CDBIterator> pcursor(NewIterator());
 
-    pcursor->Seek(make_pair(DB_BLOCK_INDEX, uint256()));
+    pcursor->Seek(make_pair(DB_BLOCK_INDEX, H256()));
 
     // Load mapBlockIndex
     while (pcursor->Valid()) {
         boost::this_thread::interruption_point();
-        std::pair<char, uint256> key;
+        std::pair<char, H256> key;
         if (pcursor->GetKey(key) && key.first == DB_BLOCK_INDEX) {
             CDiskBlockIndex diskindex;
             if (pcursor->GetValue(diskindex)) {

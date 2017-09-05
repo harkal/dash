@@ -217,7 +217,7 @@ UniValue getrawtransaction(const UniValue& params, bool fHelp)
         fVerbose = (params[1].get_int() != 0);
 
     CTransaction tx;
-    uint256 hashBlock;
+    H256 hashBlock;
     if (!GetTransaction(hash, tx, Params().GetConsensus(), hashBlock, true))
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "No information available about transaction");
 
@@ -254,8 +254,8 @@ UniValue gettxoutproof(const UniValue& params, bool fHelp)
             "\"data\"           (string) A string that is a serialized, hex-encoded data for the proof.\n"
         );
 
-    set<uint256> setTxids;
-    uint256 oneTxid;
+    set<H256> setTxids;
+    H256 oneTxid;
     UniValue txids = params[0].get_array();
     for (unsigned int idx = 0; idx < txids.size(); idx++) {
         const UniValue& txid = txids[idx];
@@ -272,7 +272,7 @@ UniValue gettxoutproof(const UniValue& params, bool fHelp)
 
     CBlockIndex* pblockindex = NULL;
 
-    uint256 hashBlock;
+    H256 hashBlock;
     if (params.size() > 1)
     {
         hashBlock = uint256S(params[1].get_str());
@@ -674,7 +674,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
         view.SetBackend(viewMempool); // temporarily switch cache backend to db+mempool view
 
         BOOST_FOREACH(const CTxIn& txin, mergedTx.vin) {
-            const uint256& prevHash = txin.prevout.hash;
+            const H256& prevHash = txin.prevout.hash;
             CCoins coins;
             view.AccessCoins(prevHash); // this is certainly allowed to fail
         }
@@ -849,7 +849,7 @@ UniValue sendrawtransaction(const UniValue& params, bool fHelp)
     CTransaction tx;
     if (!DecodeHexTx(tx, params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
-    uint256 hashTx = tx.GetHash();
+    H256 hashTx = tx.GetHash();
 
     bool fOverrideFees = false;
     if (params.size() > 1)
