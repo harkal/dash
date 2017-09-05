@@ -15,7 +15,7 @@ class CSporkManager;
 
 CSporkManager sporkManager;
 
-std::map<uint256, CSporkMessage> mapSporks;
+std::map<H256, CSporkMessage> mapSporks;
 
 void CSporkManager::ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
 {
@@ -26,7 +26,7 @@ void CSporkManager::ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStr
         CSporkMessage spork;
         vRecv >> spork;
 
-        uint256 hash = spork.GetHash();
+        H256 hash = spork.GetHash();
 
         std::string strLogMsg;
         {

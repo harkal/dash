@@ -338,7 +338,7 @@ void CMasternodePayments::ProcessMessage(CNode* pfrom, std::string& strCommand, 
 
         if(pfrom->nVersion < GetMinMasternodePaymentsProto()) return;
 
-        uint256 nHash = vote.GetHash();
+        H256 nHash = vote.GetHash();
 
         pfrom->setAskFor.erase(nHash);
 
@@ -466,7 +466,7 @@ bool CMasternodePayments::IsScheduled(CMasternode& mn, int nNotBlockHeight)
 
 bool CMasternodePayments::AddPaymentVote(const CMasternodePaymentVote& vote)
 {
-    uint256 blockHash = uint256();
+    H256 blockHash = H256();
     if(!GetBlockHash(blockHash, vote.nBlockHeight - 101)) return false;
 
     if(HasVerifiedPaymentVote(vote.GetHash())) return false;
@@ -485,10 +485,10 @@ bool CMasternodePayments::AddPaymentVote(const CMasternodePaymentVote& vote)
     return true;
 }
 
-bool CMasternodePayments::HasVerifiedPaymentVote(uint256 hashIn)
+bool CMasternodePayments::HasVerifiedPaymentVote(H256 hashIn)
 {
     LOCK(cs_mapMasternodePaymentVotes);
-    std::map<uint256, CMasternodePaymentVote>::iterator it = mapMasternodePaymentVotes.find(hashIn);
+    std::map<H256, CMasternodePaymentVote>::iterator it = mapMasternodePaymentVotes.find(hashIn);
     return it != mapMasternodePaymentVotes.end() && it->second.IsVerified();
 }
 
@@ -637,7 +637,7 @@ void CMasternodePayments::CheckAndRemove()
 
     int nLimit = GetStorageLimit();
 
-    std::map<uint256, CMasternodePaymentVote>::iterator it = mapMasternodePaymentVotes.begin();
+    std::map<H256, CMasternodePaymentVote>::iterator it = mapMasternodePaymentVotes.begin();
     while(it != mapMasternodePaymentVotes.end()) {
         CMasternodePaymentVote vote = (*it).second;
 
@@ -829,8 +829,8 @@ void CMasternodePayments::Sync(CNode* pnode)
     for(int h = nCachedBlockHeight; h < nCachedBlockHeight + 20; h++) {
         if(mapMasternodeBlocks.count(h)) {
             BOOST_FOREACH(CMasternodePayee& payee, mapMasternodeBlocks[h].vecPayees) {
-                std::vector<uint256> vecVoteHashes = payee.GetVoteHashes();
-                BOOST_FOREACH(uint256& hash, vecVoteHashes) {
+                std::vector<H256> vecVoteHashes = payee.GetVoteHashes();
+                BOOST_FOREACH(H256& hash, vecVoteHashes) {
                     if(!HasVerifiedPaymentVote(hash)) continue;
                     pnode->PushInventory(CInv(MSG_MASTERNODE_PAYMENT_VOTE, hash));
                     nInvCount++;
@@ -903,7 +903,7 @@ void CMasternodePayments::RequestLowDataPaymentBlocks(CNode* pnode)
         )
         // END DEBUG
         // Low data block found, let's try to sync it
-        uint256 hash;
+        H256 hash;
         if(GetBlockHash(hash, it->first)) {
             vToFetch.push_back(CInv(MSG_MASTERNODE_PAYMENT_BLOCK, hash));
         }

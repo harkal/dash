@@ -6,7 +6,6 @@
 #ifndef BITCOIN_CONSENSUS_PARAMS_H
 #define BITCOIN_CONSENSUS_PARAMS_H
 
-#include "uint256.h"
 #include "crypto/hash.h"
 #include <map>
 #include <string>
@@ -37,7 +36,7 @@ struct BIP9Deployment {
  * Parameters that influence chain consensus.
  */
 struct Params {
-    uint256 hashGenesisBlock;
+    H256 hashGenesisBlock;
     int nSubsidyHalvingInterval;
     int nMasternodePaymentsStartBlock;
     int nMasternodePaymentsIncreaseBlock;

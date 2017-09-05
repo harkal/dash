@@ -31,7 +31,7 @@ private:
     static const int CURRENT_VERSION = 1;
     int nVersion;
 
-    uint256 id;
+    H256 id;
 
     bool fCrypted;
 
@@ -108,9 +108,9 @@ public:
     bool SetSeed(const SecureVector& vchSeedIn, bool fUpdateID);
     SecureVector GetSeed() const;
 
-    uint256 GetID() const { return id; }
+    H256 GetID() const { return id; }
 
-    uint256 GetSeedHash();
+    H256 GetSeedHash();
     void DeriveChildExtKey(uint32_t nAccountIndex, bool fInternal, uint32_t nChildIndex, CExtKey& extKeyRet);
 
     void AddAccount();
@@ -128,7 +128,7 @@ private:
 
 public:
     CExtPubKey extPubKey;
-    uint256 hdchainID;
+    H256 hdchainID;
     uint32_t nAccountIndex;
     uint32_t nChangeIndex;
 

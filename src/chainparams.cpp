@@ -138,13 +138,14 @@ public:
                     printf("Searching for genesis block...\n");
                     // This will figure out a valid hash and Nonce if you're
                     // creating a different genesis block:
-                    arith_uint256 hashTarget = arith_uint256().SetCompact(genesis.nBits);
+                    H256 hashTarget;
+                    hashTarget.SetCompact(genesis.nBits);
 
-                    uint256 thash;
+                    H256 thash;
 
                     while (true) {
                             thash = genesis.GetHash();
-                            if (UintToArith256(thash) <= hashTarget)
+                            if (thash <= hashTarget)
                                     break;
                             if ((genesis.nNonce & 0xFFF) == 0) {
                                     printf("nonce %08X: hash = %s (target = %s)\n", genesis.nNonce,

@@ -26,7 +26,7 @@ bool TransactionSignatureCreator::CreateSig(std::vector<unsigned char>& vchSig, 
     if (!keystore->GetKey(address, key))
         return false;
 
-    uint256 hash = SignatureHash(scriptCode, *txTo, nIn, nHashType);
+    H256 hash = SignatureHash(scriptCode, *txTo, nIn, nHashType);
     if (!key.Sign(hash, vchSig))
         return false;
     vchSig.push_back((unsigned char)nHashType);
@@ -88,11 +88,12 @@ static bool SignStep(const BaseSignatureCreator& creator, const CScript& scriptP
         {
             CPubKey vch;
             creator.KeyStore().GetPubKey(keyID, vch);
-            scriptSigRet << ToByteVector(vch);
+            // disabled -- HarKal
+            //scriptSigRet << ToByteVector(vch);
         }
         return true;
     case TX_SCRIPTHASH:
-        return creator.KeyStore().GetCScript(uint160(vSolutions[0]), scriptSigRet);
+        return creator.KeyStore().GetCScript(H160(vSolutions[0]), scriptSigRet);
 
     case TX_MULTISIG:
         scriptSigRet << OP_0; // workaround CHECKMULTISIG bug

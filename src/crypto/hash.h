@@ -32,6 +32,10 @@ public:
         memcpy(mData.data(), blob.begin(), N);
     }
 
+    CHash(const typename std::array<Byte, N>::const_iterator& b, const typename std::array<Byte, N>::const_iterator& e) {
+        std::copy(b,e,mData.begin());
+    }
+
     CHash(uint64_t v) {
         SetNull();
         mData[0] = (uint32_t)v;
@@ -110,6 +114,8 @@ public:
     void SetHex(const std::string& str);
 
     std::string ToString() const { return GetHex(); }
+
+    double GetDouble() const { return (double)((Arith)*this); };
 
     typename std::array<Byte, N>::iterator begin() { return mData.begin(); }
     typename std::array<Byte, N>::iterator end() { return mData.end(); }

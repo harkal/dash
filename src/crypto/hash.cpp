@@ -1,7 +1,8 @@
 #include "crypto/hash.h"
+#include "utilstrencodings.h"
 
 template <unsigned N>
-CHash<N>& CHash<N>::SetCompact(uint32_t nCompact, bool *pfNegative = NULL, bool* pfOverflow = NULL)
+CHash<N>& CHash<N>::SetCompact(uint32_t nCompact, bool *pfNegative, bool* pfOverflow)
 {
     int nSize = nCompact >> 24;
     uint32_t nWord = nCompact & 0x007fffff;
@@ -21,14 +22,15 @@ CHash<N>& CHash<N>::SetCompact(uint32_t nCompact, bool *pfNegative = NULL, bool*
     return *this;
 }
 
+template <unsigned N>
 uint32_t CHash<N>::GetCompact(bool fNegative) const
 {
-    int nSize = (bits() + 7) / 8;
+    int nSize = (Bits() + 7) / 8;
     uint32_t nCompact = 0;
     if (nSize <= 3) {
         nCompact = GetLow64() << 8 * (3 - nSize);
     } else {
-        arith_uint256 bn = *this >> 8 * (nSize - 3);
+        H256 bn = (H256::Arith)*this >> 8 * (nSize - 3);
         nCompact = bn.GetLow64();
     }
     // The 0x00800000 bit denotes the sign.
@@ -46,11 +48,11 @@ uint32_t CHash<N>::GetCompact(bool fNegative) const
 
 
 template <unsigned N>
-std::string CHash<N>::getHex() const
+std::string CHash<N>::GetHex() const
 {
     char psz[N * 2 + 1];
     for (unsigned int i = 0; i < N ; i++)
-        sprintf(psz + i * 2, "%02x", data[N - i - 1]);
+        sprintf(psz + i * 2, "%02x", mData[N - i - 1]);
     return std::string(psz, psz + N * 2);
 }
 
@@ -72,7 +74,7 @@ void CHash<N>::SetHex(const char* psz)
     while (::HexDigit(*psz) != -1)
         psz++;
     psz--;
-    unsigned char* p1 = (unsigned char*)data;
+    unsigned char* p1 = (unsigned char*)mData.data();
     unsigned char* pend = p1 + N;
     while (psz >= pbegin && p1 < pend) {
         *p1 = ::HexDigit(*psz--);
@@ -89,13 +91,55 @@ void CHash<N>::SetHex(const std::string& str)
     SetHex(str.c_str());
 }
 
+static void inline HashMix(uint32_t& a, uint32_t& b, uint32_t& c)
+{
+    // Taken from lookup3, by Bob Jenkins.
+    a -= c;
+    a ^= ((c << 4) | (c >> 28));
+    c += b;
+    b -= a;
+    b ^= ((a << 6) | (a >> 26));
+    a += c;
+    c -= b;
+    c ^= ((b << 8) | (b >> 24));
+    b += a;
+    a -= c;
+    a ^= ((c << 16) | (c >> 16));
+    c += b;
+    b -= a;
+    b ^= ((a << 19) | (a >> 13));
+    a += c;
+    c -= b;
+    c ^= ((b << 4) | (b >> 28));
+    b += a;
+}
+
+static void inline HashFinal(uint32_t& a, uint32_t& b, uint32_t& c)
+{
+    // Taken from lookup3, by Bob Jenkins.
+    c ^= b;
+    c -= ((b << 14) | (b >> 18));
+    a ^= c;
+    a -= ((c << 11) | (c >> 21));
+    b ^= a;
+    b -= ((a << 25) | (a >> 7));
+    c ^= b;
+    c -= ((b << 16) | (b >> 16));
+    a ^= c;
+    a -= ((c << 4) | (c >> 28));
+    b ^= a;
+    b -= ((a << 14) | (a >> 18));
+    c ^= b;
+    c -= ((b << 24) | (b >> 8));
+}
+
 template <unsigned N>
 uint64_t CHash<N>::GetHash(const CHash<N>& salt) const
 {
     uint32_t a, b, c;
     const uint32_t *pn = (const uint32_t*)mData.data();
     const uint32_t *salt_pn = (const uint32_t*)salt.mData.data();
-    a = b = c = 0xdeadbeef + WIDTH;
+    a = b = c = 0xdeadbeef + N;
 
     a += pn[0] ^ salt_pn[0];
     b += pn[1] ^ salt_pn[1];

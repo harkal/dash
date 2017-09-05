@@ -137,7 +137,7 @@ void CMasternodeMan::CheckAndRemove()
         int nAskForMnbRecovery = MNB_RECOVERY_MAX_ASK_ENTRIES;
         while(it != vMasternodes.end()) {
             CMasternodeBroadcast mnb = CMasternodeBroadcast(*it);
-            uint256 hash = mnb.GetHash();
+            H256 hash = mnb.GetHash();
             // If collateral was spent ...
             if ((*it).IsOutpointSpent()) {
                 LogPrint("masternode", "CMasternodeMan::CheckAndRemove -- Removing Masternode: %s  addr=%s  %i now\n", (*it).GetStateString(), (*it).addr.ToString(), size() - 1);
@@ -187,7 +187,7 @@ void CMasternodeMan::CheckAndRemove()
 
         // proces replies for MASTERNODE_NEW_START_REQUIRED masternodes
         LogPrint("masternode", "CMasternodeMan::CheckAndRemove -- mMnbRecoveryGoodReplies size=%d\n", (int)mMnbRecoveryGoodReplies.size());
-        std::map<uint256, std::vector<CMasternodeBroadcast> >::iterator itMnbReplies = mMnbRecoveryGoodReplies.begin();
+        std::map<H256, std::vector<CMasternodeBroadcast> >::iterator itMnbReplies = mMnbRecoveryGoodReplies.begin();
         while(itMnbReplies != mMnbRecoveryGoodReplies.end()){
             if(mMnbRecoveryRequests[itMnbReplies->first].first < GetTime()) {
                 // all nodes we asked should have replied now
@@ -210,7 +210,7 @@ void CMasternodeMan::CheckAndRemove()
         // no need for cm_main below
         LOCK(cs);
 
-        std::map<uint256, std::pair< int64_t, std::set<CNetAddr> > >::iterator itMnbRequest = mMnbRecoveryRequests.begin();
+        std::map<H256, std::pair< int64_t, std::set<CNetAddr> > >::iterator itMnbRequest = mMnbRecoveryRequests.begin();
         while(itMnbRequest != mMnbRecoveryRequests.end()){
             // Allow this mnb to be re-verified again after MNB_RECOVERY_RETRY_SECONDS seconds
             // if mn is still in MASTERNODE_NEW_START_REQUIRED state.
@@ -271,7 +271,7 @@ void CMasternodeMan::CheckAndRemove()
         // NOTE: do not expire mapSeenMasternodeBroadcast entries here, clean them on mnb updates!
 
         // remove expired mapSeenMasternodePing
-        std::map<uint256, CMasternodePing>::iterator it4 = mapSeenMasternodePing.begin();
+        std::map<H256, CMasternodePing>::iterator it4 = mapSeenMasternodePing.begin();
         while(it4 != mapSeenMasternodePing.end()){
             if((*it4).second.IsExpired()) {
                 LogPrint("masternode", "CMasternodeMan::CheckAndRemove -- Removing expired Masternode ping: hash=%s\n", (*it4).second.GetHash().ToString());
@@ -282,7 +282,7 @@ void CMasternodeMan::CheckAndRemove()
         }
 
         // remove expired mapSeenMasternodeVerification
-        std::map<uint256, CMasternodeVerification>::iterator itv2 = mapSeenMasternodeVerification.begin();
+        std::map<H256, CMasternodeVerification>::iterator itv2 = mapSeenMasternodeVerification.begin();
         while(itv2 != mapSeenMasternodeVerification.end()){
             if((*itv2).second.nBlockHeight < nCachedBlockHeight - MAX_POSE_BLOCKS){
                 LogPrint("masternode", "CMasternodeMan::CheckAndRemove -- Removing expired Masternode verification: hash=%s\n", (*itv2).first.ToString());
@@ -524,7 +524,7 @@ CMasternode* CMasternodeMan::GetNextMasternodeInQueueForPayment(int nBlockHeight
     // Sort them low to high
     sort(vecMasternodeLastPaid.begin(), vecMasternodeLastPaid.end(), CompareLastPaidBlock());
 
-    uint256 blockHash;
+    H256 blockHash;
     if(!GetBlockHash(blockHash, nBlockHeight - 101)) {
         LogPrintf("CMasternode::GetNextMasternodeInQueueForPayment -- ERROR: GetBlockHash() failed at nBlockHeight %d\n", nBlockHeight - 101);
         return NULL;
@@ -632,7 +632,7 @@ std::vector<std::pair<int, CMasternode> > CMasternodeMan::GetMasternodeRanks(int
     std::vector<std::pair<int, CMasternode> > vecMasternodeRanks;
 
     //make sure we know about this block
-    uint256 blockHash = uint256();
+    H256 blockHash = H256();
     if(!GetBlockHash(blockHash, nBlockHeight)) return vecMasternodeRanks;
 
     LOCK(cs);

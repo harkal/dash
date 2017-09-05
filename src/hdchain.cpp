@@ -143,7 +143,7 @@ SecureVector CHDChain::GetSeed() const
     return vchSeed;
 }
 
-uint256 CHDChain::GetSeedHash()
+H256 CHDChain::GetSeedHash()
 {
     return Hash(vchSeed.begin(), vchSeed.end());
 }

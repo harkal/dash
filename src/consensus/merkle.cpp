@@ -39,11 +39,11 @@
 */
 
 /* This implements a constant-space merkle root/path calculator, limited to 2^32 leaves. */
-static void MerkleComputation(const std::vector<uint256>& leaves, uint256* proot, bool* pmutated, uint32_t branchpos, std::vector<uint256>* pbranch) {
+static void MerkleComputation(const std::vector<H256>& leaves, H256* proot, bool* pmutated, uint32_t branchpos, std::vector<H256>* pbranch) {
     if (pbranch) pbranch->clear();
     if (leaves.size() == 0) {
         if (pmutated) *pmutated = false;
-        if (proot) *proot = uint256();
+        if (proot) *proot = H256();
         return;
     }
     bool mutated = false;
@@ -54,12 +54,12 @@ static void MerkleComputation(const std::vector<uint256>& leaves, uint256* proot
     // For example, when count is 25 (11001 in binary), inner[4] is the hash of
     // the first 16 leaves, inner[3] of the next 8 leaves, and inner[0] equal to
     // the last leaf. The other inner entries are undefined.
-    uint256 inner[32];
+    H256 inner[32];
     // Which position in inner is a hash that depends on the matching leaf.
     int matchlevel = -1;
     // First process all leaves into 'inner' values.
     while (count < leaves.size()) {
-        uint256 h = leaves[count];
+        H256 h = leaves[count];
         bool matchh = count == branchpos;
         count++;
         int level;
@@ -93,7 +93,7 @@ static void MerkleComputation(const std::vector<uint256>& leaves, uint256* proot
     while (!(count & (((uint32_t)1) << level))) {
         level++;
     }
-    uint256 h = inner[level];
+    H256 h = inner[level];
     bool matchh = matchlevel == level;
     while (count != (((uint32_t)1) << level)) {
         // If we reach this point, h is an inner value that is not the top.
@@ -126,21 +126,21 @@ static void MerkleComputation(const std::vector<uint256>& leaves, uint256* proot
     if (proot) *proot = h;
 }
 
-uint256 ComputeMerkleRoot(const std::vector<uint256>& leaves, bool* mutated) {
-    uint256 hash;
+H256 ComputeMerkleRoot(const std::vector<H256>& leaves, bool* mutated) {
+    H256 hash;
     MerkleComputation(leaves, &hash, mutated, -1, NULL);
     return hash;
 }
 
-std::vector<uint256> ComputeMerkleBranch(const std::vector<uint256>& leaves, uint32_t position) {
-    std::vector<uint256> ret;
+std::vector<H256> ComputeMerkleBranch(const std::vector<H256>& leaves, uint32_t position) {
+    std::vector<H256> ret;
     MerkleComputation(leaves, NULL, NULL, position, &ret);
     return ret;
 }
 
-uint256 ComputeMerkleRootFromBranch(const uint256& leaf, const std::vector<uint256>& vMerkleBranch, uint32_t nIndex) {
-    uint256 hash = leaf;
-    for (std::vector<uint256>::const_iterator it = vMerkleBranch.begin(); it != vMerkleBranch.end(); ++it) {
+H256 ComputeMerkleRootFromBranch(const H256& leaf, const std::vector<H256>& vMerkleBranch, uint32_t nIndex) {
+    H256 hash = leaf;
+    for (std::vector<H256>::const_iterator it = vMerkleBranch.begin(); it != vMerkleBranch.end(); ++it) {
         if (nIndex & 1) {
             hash = Hash(BEGIN(*it), END(*it), BEGIN(hash), END(hash));
         } else {
@@ -151,9 +151,9 @@ uint256 ComputeMerkleRootFromBranch(const uint256& leaf, const std::vector<uint2
     return hash;
 }
 
-uint256 BlockMerkleRoot(const CBlock& block, bool* mutated)
+H256 BlockMerkleRoot(const CBlock& block, bool* mutated)
 {
-    std::vector<uint256> leaves;
+    std::vector<H256> leaves;
     leaves.resize(block.vtx.size());
     for (size_t s = 0; s < block.vtx.size(); s++) {
         leaves[s] = block.vtx[s].GetHash();
@@ -161,9 +161,9 @@ uint256 BlockMerkleRoot(const CBlock& block, bool* mutated)
     return ComputeMerkleRoot(leaves, mutated);
 }
 
-std::vector<uint256> BlockMerkleBranch(const CBlock& block, uint32_t position)
+std::vector<H256> BlockMerkleBranch(const CBlock& block, uint32_t position)
 {
-    std::vector<uint256> leaves;
+    std::vector<H256> leaves;
     leaves.resize(block.vtx.size());
     for (size_t s = 0; s < block.vtx.size(); s++) {
         leaves[s] = block.vtx[s].GetHash();
