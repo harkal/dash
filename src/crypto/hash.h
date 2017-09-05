@@ -45,7 +45,32 @@ public:
     bool operator != (CHash const &o) const { return mData != o.mData; }
 
     friend inline bool operator<(const CHash& a, const CHash& b) { return memcmp(a.mData.data(), b.mData.data(), N) < 0; }
+    friend inline bool operator<=(const CHash& a, const CHash& b) { return memcmp(a.mData.data(), b.mData.data(), N) <= 0; }
     friend inline bool operator>(const CHash& a, const CHash& b) { return memcmp(a.mData.data(), b.mData.data(), N) > 0; }
+    friend inline bool operator>=(const CHash& a, const CHash& b) { return memcmp(a.mData.data(), b.mData.data(), N) >= 0; }
+    friend inline const CHash operator|(const CHash& a, const CHash& b) { return CHash(a) |= b; }
+
+    friend inline const CHash operator+(const CHash& a, const CHash& b) { return CHash(a) += b; }
+    friend inline const CHash operator-(const CHash& a, const CHash& b) { return CHash(a) -= b; }
+    friend inline const CHash operator*(const CHash& a, const CHash& b) { return CHash(a) *= b; }
+    friend inline const CHash operator/(const CHash& a, const CHash& b) { return CHash(a) /= b; }
+
+    CHash& operator*=(uint32_t b32) { *this = ((Arith)*this) * b32; return *this; }
+
+    CHash& operator*=(const CHash& b) { *this = ((Arith)*this) * (Arith)b; return *this; }
+    CHash& operator/=(const CHash& b) { *this = ((Arith)*this) / (Arith)b; return *this; }
+    CHash& operator+=(const CHash& b) { *this = ((Arith)*this) + (Arith)b; return *this; }
+    CHash& operator-=(const CHash& b) { *this = ((Arith)*this) - (Arith)b; return *this; }
+
+    const CHash& operator~() const { return ~((Arith)*this); }
+
+    CHash& operator|=(const CHash& b)
+    {
+        for (int i = 0; i < N; ++i)
+            mData[i] |= b.mData[i];
+
+        return *this;
+    }
 
     void Randomize(boost::random_device)
     {
@@ -93,6 +118,14 @@ public:
 
     uint32_t GetCompact(bool fNegative = false) const;
     CHash& SetCompact(uint32_t nCompact, bool *pfNegative = NULL, bool* pfOverflow = NULL);
+
+    uint32_t Bits() const;
+
+    uint64_t GetLow64() const
+    {
+        assert(N >= 2);
+        return mData[0] | (uint64_t)mData[1] << 32;
+    }
 
     // Serializaton support
     unsigned int GetSerializeSize(int nType, int nVersion) const

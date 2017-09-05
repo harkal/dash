@@ -7,10 +7,11 @@
 #define BITCOIN_SPENTINDEX_H
 
 #include "uint256.h"
+#include "crypto/hash.h"
 #include "amount.h"
 
 struct CSpentIndexKey {
-    uint256 txid;
+    H256 txid;
     unsigned int outputIndex;
 
     ADD_SERIALIZE_METHODS;
@@ -21,7 +22,7 @@ struct CSpentIndexKey {
         READWRITE(outputIndex);
     }
 
-    CSpentIndexKey(uint256 t, unsigned int i) {
+    CSpentIndexKey(H256 t, unsigned int i) {
         txid = t;
         outputIndex = i;
     }
@@ -38,12 +39,12 @@ struct CSpentIndexKey {
 };
 
 struct CSpentIndexValue {
-    uint256 txid;
+    H256 txid;
     unsigned int inputIndex;
     int blockHeight;
     CAmount satoshis;
     int addressType;
-    uint160 addressHash;
+    H160 addressHash;
 
     ADD_SERIALIZE_METHODS;
 
@@ -57,7 +58,7 @@ struct CSpentIndexValue {
         READWRITE(addressHash);
     }
 
-    CSpentIndexValue(uint256 t, unsigned int i, int h, CAmount s, int type, uint160 a) {
+    CSpentIndexValue(H256 t, unsigned int i, int h, CAmount s, int type, H160 a) {
         txid = t;
         inputIndex = i;
         blockHeight = h;

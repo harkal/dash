@@ -111,3 +111,18 @@ uint64_t CHash<N>::GetHash(const CHash<N>& salt) const
 
     return ((((uint64_t)b) << 32) | c);
 }
+
+template <unsigned N>
+uint32_t CHash<N>::Bits() const
+{
+    for (int pos = N - 1; pos >= 0; pos--) {
+        if (mData[pos]) {
+            for (int bits = 31; bits > 0; bits--) {
+                if (mData[pos] & 1 << bits)
+                    return 32 * pos + bits + 1;
+            }
+            return 32 * pos + 1;
+        }
+    }
+    return 0;
+}

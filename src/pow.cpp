@@ -22,8 +22,8 @@ unsigned int static KimotoGravityWell(const CBlockIndex* pindexLast, const Conse
     int64_t PastRateActualSeconds = 0;
     int64_t PastRateTargetSeconds = 0;
     double PastRateAdjustmentRatio = double(1);
-    arith_uint256 PastDifficultyAverage;
-    arith_uint256 PastDifficultyAveragePrev;
+    H256 PastDifficultyAverage;
+    H256 PastDifficultyAveragePrev;
     double EventHorizonDeviation;
     double EventHorizonDeviationFast;
     double EventHorizonDeviationSlow;
@@ -33,7 +33,7 @@ unsigned int static KimotoGravityWell(const CBlockIndex* pindexLast, const Conse
     uint64_t PastBlocksMin = pastSecondsMin / params.nPowTargetSpacing;
     uint64_t PastBlocksMax = pastSecondsMax / params.nPowTargetSpacing;
 
-    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || (uint64_t)BlockLastSolved->nHeight < PastBlocksMin) { return UintToArith256(params.powLimit).GetCompact(); }
+    if (BlockLastSolved == NULL || BlockLastSolved->nHeight == 0 || (uint64_t)BlockLastSolved->nHeight < PastBlocksMin) { return params.powLimit.GetCompact(); }
 
     for (unsigned int i = 1; BlockReading && BlockReading->nHeight > 0; i++) {
         if (PastBlocksMax > 0 && i > PastBlocksMax) { break; }
@@ -68,14 +68,14 @@ unsigned int static KimotoGravityWell(const CBlockIndex* pindexLast, const Conse
         BlockReading = BlockReading->pprev;
     }
 
-    arith_uint256 bnNew(PastDifficultyAverage);
+    H256 bnNew(PastDifficultyAverage);
     if (PastRateActualSeconds != 0 && PastRateTargetSeconds != 0) {
         bnNew *= PastRateActualSeconds;
         bnNew /= PastRateTargetSeconds;
     }
 
-    if (bnNew > UintToArith256(params.powLimit)) {
-        bnNew = UintToArith256(params.powLimit);
+    if (bnNew > params.powLimit) {
+        bnNew = params.powLimit;
     }
 
     return bnNew.GetCompact();
@@ -83,7 +83,7 @@ unsigned int static KimotoGravityWell(const CBlockIndex* pindexLast, const Conse
 
 unsigned int static DarkGravityWave(const CBlockIndex* pindexLast, const Consensus::Params& params) {
     /* current difficulty formula, ebakus - DarkGravity v3, written by Evan Duffield - evan@ebakus.org */
-    const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);
+    const H256 bnPowLimit = params.powLimit;
     int64_t nPastBlocks = 24;
 
     // make sure we have at least (nPastBlocks + 1) blocks, otherwise just return powLimit
@@ -92,10 +92,11 @@ unsigned int static DarkGravityWave(const CBlockIndex* pindexLast, const Consens
     }
 
     const CBlockIndex *pindex = pindexLast;
-    arith_uint256 bnPastTargetAvg;
+    H256 bnPastTargetAvg;
 
     for (unsigned int nCountBlocks = 1; nCountBlocks <= nPastBlocks; nCountBlocks++) {
-        arith_uint256 bnTarget = arith_uint256().SetCompact(pindex->nBits);
+        H256 bnTarget;
+        bnTarget.SetCompact(pindex->nBits);
         if (nCountBlocks == 1) {
             bnPastTargetAvg = bnTarget;
         } else {
@@ -109,7 +110,7 @@ unsigned int static DarkGravityWave(const CBlockIndex* pindexLast, const Consens
         }
     }
 
-    arith_uint256 bnNew(bnPastTargetAvg);
+    H256 bnNew(bnPastTargetAvg);
 
     int64_t nActualTimespan = pindexLast->GetBlockTime() - pindex->GetBlockTime();
     // NOTE: is this accurate? nActualTimespan counts it for (nPastBlocks - 1) blocks only...
@@ -133,7 +134,7 @@ unsigned int static DarkGravityWave(const CBlockIndex* pindexLast, const Consens
 
 unsigned int GetNextWorkRequiredBTC(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
-    unsigned int nProofOfWorkLimit = UintToArith256(params.powLimit).GetCompact();
+    unsigned int nProofOfWorkLimit = params.powLimit.GetCompact();
 
     // Genesis block
     if (pindexLast == NULL)
@@ -216,9 +217,9 @@ unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nF
         nActualTimespan = params.nPowTargetTimespan*4;
 
     // Retarget
-    const arith_uint256 bnPowLimit = UintToArith256(params.powLimit);
-    arith_uint256 bnNew;
-    arith_uint256 bnOld;
+    const H256 bnPowLimit = params.powLimit;
+    H256 bnNew;
+    H256 bnOld;
     bnNew.SetCompact(pindexLast->nBits);
     bnOld = bnNew;
     bnNew *= nActualTimespan;
@@ -245,7 +246,7 @@ bool CheckProofOfWork(H256 hash, unsigned int nBits, const Consensus::Params& pa
     bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
 
     // Check range
-    if (fNegative || bnTarget == 0 || fOverflow || bnTarget > UintToArith256(params.powLimit))
+    if (fNegative || bnTarget == 0 || fOverflow || bnTarget > params.powLimit)
         return error("CheckProofOfWork(): nBits below minimum work");
 
     // Check proof of work matches claimed amount
@@ -255,9 +256,9 @@ bool CheckProofOfWork(H256 hash, unsigned int nBits, const Consensus::Params& pa
     return true;
 }
 
-arith_uint256 GetBlockProof(const CBlockIndex& block)
+H256 GetBlockProof(const CBlockIndex& block)
 {
-    arith_uint256 bnTarget;
+    H256 bnTarget;
     bool fNegative;
     bool fOverflow;
     bnTarget.SetCompact(block.nBits, &fNegative, &fOverflow);
@@ -272,7 +273,7 @@ arith_uint256 GetBlockProof(const CBlockIndex& block)
 
 int64_t GetBlockProofEquivalentTime(const CBlockIndex& to, const CBlockIndex& from, const CBlockIndex& tip, const Consensus::Params& params)
 {
-    arith_uint256 r;
+    H256 r;
     int sign = 1;
     if (to.nChainWork > from.nChainWork) {
         r = to.nChainWork - from.nChainWork;
@@ -280,8 +281,8 @@ int64_t GetBlockProofEquivalentTime(const CBlockIndex& to, const CBlockIndex& fr
         r = from.nChainWork - to.nChainWork;
         sign = -1;
     }
-    r = r * arith_uint256(params.nPowTargetSpacing) / GetBlockProof(tip);
-    if (r.bits() > 63) {
+    r = r * params.nPowTargetSpacing / GetBlockProof(tip);
+    if (r.Bits() > 63) {
         return sign * std::numeric_limits<int64_t>::max();
     }
     return sign * r.GetLow64();
