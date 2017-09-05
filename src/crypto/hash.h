@@ -6,6 +6,7 @@
 #define HASH_H
 
 #include <array>
+#include <algorithm>
 
 #include <boost/random/random_device.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
@@ -38,7 +39,7 @@ public:
     }
 
     explicit CHash(const Byte *data) { memcpy(mData.data(), data, N); }
-    explicit CHash(const std::vector<Byte>& data) { mData(data.begin(), data.end()); }
+    explicit CHash(const std::vector<Byte>& data) { std::copy(data.begin(), data.end(), mData.begin()); }
 
     operator Arith() const { return fromBigEndian<Arith>( mData ); }
 
