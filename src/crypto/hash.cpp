@@ -1,7 +1,7 @@
 #include "crypto/hash.h"
 
 template <unsigned N>
-ArithInteger& ArithInteger<N>::SetCompact(uint32_t nCompact, bool *pfNegative = NULL, bool* pfOverflow = NULL)
+CHash<N>& CHash<N>::SetCompact(uint32_t nCompact, bool *pfNegative = NULL, bool* pfOverflow = NULL)
 {
     int nSize = nCompact >> 24;
     uint32_t nWord = nCompact & 0x007fffff;
@@ -20,6 +20,30 @@ ArithInteger& ArithInteger<N>::SetCompact(uint32_t nCompact, bool *pfNegative = 
                                      (nWord > 0xffff && nSize > 32));
     return *this;
 }
+
+uint32_t CHash<N>::GetCompact(bool fNegative) const
+{
+    int nSize = (bits() + 7) / 8;
+    uint32_t nCompact = 0;
+    if (nSize <= 3) {
+        nCompact = GetLow64() << 8 * (3 - nSize);
+    } else {
+        arith_uint256 bn = *this >> 8 * (nSize - 3);
+        nCompact = bn.GetLow64();
+    }
+    // The 0x00800000 bit denotes the sign.
+    // Thus, if it is already set, divide the mantissa by 256 and increase the exponent.
+    if (nCompact & 0x00800000) {
+        nCompact >>= 8;
+        nSize++;
+    }
+    assert((nCompact & ~0x007fffff) == 0);
+    assert(nSize < 256);
+    nCompact |= nSize << 24;
+    nCompact |= (fNegative && (nCompact & 0x007fffff) ? 0x00800000 : 0);
+    return nCompact;
+}
+
 
 template <unsigned N>
 std::string CHash<N>::getHex() const

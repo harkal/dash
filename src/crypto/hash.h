@@ -15,13 +15,6 @@
 #include "../uint256.h"
 
 template <unsigned N>
-class ArithInteger : public boost::multiprecision::number<boost::multiprecision::cpp_int_backend<N * 8, N * 8, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void>>
-{
-public:
-    ArithInteger& SetCompact(uint32_t nCompact, bool *pfNegative = NULL, bool* pfOverflow = NULL);
-};
-
-template <unsigned N>
 class CHash
 {
 public:
@@ -36,6 +29,12 @@ public:
 
     CHash(const base_blob<N * 8> &blob) {
         memcpy(mData.data(), blob.begin(), N);
+    }
+
+    CHash(uint64_t v) {
+        SetNull();
+        mData[0] = (uint32_t)v;
+        mData[1] = (uint32_t)(v >> 32);
     }
 
     explicit CHash(const Byte *data) { memcpy(mData.data(), data, N); }
@@ -91,6 +90,9 @@ public:
     const typename std::array<Byte, N>::const_iterator end() const { return mData.end(); }
 
     unsigned int size() const { return N; }
+
+    uint32_t GetCompact(bool fNegative = false) const;
+    CHash& SetCompact(uint32_t nCompact, bool *pfNegative = NULL, bool* pfOverflow = NULL);
 
     // Serializaton support
     unsigned int GetSerializeSize(int nType, int nVersion) const

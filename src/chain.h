@@ -122,7 +122,7 @@ public:
     unsigned int nUndoPos;
 
     //! (memory only) Total amount of work (expected number of hashes) in the chain up to and including this block
-    arith_uint256 nChainWork;
+    H256 nChainWork;
 
     //! Number of transactions in this block.
     //! Note: in a potential headers-first mode, this number cannot be relied upon

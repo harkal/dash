@@ -453,7 +453,8 @@ void static BitcoinMiner(const CChainParams& chainparams, CConnman& connman)
             // Search
             //
             int64_t nStart = GetTime();
-            H256::Arith hashTarget = arith_uint256().SetCompact(pblock->nBits);
+            H256 hashTarget;
+            hashTarget.SetCompact(pblock->nBits);
             while (true)
             {
                 unsigned int nHashesDone = 0;

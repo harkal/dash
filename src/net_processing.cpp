@@ -28,6 +28,7 @@
 #include "utilmoneystr.h"
 #include "utilstrencodings.h"
 #include "validationinterface.h"
+#include "crypto/hash.h"
 
 #include "spork.h"
 #include "governance.h"
@@ -392,7 +393,7 @@ void FindNextBlocksToDownload(NodeId nodeid, unsigned int count, std::vector<CBl
     // Make sure pindexBestKnownBlock is up to date, we'll need it.
     ProcessBlockAvailability(nodeid);
 
-    if (state->pindexBestKnownBlock == NULL || state->pindexBestKnownBlock->nChainWork < chainActive.Tip()->nChainWork || state->pindexBestKnownBlock->nChainWork < UintToArith256(consensusParams.nMinimumChainWork)) {
+    if (state->pindexBestKnownBlock == NULL || state->pindexBestKnownBlock->nChainWork < chainActive.Tip()->nChainWork || state->pindexBestKnownBlock->nChainWork < consensusParams.nMinimumChainWork) {
         // This peer has nothing interesting.
         return;
     }
@@ -760,7 +761,7 @@ static void RelayAddress(const CAddress& addr, bool fReachable, CConnman& connma
     if (hashSalt.IsNull())
         hashSalt = GetRandHash();
     uint64_t hashAddr = addr.GetHash();
-    H256 hashRand = ArithToUint256(UintToArith256(hashSalt) ^ (hashAddr<<32) ^ ((GetTime()+hashAddr)/(24*60*60)));
+    H256 hashRand((H256::Arith)(hashSalt) ^ (hashAddr<<32) ^ ((GetTime()+hashAddr)/(24*60*60)));
     hashRand = Hash(BEGIN(hashRand), END(hashRand));
     std::multimap<H256, CNode*> mapMix;
 
@@ -768,7 +769,7 @@ static void RelayAddress(const CAddress& addr, bool fReachable, CConnman& connma
         if (pnode->nVersion >= CADDR_TIME_VERSION) {
             unsigned int nPointer;
             memcpy(&nPointer, &pnode, sizeof(nPointer));
-            H256 hashKey = ArithToUint256(UintToArith256(hashRand) ^ nPointer);
+            H256 hashKey((H256::Arith)(hashRand) ^ nPointer);
             hashKey = Hash(BEGIN(hashKey), END(hashKey));
             mapMix.emplace(hashKey, pnode);
         }
@@ -2539,9 +2540,9 @@ bool SendMessages(CNode* pto, CConnman& connman, std::atomic<bool>& interruptMsg
                     static H256 hashSalt;
                     if (hashSalt.IsNull())
                         hashSalt = GetRandHash();
-                    H256 hashRand = ArithToUint256(UintToArith256(inv.hash) ^ UintToArith256(hashSalt));
+                    H256 hashRand((H256::Arith)(inv.hash) ^ (H256::Arith)(hashSalt));
                     hashRand = Hash(BEGIN(hashRand), END(hashRand));
-                    bool fTrickleWait = ((UintToArith256(hashRand) & 3) != 0);
+                    bool fTrickleWait = (((H256::Arith)(hashRand) & 3) != 0);
 
                     if (fTrickleWait)
                     {

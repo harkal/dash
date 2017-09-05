@@ -9,6 +9,7 @@
 #include "chain.h"
 #include "chainparams.h"
 #include "primitives/block.h"
+#include "crypto/hash.h"
 #include "uint256.h"
 #include "util.h"
 
@@ -235,11 +236,11 @@ unsigned int CalculateNextWorkRequired(const CBlockIndex* pindexLast, int64_t nF
     return bnNew.GetCompact();
 }
 
-bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params& params)
+bool CheckProofOfWork(H256 hash, unsigned int nBits, const Consensus::Params& params)
 {
     bool fNegative;
     bool fOverflow;
-    arith_uint256 bnTarget;
+    H256 bnTarget;
 
     bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
 
@@ -248,7 +249,7 @@ bool CheckProofOfWork(uint256 hash, unsigned int nBits, const Consensus::Params&
         return error("CheckProofOfWork(): nBits below minimum work");
 
     // Check proof of work matches claimed amount
-    if (UintToArith256(hash) > bnTarget)
+    if (hash > bnTarget)
         return error("CheckProofOfWork(): hash doesn't match nBits");
 
     return true;
