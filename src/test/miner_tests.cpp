@@ -80,7 +80,7 @@ BOOST_AUTO_TEST_CASE(CreateNewBlock_validity)
     CBlockTemplate *pblocktemplate;
     CMutableTransaction tx,tx2;
     CScript script;
-    uint256 hash;
+    H256 hash;
     TestMemPoolEntryHelper entry;
     entry.nFee = 11;
     entry.dPriority = 111.0;

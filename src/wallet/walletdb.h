@@ -27,8 +27,6 @@ class CMasterKey;
 class CScript;
 class CWallet;
 class CWalletTx;
-class uint160;
-class uint256;
 
 /** Error statuses for the wallet database */
 enum DBErrors
@@ -88,14 +86,14 @@ public:
     bool WritePurpose(const std::string& strAddress, const std::string& purpose);
     bool ErasePurpose(const std::string& strAddress);
 
-    bool WriteTx(uint256 hash, const CWalletTx& wtx);
-    bool EraseTx(uint256 hash);
+    bool WriteTx(H256 hash, const CWalletTx& wtx);
+    bool EraseTx(H256 hash);
 
     bool WriteKey(const CPubKey& vchPubKey, const CPrivKey& vchPrivKey, const CKeyMetadata &keyMeta);
     bool WriteCryptedKey(const CPubKey& vchPubKey, const std::vector<unsigned char>& vchCryptedSecret, const CKeyMetadata &keyMeta);
     bool WriteMasterKey(unsigned int nID, const CMasterKey& kMasterKey);
 
-    bool WriteCScript(const uint160& hash, const CScript& redeemScript);
+    bool WriteCScript(const H160& hash, const CScript& redeemScript);
 
     bool WriteWatchOnly(const CScript &script);
     bool EraseWatchOnly(const CScript &script);
@@ -129,7 +127,7 @@ public:
 
     DBErrors ReorderTransactions(CWallet* pwallet);
     DBErrors LoadWallet(CWallet* pwallet);
-    DBErrors FindWalletTx(CWallet* pwallet, std::vector<uint256>& vTxHash, std::vector<CWalletTx>& vWtx);
+    DBErrors FindWalletTx(CWallet* pwallet, std::vector<H256>& vTxHash, std::vector<CWalletTx>& vWtx);
     DBErrors ZapWalletTx(CWallet* pwallet, std::vector<CWalletTx>& vWtx);
     static bool Recover(CDBEnv& dbenv, const std::string& filename, bool fOnlyKeys);
     static bool Recover(CDBEnv& dbenv, const std::string& filename);

@@ -4,7 +4,7 @@
 
 #include "coins.h"
 #include "random.h"
-#include "uint256.h"
+#include "crypto/hash.h"
 #include "test/test_ebakus.h"
 #include "validation.h"
 #include "consensus/validation.h"
@@ -18,13 +18,13 @@ namespace
 {
 class CCoinsViewTest : public CCoinsView
 {
-    uint256 hashBestBlock_;
-    std::map<uint256, CCoins> map_;
+    H256 hashBestBlock_;
+    std::map<H256, CCoins> map_;
 
 public:
-    bool GetCoins(const uint256& txid, CCoins& coins) const
+    bool GetCoins(const H256& txid, CCoins& coins) const
     {
-        std::map<uint256, CCoins>::const_iterator it = map_.find(txid);
+        std::map<H256, CCoins>::const_iterator it = map_.find(txid);
         if (it == map_.end()) {
             return false;
         }
@@ -36,15 +36,15 @@ public:
         return true;
     }
 
-    bool HaveCoins(const uint256& txid) const
+    bool HaveCoins(const H256& txid) const
     {
         CCoins coins;
         return GetCoins(txid, coins);
     }
 
-    uint256 GetBestBlock() const { return hashBestBlock_; }
+    H256 GetBestBlock() const { return hashBestBlock_; }
 
-    bool BatchWrite(CCoinsMap& mapCoins, const uint256& hashBlock)
+    bool BatchWrite(CCoinsMap& mapCoins, const H256& hashBlock)
     {
         for (CCoinsMap::iterator it = mapCoins.begin(); it != mapCoins.end(); ) {
             if (it->second.flags & CCoinsCacheEntry::DIRTY) {
@@ -109,7 +109,7 @@ BOOST_AUTO_TEST_CASE(coins_cache_simulation_test)
     bool missed_an_entry = false;
 
     // A simple map to track what we expect the cache stack to represent.
-    std::map<uint256, CCoins> result;
+    std::map<H256, CCoins> result;
 
     // The cache stack.
     CCoinsViewTest base; // A CCoinsViewTest at the bottom.
@@ -117,7 +117,7 @@ BOOST_AUTO_TEST_CASE(coins_cache_simulation_test)
     stack.push_back(new CCoinsViewCacheTest(&base)); // Start with one cache.
 
     // Use a limited set of random transaction ids, so we do test overwriting entries.
-    std::vector<uint256> txids;
+    std::vector<H256> txids;
     txids.resize(NUM_SIMULATION_ITERATIONS / 8);
     for (unsigned int i = 0; i < txids.size(); i++) {
         txids[i] = GetRandHash();
@@ -126,7 +126,7 @@ BOOST_AUTO_TEST_CASE(coins_cache_simulation_test)
     for (unsigned int i = 0; i < NUM_SIMULATION_ITERATIONS; i++) {
         // Do a random modification.
         {
-            uint256 txid = txids[insecure_rand() % txids.size()]; // txid we're going to modify in this iteration.
+            H256 txid = txids[insecure_rand() % txids.size()]; // txid we're going to modify in this iteration.
             CCoins& coins = result[txid];
             CCoinsModifier entry = stack.back()->ModifyCoins(txid);
             BOOST_CHECK(coins == *entry);
@@ -149,7 +149,7 @@ BOOST_AUTO_TEST_CASE(coins_cache_simulation_test)
 
         // Once every 1000 iterations and at the end, verify the full cache.
         if (insecure_rand() % 1000 == 1 || i == NUM_SIMULATION_ITERATIONS - 1) {
-            for (std::map<uint256, CCoins>::iterator it = result.begin(); it != result.end(); it++) {
+            for (std::map<H256, CCoins>::iterator it = result.begin(); it != result.end(); it++) {
                 const CCoins* coins = stack.back()->AccessCoins(it->first);
                 if (coins) {
                     BOOST_CHECK(*coins == it->second);
@@ -220,7 +220,7 @@ BOOST_AUTO_TEST_CASE(updatecoins_simulation_test)
 {
     bool spent_a_duplicate_coinbase = false;
     // A simple map to track what we expect the cache stack to represent.
-    std::map<uint256, CCoins> result;
+    std::map<H256, CCoins> result;
 
     // The cache stack.
     CCoinsViewTest base; // A CCoinsViewTest at the bottom.
@@ -228,9 +228,9 @@ BOOST_AUTO_TEST_CASE(updatecoins_simulation_test)
     stack.push_back(new CCoinsViewCacheTest(&base)); // Start with one cache.
 
     // Track the txids we've used and whether they have been spent or not
-    std::map<uint256, CAmount> coinbaseids;
-    std::set<uint256> alltxids;
-    std::set<uint256> duplicateids;
+    std::map<H256, CAmount> coinbaseids;
+    std::set<H256> alltxids;
+    std::set<H256> duplicateids;
 
     for (unsigned int i = 0; i < NUM_SIMULATION_ITERATIONS; i++) {
         {
@@ -244,7 +244,7 @@ BOOST_AUTO_TEST_CASE(updatecoins_simulation_test)
             if (insecure_rand() % 10 == 0 || coinbaseids.size() < 10) {
                 // 1/100 times create a duplicate coinbase
                 if (insecure_rand() % 10 == 0 && coinbaseids.size()) {
-                    std::map<uint256, CAmount>::iterator coinbaseIt = coinbaseids.lower_bound(GetRandHash());
+                    std::map<H256, CAmount>::iterator coinbaseIt = coinbaseids.lower_bound(GetRandHash());
                     if (coinbaseIt == coinbaseids.end()) {
                         coinbaseIt = coinbaseids.begin();
                     }
@@ -260,9 +260,9 @@ BOOST_AUTO_TEST_CASE(updatecoins_simulation_test)
             }
             // 9/10 times create a regular tx
             else {
-                uint256 prevouthash;
+                H256 prevouthash;
                 // equally likely to spend coinbase or non coinbase
-                std::set<uint256>::iterator txIt = alltxids.lower_bound(GetRandHash());
+                std::set<H256>::iterator txIt = alltxids.lower_bound(GetRandHash());
                 if (txIt == alltxids.end()) {
                     txIt = alltxids.begin();
                 }
@@ -303,7 +303,7 @@ BOOST_AUTO_TEST_CASE(updatecoins_simulation_test)
 
         // Once every 1000 iterations and at the end, verify the full cache.
         if (insecure_rand() % 1000 == 1 || i == NUM_SIMULATION_ITERATIONS - 1) {
-            for (std::map<uint256, CCoins>::iterator it = result.begin(); it != result.end(); it++) {
+            for (std::map<H256, CCoins>::iterator it = result.begin(); it != result.end(); it++) {
                 const CCoins* coins = stack.back()->AccessCoins(it->first);
                 if (coins) {
                     BOOST_CHECK(*coins == it->second);

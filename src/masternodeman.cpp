@@ -642,7 +642,7 @@ std::vector<std::pair<int, CMasternode> > CMasternodeMan::GetMasternodeRanks(int
 
         if(mn.nProtocolVersion < nMinProtocol || !mn.IsEnabled()) continue;
 
-        int64_t nScore = mn.CalculateScore(blockHash).GetCompact(false);
+        int64_t nScore = H256(mn.CalculateScore(blockHash)).GetCompact(false);
 
         vecMasternodeScores.push_back(std::make_pair(nScore, &mn));
     }
@@ -664,7 +664,7 @@ CMasternode* CMasternodeMan::GetMasternodeByRank(int nRank, int nBlockHeight, in
 
     LOCK(cs);
 
-    uint256 blockHash;
+    H256 blockHash;
     if(!GetBlockHash(blockHash, nBlockHeight)) {
         LogPrintf("CMasternode::GetMasternodeByRank -- ERROR: GetBlockHash() failed at nBlockHeight %d\n", nBlockHeight);
         return NULL;
@@ -676,7 +676,7 @@ CMasternode* CMasternodeMan::GetMasternodeByRank(int nRank, int nBlockHeight, in
         if(mn.nProtocolVersion < nMinProtocol) continue;
         if(fOnlyActive && !mn.IsEnabled()) continue;
 
-        int64_t nScore = mn.CalculateScore(blockHash).GetCompact(false);
+        int64_t nScore = H256(mn.CalculateScore(blockHash)).GetCompact(false);
 
         vecMasternodeScores.push_back(std::make_pair(nScore, &mn));
     }
@@ -708,20 +708,20 @@ void CMasternodeMan::ProcessMasternodeConnections()
     });
 }
 
-std::pair<CService, std::set<uint256> > CMasternodeMan::PopScheduledMnbRequestConnection()
+std::pair<CService, std::set<H256> > CMasternodeMan::PopScheduledMnbRequestConnection()
 {
     LOCK(cs);
     if(listScheduledMnbRequestConnections.empty()) {
-        return std::make_pair(CService(), std::set<uint256>());
+        return std::make_pair(CService(), std::set<H256>());
     }
 
-    std::set<uint256> setResult;
+    std::set<H256> setResult;
 
     listScheduledMnbRequestConnections.sort();
-    std::pair<CService, uint256> pairFront = listScheduledMnbRequestConnections.front();
+    std::pair<CService, H256> pairFront = listScheduledMnbRequestConnections.front();
 
     // squash hashes from requests with the same CService as the first one into setResult
-    std::list< std::pair<CService, uint256> >::iterator it = listScheduledMnbRequestConnections.begin();
+    std::list< std::pair<CService, H256> >::iterator it = listScheduledMnbRequestConnections.begin();
     while(it != listScheduledMnbRequestConnections.end()) {
         if(pairFront.first == it->first) {
             setResult.insert(it->second);
@@ -767,7 +767,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         CMasternodePing mnp;
         vRecv >> mnp;
 
-        uint256 nHash = mnp.GetHash();
+        H256 nHash = mnp.GetHash();
 
         pfrom->setAskFor.erase(nHash);
 
@@ -846,7 +846,7 @@ void CMasternodeMan::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
 
             LogPrint("masternode", "DSEG -- Sending Masternode entry: masternode=%s  addr=%s\n", mn.vin.prevout.ToStringShort(), mn.addr.ToString());
             CMasternodeBroadcast mnb = CMasternodeBroadcast(mn);
-            uint256 hash = mnb.GetHash();
+            H256 hash = mnb.GetHash();
             pfrom->PushInventory(CInv(MSG_MASTERNODE_ANNOUNCE, hash));
             pfrom->PushInventory(CInv(MSG_MASTERNODE_PING, mn.lastPing.GetHash()));
             nInvCount++;
@@ -1066,7 +1066,7 @@ void CMasternodeMan::SendVerifyReply(CNode* pnode, CMasternodeVerification& mnv)
         return;
     }
 
-    uint256 blockHash;
+    H256 blockHash;
     if(!GetBlockHash(blockHash, mnv.nBlockHeight)) {
         LogPrintf("MasternodeMan::SendVerifyReply -- can't get block hash for unknown block height %d, peer=%d\n", mnv.nBlockHeight, pnode->id);
         return;
@@ -1117,7 +1117,7 @@ void CMasternodeMan::ProcessVerifyReply(CNode* pnode, CMasternodeVerification& m
         return;
     }
 
-    uint256 blockHash;
+    H256 blockHash;
     if(!GetBlockHash(blockHash, mnv.nBlockHeight)) {
         // this shouldn't happen...
         LogPrintf("MasternodeMan::ProcessVerifyReply -- can't get block hash for unknown block height %d, peer=%d\n", mnv.nBlockHeight, pnode->id);
@@ -1225,7 +1225,7 @@ void CMasternodeMan::ProcessVerifyBroadcast(CNode* pnode, const CMasternodeVerif
         return;
     }
 
-    uint256 blockHash;
+    H256 blockHash;
     if(!GetBlockHash(blockHash, mnv.nBlockHeight)) {
         // this shouldn't happen...
         LogPrintf("CMasternodeMan::ProcessVerifyBroadcast -- Can't get block hash for unknown block height %d, peer=%d\n", mnv.nBlockHeight, pnode->id);
@@ -1347,7 +1347,7 @@ bool CMasternodeMan::CheckMnbAndUpdateMasternodeList(CNode* pfrom, CMasternodeBr
         nDos = 0;
         LogPrint("masternode", "CMasternodeMan::CheckMnbAndUpdateMasternodeList -- masternode=%s\n", mnb.vin.prevout.ToStringShort());
 
-        uint256 hash = mnb.GetHash();
+        H256 hash = mnb.GetHash();
         if(mapSeenMasternodeBroadcast.count(hash) && !mnb.fRecovery) { //seen
             LogPrint("masternode", "CMasternodeMan::CheckMnbAndUpdateMasternodeList -- masternode=%s seen\n", mnb.vin.prevout.ToStringShort());
             // less then 2 pings left before this MN goes into non-recoverable state, bump sync timeout
@@ -1482,7 +1482,7 @@ bool CMasternodeMan::IsWatchdogActive()
     return (GetTime() - nLastWatchdogVoteTime) <= MASTERNODE_WATCHDOG_MAX_SECONDS;
 }
 
-bool CMasternodeMan::AddGovernanceVote(const CTxIn& vin, uint256 nGovernanceObjectHash)
+bool CMasternodeMan::AddGovernanceVote(const CTxIn& vin, H256 nGovernanceObjectHash)
 {
     LOCK(cs);
     CMasternode* pMN = Find(vin);
@@ -1493,7 +1493,7 @@ bool CMasternodeMan::AddGovernanceVote(const CTxIn& vin, uint256 nGovernanceObje
     return true;
 }
 
-void CMasternodeMan::RemoveGovernanceObject(uint256 nGovernanceObjectHash)
+void CMasternodeMan::RemoveGovernanceObject(H256 nGovernanceObjectHash)
 {
     LOCK(cs);
     BOOST_FOREACH(CMasternode& mn, vMasternodes) {
@@ -1567,7 +1567,7 @@ void CMasternodeMan::SetMasternodeLastPing(const CTxIn& vin, const CMasternodePi
     mapSeenMasternodePing.insert(std::make_pair(mnp.GetHash(), mnp));
 
     CMasternodeBroadcast mnb(*pMN);
-    uint256 hash = mnb.GetHash();
+    H256 hash = mnb.GetHash();
     if(mapSeenMasternodeBroadcast.count(hash)) {
         mapSeenMasternodeBroadcast[hash].second.lastPing = mnp;
     }

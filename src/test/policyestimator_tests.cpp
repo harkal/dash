@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE(BlockPolicyEstimates)
     // added to the mempool by their associate fee/pri
     // txHashes[j] is populated with transactions either of
     // fee = basefee * (j+1)  OR  pri = 10^6 * 10^(j+1)
-    std::vector<uint256> txHashes[10];
+    std::vector<H256> txHashes[10];
 
     // Create a transaction template
     CScript garbage;
@@ -63,7 +63,7 @@ BOOST_AUTO_TEST_CASE(BlockPolicyEstimates)
         for (int j = 0; j < 10; j++) { // For each fee/pri multiple
             for (int k = 0; k < 5; k++) { // add 4 fee txs for every priority tx
                 tx.vin[0].prevout.n = 10000*blocknum+100*j+k; // make transaction unique
-                uint256 hash = tx.GetHash();
+                H256 hash = tx.GetHash();
                 mpool.addUnchecked(hash, entry.Fee(feeV[k/4][j]).Time(GetTime()).Priority(priV[k/4][j]).Height(blocknum).FromTx(tx, &mpool));
                 txHashes[j].push_back(hash);
             }
@@ -140,7 +140,7 @@ BOOST_AUTO_TEST_CASE(BlockPolicyEstimates)
         for (int j = 0; j < 10; j++) { // For each fee/pri multiple
             for (int k = 0; k < 5; k++) { // add 4 fee txs for every priority tx
                 tx.vin[0].prevout.n = 10000*blocknum+100*j+k;
-                uint256 hash = tx.GetHash();
+                H256 hash = tx.GetHash();
                 mpool.addUnchecked(hash, entry.Fee(feeV[k/4][j]).Time(GetTime()).Priority(priV[k/4][j]).Height(blocknum).FromTx(tx, &mpool));
                 txHashes[j].push_back(hash);
             }
@@ -179,7 +179,7 @@ BOOST_AUTO_TEST_CASE(BlockPolicyEstimates)
         for (int j = 0; j < 10; j++) { // For each fee/pri multiple
             for (int k = 0; k < 5; k++) { // add 4 fee txs for every priority tx
                 tx.vin[0].prevout.n = 10000*blocknum+100*j+k;
-                uint256 hash = tx.GetHash();
+                H256 hash = tx.GetHash();
                 mpool.addUnchecked(hash, entry.Fee(feeV[k/4][j]).Time(GetTime()).Priority(priV[k/4][j]).Height(blocknum).FromTx(tx, &mpool));
                 CTransaction btx;
                 if (mpool.lookup(hash, btx))
