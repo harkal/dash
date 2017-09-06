@@ -25,9 +25,9 @@
 extern UniValue read_json(const std::string& jsondata);
 
 // Old script.cpp SignatureHash function
-uint256 static SignatureHashOld(CScript scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType)
+H256 static SignatureHashOld(CScript scriptCode, const CTransaction& txTo, unsigned int nIn, int nHashType)
 {
-    static const uint256 one(uint256S("0000000000000000000000000000000000000000000000000000000000000001"));
+    static const H256 one(uint256S("0000000000000000000000000000000000000000000000000000000000000001"));
     if (nIn >= txTo.vin.size())
     {
         printf("ERROR: SignatureHash(): nIn=%d out of range\n", nIn);
@@ -141,7 +141,7 @@ BOOST_AUTO_TEST_CASE(sighash_test)
         RandomScript(scriptCode);
         int nIn = insecure_rand() % txTo.vin.size();
 
-        uint256 sh, sho;
+        H256 sh, sho;
         sho = SignatureHashOld(scriptCode, txTo, nIn, nHashType);
         sh = SignatureHash(scriptCode, txTo, nIn, nHashType);
         #if defined(PRINT_SIGHASH_JSON)
@@ -183,7 +183,7 @@ BOOST_AUTO_TEST_CASE(sighash_from_data)
 
         std::string raw_tx, raw_script, sigHashHex;
         int nIn, nHashType;
-        uint256 sh;
+        H256 sh;
         CTransaction tx;
         CScript scriptCode = CScript();
 
@@ -195,7 +195,7 @@ BOOST_AUTO_TEST_CASE(sighash_from_data)
           nHashType = test[3].get_int();
           sigHashHex = test[4].get_str();
 
-          uint256 sh;
+          H256 sh;
           CDataStream stream(ParseHex(raw_tx), SER_NETWORK, PROTOCOL_VERSION);
           stream >> tx;
 
