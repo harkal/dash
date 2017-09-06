@@ -16,7 +16,6 @@
 #include "random.h"
 #include "streams.h"
 #include "sync.h"
-#include "uint256.h"
 #include "crypto/hash.h"
 #include "util.h"
 #include "threadinterrupt.h"

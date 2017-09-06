@@ -34,7 +34,8 @@ static const unsigned int LOCKTIME_THRESHOLD = 500000000; // Tue Nov  5 00:53:20
 template <typename T>
 std::vector<unsigned char> ToByteVector(const T& in)
 {
-    return in.AsBytes();
+    return std::vector<unsigned char>(in.begin(), in.end());
+    //return in.AsBytes();
 }
 
 /** Script opcodes */
