@@ -8,7 +8,7 @@
 
 #include "hash.h"
 #include "serialize.h"
-#include "uint256.h"
+#include "crypto/hash.h"
 
 #include <stdexcept>
 #include <vector>

@@ -535,9 +535,9 @@ CMasternode* CMasternodeMan::GetNextMasternodeInQueueForPayment(int nBlockHeight
     //  -- (chance per block * chances before IsScheduled will fire)
     int nTenthNetwork = nMnCount/10;
     int nCountTenth = 0;
-    arith_uint256 nHighest = 0;
+    U256 nHighest = 0;
     BOOST_FOREACH (PAIRTYPE(int, CMasternode*)& s, vecMasternodeLastPaid){
-        arith_uint256 nScore = s.second->CalculateScore(blockHash);
+        U256 nScore = s.second->CalculateScore(blockHash);
         if(nScore > nHighest){
             nHighest = nScore;
             pBestMasternode = s.second;
@@ -596,7 +596,7 @@ int CMasternodeMan::GetMasternodeRank(const CTxIn& vin, int nBlockHeight, int nM
     std::vector<std::pair<int64_t, CMasternode*> > vecMasternodeScores;
 
     //make sure we know about this block
-    uint256 blockHash = uint256();
+    H256 blockHash = H256();
     if(!GetBlockHash(blockHash, nBlockHeight)) return -1;
 
     LOCK(cs);
@@ -610,7 +610,7 @@ int CMasternodeMan::GetMasternodeRank(const CTxIn& vin, int nBlockHeight, int nM
         else {
             if(!mn.IsValidForPayment()) continue;
         }
-        int64_t nScore = mn.CalculateScore(blockHash).GetCompact(false);
+        int64_t nScore = H256(mn.CalculateScore(blockHash)).GetCompact(false);
 
         vecMasternodeScores.push_back(std::make_pair(nScore, &mn));
     }

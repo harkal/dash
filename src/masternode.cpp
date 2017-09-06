@@ -87,18 +87,18 @@ bool CMasternode::UpdateFromNewBroadcast(CMasternodeBroadcast& mnb)
 // the proof of work for that block. The further away they are the better, the furthest will win the election
 // and get paid this block
 //
-arith_uint256 CMasternode::CalculateScore(const uint256& blockHash)
+U256 CMasternode::CalculateScore(const H256& blockHash)
 {
-    uint256 aux = ArithToUint256(UintToArith256(vin.prevout.hash) + vin.prevout.n);
+    H256 aux = vin.prevout.hash + vin.prevout.n;
 
     CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
     ss << blockHash;
-    arith_uint256 hash2 = UintToArith256(ss.GetHash());
+    U256 hash2 = ss.GetHash();
 
     CHashWriter ss2(SER_GETHASH, PROTOCOL_VERSION);
     ss2 << blockHash;
     ss2 << aux;
-    arith_uint256 hash3 = UintToArith256(ss2.GetHash());
+    U256 hash3 = ss2.GetHash();
 
     return (hash3 > hash2 ? hash3 - hash2 : hash2 - hash3);
 }
@@ -251,7 +251,7 @@ bool CMasternode::IsInputAssociatedWithPubkey()
     payee = GetScriptForDestination(pubKeyCollateralAddress.GetID());
 
     CTransaction tx;
-    uint256 hash;
+    H256 hash;
     if(GetTransaction(vin.prevout.hash, tx, Params().GetConsensus(), hash, true)) {
         BOOST_FOREACH(CTxOut out, tx.vout)
             if(out.nValue == 1000*COIN && out.scriptPubKey == payee) return true;
@@ -583,7 +583,7 @@ bool CMasternodeBroadcast::CheckOutpoint(int& nDos)
 
     // verify that sig time is legit in past
     // should be at least not earlier than block when 1000 EBAKUS tx got nMasternodeMinimumConfirmations
-    uint256 hashBlock = uint256();
+    H256 hashBlock = H256();
     CTransaction tx2;
     GetTransaction(vin.prevout.hash, tx2, Params().GetConsensus(), hashBlock, true);
     {
@@ -791,7 +791,7 @@ bool CMasternodePing::CheckAndUpdate(CMasternode* pmn, bool fFromNewBroadcast, i
 
     // and update mnodeman.mapSeenMasternodeBroadcast.lastPing which is probably outdated
     CMasternodeBroadcast mnb(*pmn);
-    uint256 hash = mnb.GetHash();
+    H256 hash = mnb.GetHash();
     if (mnodeman.mapSeenMasternodeBroadcast.count(hash)) {
         mnodeman.mapSeenMasternodeBroadcast[hash].second.lastPing = *this;
     }
@@ -811,7 +811,7 @@ void CMasternodePing::Relay()
     g_connman->RelayInv(inv);
 }
 
-void CMasternode::AddGovernanceVote(uint256 nGovernanceObjectHash)
+void CMasternode::AddGovernanceVote(H256 nGovernanceObjectHash)
 {
     if(mapGovernanceObjectsVotedOn.count(nGovernanceObjectHash)) {
         mapGovernanceObjectsVotedOn[nGovernanceObjectHash]++;
@@ -820,9 +820,9 @@ void CMasternode::AddGovernanceVote(uint256 nGovernanceObjectHash)
     }
 }
 
-void CMasternode::RemoveGovernanceObject(uint256 nGovernanceObjectHash)
+void CMasternode::RemoveGovernanceObject(H256 nGovernanceObjectHash)
 {
-    std::map<uint256, int>::iterator it = mapGovernanceObjectsVotedOn.find(nGovernanceObjectHash);
+    std::map<H256, int>::iterator it = mapGovernanceObjectsVotedOn.find(nGovernanceObjectHash);
     if(it == mapGovernanceObjectsVotedOn.end()) {
         return;
     }
@@ -843,9 +843,9 @@ void CMasternode::UpdateWatchdogVoteTime(uint64_t nVoteTime)
 */
 void CMasternode::FlagGovernanceItemsAsDirty()
 {
-    std::vector<uint256> vecDirty;
+    std::vector<H256> vecDirty;
     {
-        std::map<uint256, int>::iterator it = mapGovernanceObjectsVotedOn.begin();
+        std::map<H256, int>::iterator it = mapGovernanceObjectsVotedOn.begin();
         while(it != mapGovernanceObjectsVotedOn.end()) {
             vecDirty.push_back(it->first);
             ++it;

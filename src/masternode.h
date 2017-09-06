@@ -32,7 +32,7 @@ class CMasternodePing
 {
 public:
     CTxIn vin{};
-    uint256 blockHash{};
+    H256 blockHash{};
     int64_t sigTime{}; //mnb message times
     std::vector<unsigned char> vchSig{};
     bool fSentinelIsCurrent = false; // true if last sentinel ping was actual
@@ -163,7 +163,7 @@ public:
     bool fUnitTest = false;
 
     // KEEP TRACK OF GOVERNANCE ITEMS EACH MASTERNODE HAS VOTE UPON FOR RECALCULATION
-    std::map<uint256, int> mapGovernanceObjectsVotedOn;
+    std::map<H256, int> mapGovernanceObjectsVotedOn;
 
     CMasternode();
     CMasternode(const CMasternode& other);
@@ -198,7 +198,7 @@ public:
     }
 
     // CALCULATE A RANK AGAINST OF GIVEN BLOCK
-    arith_uint256 CalculateScore(const uint256& blockHash);
+    U256 CalculateScore(const H256& blockHash);
 
     bool UpdateFromNewBroadcast(CMasternodeBroadcast& mnb);
 
@@ -270,11 +270,11 @@ public:
     void UpdateLastPaid(const CBlockIndex *pindex, int nMaxBlocksToScanBack);
 
     // KEEP TRACK OF EACH GOVERNANCE ITEM INCASE THIS NODE GOES OFFLINE, SO WE CAN RECALC THEIR STATUS
-    void AddGovernanceVote(uint256 nGovernanceObjectHash);
+    void AddGovernanceVote(H256 nGovernanceObjectHash);
     // RECALCULATE CACHED STATUS FLAGS FOR ALL AFFECTED OBJECTS
     void FlagGovernanceItemsAsDirty();
 
-    void RemoveGovernanceObject(uint256 nGovernanceObjectHash);
+    void RemoveGovernanceObject(H256 nGovernanceObjectHash);
 
     void UpdateWatchdogVoteTime(uint64_t nVoteTime = 0);
 
