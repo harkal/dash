@@ -12,17 +12,17 @@
 #include <boost/random/uniform_int_distribution.hpp>
 #include <boost/functional/hash.hpp>
 
-#include <../common.h>
+#include "../common.h"
 #include "../uint256.h"
 
-template <unsigned N>
+template <unsigned int N>
 class CHash
 {
 public:
     // The arithmetic type
     using Arith = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<N * 8, N * 8, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void>>;
 
-    static const unsigned SIZE = N;
+    static const unsigned int SIZE = N;
 
     CHash() { SetNull(); }
 
@@ -68,7 +68,7 @@ public:
     CHash& operator+=(const CHash& b) { *this = ((Arith)*this) + (Arith)b; return *this; }
     CHash& operator-=(const CHash& b) { *this = ((Arith)*this) - (Arith)b; return *this; }
 
-    const CHash& operator~() const { return ~((Arith)*this); }
+    CHash operator~() const { return CHash(~((Arith)*this)); }
 
     CHash& operator|=(const CHash& b)
     {

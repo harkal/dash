@@ -209,6 +209,7 @@ libbitcoin_util_a-clientversion.$(OBJEXT): obj/build.h
 libbitcoin_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
 libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_server_a_SOURCES = \
+  crypto/hash.cpp \
   common.cpp \
   addrman.cpp \
   addrdb.cpp \
@@ -276,6 +277,7 @@ libbitcoin_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_wallet_a_SOURCES = \
   activemasternode.cpp \
+  crypto/hash.cpp \
   dsnotificationinterface.cpp \
   instantx.cpp \
   masternode.cpp \
@@ -348,8 +350,10 @@ crypto_libbitcoin_crypto_a_SOURCES += \
 libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_common_a_SOURCES = \
+  crypto/hash.cpp \
   amount.cpp \
   arith_uint256.cpp \
+  crypto/hash.cpp \
   base58.cpp \
   bip39.cpp \
   chainparams.cpp \
@@ -392,6 +396,7 @@ libbitcoin_util_a_SOURCES = \
   rpc/protocol.cpp \
   support/cleanse.cpp \
   sync.cpp \
+  crypto/hash.cpp \
   uint256.cpp \
   threadinterrupt.cpp \
   util.cpp \
@@ -490,6 +495,7 @@ libebakusconsensus_la_SOURCES = \
   crypto/sha1.cpp \
   crypto/sha256.cpp \
   crypto/sha512.cpp \
+  crypto/hash.cpp \
   hash.cpp \
   primitives/transaction.cpp \
   pubkey.cpp \
