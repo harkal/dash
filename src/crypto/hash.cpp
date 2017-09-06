@@ -10,8 +10,9 @@ CHash<N>& CHash<N>::SetCompact(uint32_t nCompact, bool *pfNegative, bool* pfOver
         nWord >>= 8 * (3 - nSize);
         *this = nWord;
     } else {
-        *this = nWord;
-        *this <<= 8 * (nSize - 3);
+        Arith bWord = nWord;
+        bWord <<= 8 * (nSize - 3);
+        *this = bWord;
     }
     if (pfNegative)
         *pfNegative = nWord != 0 && (nCompact & 0x00800000) != 0;
@@ -170,3 +171,13 @@ uint32_t CHash<N>::Bits() const
     }
     return 0;
 }
+
+template CHash<32>& CHash<32>::SetCompact(uint32_t nCompact, bool *pfNegative, bool* pfOverflow);
+template uint32_t CHash<32>::GetCompact(bool fNegative) const;
+template uint64_t CHash<32>::GetHash(const CHash<32>& salt) const;
+template uint32_t CHash<32>::Bits() const;
+template std::string CHash<32>::GetHex() const;
+template void CHash<32>::SetHex(const char* psz);
+template void CHash<32>::SetHex(const std::string& str);
+
+template std::string CHash<20>::GetHex() const;

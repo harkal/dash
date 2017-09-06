@@ -495,6 +495,8 @@ libebakusconsensus_la_SOURCES = \
   crypto/sha1.cpp \
   crypto/sha256.cpp \
   crypto/sha512.cpp \
+  crypto/keccak.c \
+  crypto/keccak256.cpp \
   crypto/hash.cpp \
   hash.cpp \
   primitives/transaction.cpp \
