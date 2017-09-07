@@ -23,7 +23,7 @@ namespace {
 class CSignatureCacheHasher
 {
 public:
-    size_t operator()(const uint256& key) const {
+    size_t operator()(const H256& key) const {
         return key.GetCheapHash();
     }
 };
@@ -37,8 +37,8 @@ class CSignatureCache
 {
 private:
      //! Entries are SHA256(nonce || signature hash || public key || signature):
-    uint256 nonce;
-    typedef boost::unordered_set<uint256, CSignatureCacheHasher> map_type;
+    H256 nonce;
+    typedef boost::unordered_set<H256, CSignatureCacheHasher> map_type;
     map_type setValid;
     boost::shared_mutex cs_sigcache;
 
@@ -50,25 +50,25 @@ public:
     }
 
     void
-    ComputeEntry(uint256& entry, const uint256 &hash, const std::vector<unsigned char>& vchSig, const CPubKey& pubkey)
+    ComputeEntry(H256& entry, const H256 &hash, const std::vector<unsigned char>& vchSig, const CPubKey& pubkey)
     {
         CSHA256().Write(nonce.begin(), 32).Write(hash.begin(), 32).Write(&pubkey[0], pubkey.size()).Write(&vchSig[0], vchSig.size()).Finalize(entry.begin());
     }
 
     bool
-    Get(const uint256& entry)
+    Get(const H256& entry)
     {
         boost::shared_lock<boost::shared_mutex> lock(cs_sigcache);
         return setValid.count(entry);
     }
 
-    void Erase(const uint256& entry)
+    void Erase(const H256& entry)
     {
         boost::unique_lock<boost::shared_mutex> lock(cs_sigcache);
         setValid.erase(entry);
     }
 
-    void Set(const uint256& entry)
+    void Set(const H256& entry)
     {
         size_t nMaxCacheSize = GetArg("-maxsigcachesize", DEFAULT_MAX_SIG_CACHE_SIZE) * ((size_t) 1 << 20);
         if (nMaxCacheSize <= 0) return;
@@ -89,11 +89,11 @@ public:
 
 }
 
-bool CachingTransactionSignatureChecker::VerifySignature(const std::vector<unsigned char>& vchSig, const CPubKey& pubkey, const uint256& sighash) const
+bool CachingTransactionSignatureChecker::VerifySignature(const std::vector<unsigned char>& vchSig, const CPubKey& pubkey, const H256& sighash) const
 {
     static CSignatureCache signatureCache;
 
-    uint256 entry;
+    H256 entry;
     signatureCache.ComputeEntry(entry, sighash, vchSig, pubkey);
 
     if (signatureCache.Get(entry)) {
