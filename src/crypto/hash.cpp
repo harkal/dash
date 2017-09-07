@@ -160,13 +160,15 @@ uint64_t CHash<N>::GetHash(const CHash<N>& salt) const
 template <unsigned N>
 uint32_t CHash<N>::Bits() const
 {
-    for (int pos = N - 1; pos >= 0; pos--) {
-        if (mData[pos]) {
-            for (int bits = 31; bits > 0; bits--) {
-                if (mData[pos] & 1 << bits)
-                    return 32 * pos + bits + 1;
+    for (int pos = N - 1 ; pos >= 0 ; pos--) {
+        Byte b = mData[N - pos - 1];
+        if (b) {
+            for (int bits = 7 ; bits > 0 ; bits--) {
+                Byte mask = 1 << bits;
+                if (b & mask)
+                    return 8 * pos + bits + 1;
             }
-            return 32 * pos + 1;
+            return 8 * pos + 1;
         }
     }
     return 0;

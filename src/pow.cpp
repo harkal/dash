@@ -244,6 +244,7 @@ bool CheckProofOfWork(H256 hash, unsigned int nBits, const Consensus::Params& pa
     H256 bnTarget;
 
     bnTarget.SetCompact(nBits, &fNegative, &fOverflow);
+    //printf("bnTarget = %s (%d)\n", bnTarget.ToString().c_str(), nBits);
 
     // Check range
     if (fNegative || bnTarget == 0 || fOverflow || bnTarget > params.powLimit)

@@ -132,8 +132,16 @@ public:
 
     uint64_t GetLow64() const
     {
-        assert(N >= 2);
-        return mData[0] | (uint64_t)mData[1] << 32;
+        assert(N >= 8);
+        return    (uint64_t)mData[N - 1]
+                | (uint64_t)mData[N - 2] << 8
+                | (uint64_t)mData[N - 3] << 16
+                | (uint64_t)mData[N - 4] << 24
+                | (uint64_t)mData[N - 5] << 32
+                | (uint64_t)mData[N - 6] << 40
+                | (uint64_t)mData[N - 7] << 48
+                | (uint64_t)mData[N - 8] << 56;
+
     }
 
     // Serializaton support

@@ -137,7 +137,7 @@ public:
         //assert(genesis.hashMerkleRoot == uint256S("0xa63495e25236a8bf5e2ef5ad83e5b1add5dd4711c0f248eb7c506687fa1f75cd"));
 
 
-            if (true) {
+            if (false) {
                     H256 hh = CKeccak256().Write((const Byte*)"", 0).Finalize();
                     printf("block.GetHash = %s\n", hh.ToString().c_str());
 
@@ -378,10 +378,43 @@ public:
         nDefaultPort = 19994;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1503656759, 0, 0x207fffff, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1503656759, 1, 0x207fffff, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        //assert(consensus.hashGenesisBlock == uint256S("0x000008ca1832a4baf228eb1553c03d3a2c8e02399550dd6ea8d65cec3ef23d2e"));
-        //assert(genesis.hashMerkleRoot == uint256S("0xe0028eb9648db56b1ac77cf090b99048a8007e2bb64b68f092c03c7f56a662c7"));
+        //assert(consensus.hashGenesisBlock == uint256S("0x30901a1d7fc9af593198124e8af3151c1cdeb85b922009a7c707e3f7a7879913"));
+        //assert(genesis.hashMerkleRoot == uint256S("0xe8e6f87a39e00b70b3a7b53317bfe832b20a3d66b3e0c706b21d2a3fe0bc8f071"));
+
+        if (true) {
+                H256 hh = CKeccak256().Write((const Byte*)"", 0).Finalize();
+                printf("block.GetHash = %s\n", hh.ToString().c_str());
+
+                printf("Searching for genesis block...\n");
+                // This will figure out a valid hash and Nonce if you're
+                // creating a different genesis block:
+                H256 hashTarget;
+                hashTarget.SetCompact(genesis.nBits);
+
+                H256 thash;
+
+                while (true) {
+                        thash = genesis.GetHash();
+                        if (thash <= hashTarget)
+                                break;
+                        if ((genesis.nNonce & 0xFFF) == 0) {
+                                printf("nonce %08X: hash = %s (target = %s)\n", genesis.nNonce,
+                                       thash.ToString().c_str(), hashTarget.ToString().c_str());
+                        }
+                        ++genesis.nNonce;
+                        if (genesis.nNonce == 0) {
+                                printf("NONCE WRAPPED, incrementing time\n");
+                                ++genesis.nTime;
+                        }
+                }
+
+                printf("block.nTime = %u \n", genesis.nTime);
+                printf("blolk.nNonce = %u \n", genesis.nNonce);
+                printf("block.GetHash = %s\n", genesis.GetHash().ToString().c_str());
+                printf("block.hashMerkleRoot = %s\n", genesis.hashMerkleRoot.ToString().c_str());
+        }
 
         vFixedSeeds.clear(); //! Regtest mode doesn't have any fixed seeds.
         vSeeds.clear();  //! Regtest mode doesn't have any DNS seeds.
@@ -396,7 +429,7 @@ public:
 
         checkpointData = (CCheckpointData){
             boost::assign::map_list_of
-            ( 0, uint256S("0x000008ca1832a4baf228eb1553c03d3a2c8e02399550dd6ea8d65cec3ef23d2e")),
+            ( 0, uint256S("0x30901a1d7fc9af593198124e8af3151c1cdeb85b922009a7c707e3f7a7879913")),
             0,
             0,
             0
