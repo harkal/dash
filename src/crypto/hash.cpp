@@ -53,7 +53,7 @@ std::string CHash<N>::GetHex() const
 {
     char psz[N * 2 + 1];
     for (unsigned int i = 0; i < N ; i++)
-        sprintf(psz + i * 2, "%02x", mData[N - i - 1]);
+        sprintf(psz + i * 2, "%02x", mData[i]);
     return std::string(psz, psz + N * 2);
 }
 

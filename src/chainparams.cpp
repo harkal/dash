@@ -17,6 +17,7 @@
 
 #include "chainparamsseeds.h"
 #include "arith_uint256.h"
+#include "crypto/keccak256.h"
 
 static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesisOutputScript, uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
@@ -130,11 +131,16 @@ public:
 
         genesis = CreateGenesisBlock(1503656759, 754669, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x00000f0e1e102634632250721394a8d8bb07c96402b0705402ddb55824215ac6"));
-        assert(genesis.hashMerkleRoot == uint256S("0xa63495e25236a8bf5e2ef5ad83e5b1add5dd4711c0f248eb7c506687fa1f75cd"));
+
+        // FIXME: genesis hashes
+        //assert(consensus.hashGenesisBlock == uint256S("0x00000f0e1e102634632250721394a8d8bb07c96402b0705402ddb55824215ac6"));
+        //assert(genesis.hashMerkleRoot == uint256S("0xa63495e25236a8bf5e2ef5ad83e5b1add5dd4711c0f248eb7c506687fa1f75cd"));
 
 
-            if (false) {
+            if (true) {
+                    H256 hh = CKeccak256().Write((const Byte*)"", 0).Finalize();
+                    printf("block.GetHash = %s\n", hh.ToString().c_str());
+
                     printf("Searching for genesis block...\n");
                     // This will figure out a valid hash and Nonce if you're
                     // creating a different genesis block:
@@ -266,8 +272,9 @@ public:
         genesis = CreateGenesisBlock(1503656759, 754669, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
 
-        assert(consensus.hashGenesisBlock == uint256S("0x00000f0e1e102634632250721394a8d8bb07c96402b0705402ddb55824215ac6"));
-        assert(genesis.hashMerkleRoot == uint256S("0xa63495e25236a8bf5e2ef5ad83e5b1add5dd4711c0f248eb7c506687fa1f75cd"));
+        // FIXME: Genesis block
+        //assert(consensus.hashGenesisBlock == uint256S("0x00000f0e1e102634632250721394a8d8bb07c96402b0705402ddb55824215ac6"));
+        //assert(genesis.hashMerkleRoot == uint256S("0xa63495e25236a8bf5e2ef5ad83e5b1add5dd4711c0f248eb7c506687fa1f75cd"));
 
         vFixedSeeds.clear();
         vSeeds.clear();

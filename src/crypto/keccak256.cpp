@@ -18,14 +18,7 @@ CKeccak256& CKeccak256::Write(const Byte* data, size_t len)
 
 void CKeccak256::Finalize(Byte hash[OUTPUT_SIZE])
 {
-    uint64_t _h[4];
-
-    sph_keccak256_close(&cc, _h);
-
-    WriteBE64(hash, _h[3]);
-    WriteBE64(hash + 8, _h[2]);
-    WriteBE64(hash + 16, _h[1]);
-    WriteBE64(hash + 24, _h[0]);
+    sph_keccak256_close(&cc, hash);
 }
 
 H256 CKeccak256::Finalize()

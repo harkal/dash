@@ -24,7 +24,7 @@ public:
     CKeccak256& Reset();
 
 private:
-    sph_keccak256_context *cc;
+    sph_keccak256_context cc;
 };
 
 #endif // CKECCAK256_H

@@ -91,7 +91,8 @@ std::string CMutableTransaction::ToString() const
 
 void CTransaction::UpdateHash() const
 {
-    *const_cast<H256*>(&hash) = SerializeHash(*this);
+    H256 h = SerializeHash(*this);
+    *const_cast<H256*>(&hash) = h;
 }
 
 CTransaction::CTransaction() : nVersion(CTransaction::CURRENT_VERSION), vin(), vout(), mAmount(0), nLockTime(0) { }

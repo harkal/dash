@@ -14,6 +14,7 @@
 
 #include "../common.h"
 #include "../uint256.h"
+#include "../arith_uint256.h"
 
 template <unsigned int N>
 class CHash
@@ -29,7 +30,7 @@ public:
     CHash(Arith const &u) { toBigEndian(u, mData); }
 
     CHash(const base_blob<N * 8> &blob) {
-        memcpy(mData.data(), blob.begin(), N);
+        std::reverse_copy(blob.begin(), blob.end(), mData.begin());
     }
 
     CHash(const typename std::array<Byte, N>::const_iterator& b, const typename std::array<Byte, N>::const_iterator& e) {
