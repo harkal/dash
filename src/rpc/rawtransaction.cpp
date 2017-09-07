@@ -714,30 +714,6 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
     // Script verification errors
     UniValue vErrors(UniValue::VARR);
 
-    // Sign what we can:
-    for (unsigned int i = 0; i < mergedTx.vin.size(); i++) {
-        CTxIn& txin = mergedTx.vin[i];
-        const CCoins* coins = view.AccessCoins(txin.prevout.hash);
-        if (coins == NULL || !coins->IsAvailable(txin.prevout.n)) {
-            TxInErrorToJSON(txin, vErrors, "Input not found or already spent");
-            continue;
-        }
-        const CScript& prevPubKey = coins->vout[txin.prevout.n].scriptPubKey;
-
-        txin.scriptSig.clear();
-        // Only sign SIGHASH_SINGLE if there's a corresponding output:
-        if (!fHashSingle || (i < mergedTx.vout.size()))
-            SignSignature(keystore, prevPubKey, mergedTx, i, nHashType);
-
-        // ... and merge in other signatures:
-        BOOST_FOREACH(const CMutableTransaction& txv, txVariants) {
-            txin.scriptSig = CombineSignatures(prevPubKey, mergedTx, i, txin.scriptSig, txv.vin[i].scriptSig);
-        }
-        ScriptError serror = SCRIPT_ERR_OK;
-        if (!VerifyScript(txin.scriptSig, prevPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&mergedTx, i), &serror)) {
-            TxInErrorToJSON(txin, vErrors, ScriptErrorString(serror));
-        }
-    }
     bool fComplete = vErrors.empty();
 
     UniValue result(UniValue::VOBJ);

@@ -171,9 +171,7 @@ CBitcoinAddress GetAccountAddress(string strAccount, bool bForceNew=false)
              ++it)
         {
             const CWalletTx& wtx = (*it).second;
-            BOOST_FOREACH(const CTxOut& txout, wtx.vout)
-                if (txout.scriptPubKey == scriptPubKey)
-                    bKeyUsed = true;
+
         }
     }
 

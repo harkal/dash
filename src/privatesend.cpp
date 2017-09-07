@@ -123,8 +123,6 @@ void CPrivateSendBase::SetNull()
     nSessionID = 0;
     nSessionDenom = 0;
     vecEntries.clear();
-    finalMutableTransaction.vin.clear();
-    finalMutableTransaction.vout.clear();
     nTimeLastSuccessfulStep = GetTimeMillis();
 }
 
@@ -173,29 +171,10 @@ void CPrivateSend::InitStandardDenominations()
 // check to make sure the collateral provided by the client is valid
 bool CPrivateSend::IsCollateralValid(const CTransaction& txCollateral)
 {
-    if(txCollateral.vout.empty()) return false;
     if(txCollateral.nLockTime != 0) return false;
 
     CAmount nValueIn = 0;
     CAmount nValueOut = 0;
-
-    BOOST_FOREACH(const CTxOut txout, txCollateral.vout) {
-        nValueOut += txout.nValue;
-
-        if(!txout.scriptPubKey.IsNormalPaymentScript()) {
-            LogPrintf ("CPrivateSend::IsCollateralValid -- Invalid Script, txCollateral=%s", txCollateral.ToString());
-            return false;
-        }
-    }
-
-    BOOST_FOREACH(const CTxIn txin, txCollateral.vin) {
-        CCoins coins;
-        if(!GetUTXOCoins(txin.prevout, coins)) {
-            LogPrint("privatesend", "CPrivateSend::IsCollateralValid -- Unknown inputs in collateral transaction, txCollateral=%s", txCollateral.ToString());
-            return false;
-        }
-        nValueIn += coins.vout[txin.prevout.n].nValue;
-    }
 
     //collateral transactions are required to pay out a small fee to the miners
     if(nValueIn - nValueOut < GetCollateralAmount()) {

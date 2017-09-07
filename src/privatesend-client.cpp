@@ -365,13 +365,6 @@ bool CPrivateSendClient::SendDenominate(const std::vector<CTxIn>& vecTxIn, const
         return false;
     }
 
-    // lock the funds we're going to use
-    BOOST_FOREACH(CTxIn txin, txMyCollateral.vin)
-        vecOutPointLocked.push_back(txin.prevout);
-
-    BOOST_FOREACH(CTxIn txin, vecTxIn)
-        vecOutPointLocked.push_back(txin.prevout);
-
     // we should already be connected to a Masternode
     if(!nSessionID) {
         LogPrintf("CPrivateSendClient::SendDenominate -- No Masternode has been selected yet.\n");
@@ -397,16 +390,6 @@ bool CPrivateSendClient::SendDenominate(const std::vector<CTxIn>& vecTxIn, const
     {
         CValidationState validationState;
         CMutableTransaction tx;
-
-        BOOST_FOREACH(const CTxIn& txin, vecTxIn) {
-            LogPrint("privatesend", "CPrivateSendClient::SendDenominate -- txin=%s\n", txin.ToString());
-            tx.vin.push_back(txin);
-        }
-
-        BOOST_FOREACH(const CTxOut& txout, vecTxOut) {
-            LogPrint("privatesend", "CPrivateSendClient::SendDenominate -- txout=%s\n", txout.ToString());
-            tx.vout.push_back(txout);
-        }
 
         LogPrintf("CPrivateSendClient::SendDenominate -- Submitting partial tx %s", tx.ToString());
 
@@ -492,27 +475,10 @@ bool CPrivateSendClient::SignFinalTransaction(const CTransaction& finalTransacti
             CScript prevPubKey = CScript();
             CTxIn txin = CTxIn();
 
-            for(unsigned int i = 0; i < finalMutableTransaction.vin.size(); i++) {
-                if(finalMutableTransaction.vin[i] == txdsin) {
-                    nMyInputIndex = i;
-                    prevPubKey = txdsin.prevPubKey;
-                    txin = txdsin;
-                }
-            }
-
             if(nMyInputIndex >= 0) { //might have to do this one input at a time?
                 int nFoundOutputsCount = 0;
                 CAmount nValue1 = 0;
                 CAmount nValue2 = 0;
-
-                for(unsigned int i = 0; i < finalMutableTransaction.vout.size(); i++) {
-                    BOOST_FOREACH(const CTxOut& txout, entry.vecTxDSOut) {
-                        if(finalMutableTransaction.vout[i] == txout) {
-                            nFoundOutputsCount++;
-                            nValue1 += finalMutableTransaction.vout[i].nValue;
-                        }
-                    }
-                }
 
                 BOOST_FOREACH(const CTxOut txout, entry.vecTxDSOut)
                     nValue2 += txout.nValue;
@@ -536,8 +502,6 @@ bool CPrivateSendClient::SignFinalTransaction(const CTransaction& finalTransacti
                     // not sure what to do here, it will timeout...?
                 }
 
-                sigs.push_back(finalMutableTransaction.vin[nMyInputIndex]);
-                LogPrint("privatesend", "CPrivateSendClient::SignFinalTransaction -- nMyInputIndex: %d, sigs.size(): %d, scriptSig=%s\n", nMyInputIndex, (int)sigs.size(), ScriptToAsmStr(finalMutableTransaction.vin[nMyInputIndex].scriptSig));
             }
         }
     }
@@ -1066,39 +1030,6 @@ bool CPrivateSendClient::PrepareDenominate(int nMinRounds, int nMaxRounds, std::
         BOOST_FOREACH(int nBit, vecBits) {
             CAmount nValueDenom = vecStandardDenoms[nBit];
             if (nValueLeft - nValueDenom < 0) continue;
-
-            // Note: this relies on a fact that both vectors MUST have same size
-            std::vector<CTxIn>::iterator it = vecTxIn.begin();
-            std::vector<COutput>::iterator it2 = vCoins.begin();
-            while (it2 != vCoins.end()) {
-                // we have matching inputs
-                if ((*it2).tx->vout[(*it2).i].nValue == nValueDenom) {
-                    // add new input in resulting vector
-                    vecTxInRet.push_back(*it);
-                    // remove corresponting items from initial vectors
-                    vecTxIn.erase(it);
-                    vCoins.erase(it2);
-
-                    CScript scriptDenom;
-                    CPubKey vchPubKey;
-                    // use unique address
-                    assert(reservekey.GetReservedKey(vchPubKey, false)); // should never fail, as we just unlocked
-                    scriptDenom = GetScriptForDestination(vchPubKey.GetID());
-                    reservekey.KeepKey();
-
-                    // add new output
-                    CTxOut txout(nValueDenom, scriptDenom);
-                    vecTxOutRet.push_back(txout);
-
-                    // subtract denomination amount
-                    nValueLeft -= nValueDenom;
-
-                    // step is complete
-                    break;
-                }
-                ++it;
-                ++it2;
-            }
         }
         if(nValueLeft == 0) break;
         nStep++;

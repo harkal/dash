@@ -535,15 +535,7 @@ void static EraseOrphanTx(H256 hash) EXCLUSIVE_LOCKS_REQUIRED(cs_main)
     map<H256, COrphanTx>::iterator it = mapOrphanTransactions.find(hash);
     if (it == mapOrphanTransactions.end())
         return;
-    BOOST_FOREACH(const CTxIn& txin, it->second.tx.vin)
-    {
-        map<H256, set<H256> >::iterator itPrev = mapOrphanTransactionsByPrev.find(txin.prevout.hash);
-        if (itPrev == mapOrphanTransactionsByPrev.end())
-            continue;
-        itPrev->second.erase(hash);
-        if (itPrev->second.empty())
-            mapOrphanTransactionsByPrev.erase(itPrev);
-    }
+
     mapOrphanTransactions.erase(it);
 }
 
