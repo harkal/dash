@@ -233,8 +233,8 @@ public:
     // and bypass the constness. This is safe, as they update the entire
     // structure, including the hash.
     const int32_t nVersion;
-    const std::vector<CTxIn> vin;
-    const std::vector<CTxOut> vout;
+//    const std::vector<CTxIn> vin;
+//    const std::vector<CTxOut> vout;
     const uint32_t nLockTime;
 
     const H256      mSender;
@@ -256,15 +256,15 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(*const_cast<int32_t*>(&this->nVersion));
         nVersion = this->nVersion;
-        READWRITE(*const_cast<std::vector<CTxIn>*>(&vin));
-        READWRITE(*const_cast<std::vector<CTxOut>*>(&vout));
+//        READWRITE(*const_cast<std::vector<CTxIn>*>(&vin));
+//        READWRITE(*const_cast<std::vector<CTxOut>*>(&vout));
         READWRITE(*const_cast<uint32_t*>(&nLockTime));
         if (ser_action.ForRead())
             UpdateHash();
     }
 
     bool IsNull() const {
-        return vin.empty() && vout.empty();
+        return false;
     }
 
     const H256& GetHash() const {
@@ -284,7 +284,7 @@ public:
 
     bool IsCoinBase() const
     {
-        return (vin.size() == 1 && vin[0].prevout.IsNull());
+        return false;
     }
 
     friend bool operator==(const CTransaction& a, const CTransaction& b)
@@ -304,8 +304,8 @@ public:
 struct CMutableTransaction
 {
     int32_t nVersion;
-    std::vector<CTxIn> vin;
-    std::vector<CTxOut> vout;
+//    std::vector<CTxIn> vin;
+//    std::vector<CTxOut> vout;
     uint32_t nLockTime;
 
     // Ebakus transaction
@@ -323,8 +323,8 @@ struct CMutableTransaction
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(this->nVersion);
         nVersion = this->nVersion;
-        READWRITE(vin);
-        READWRITE(vout);
+//        READWRITE(vin);
+//        READWRITE(vout);
         READWRITE(nLockTime);
         READWRITE(mSender);
     }

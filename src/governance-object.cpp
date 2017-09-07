@@ -500,6 +500,7 @@ CAmount CGovernanceObject::GetMinCollateralFee()
 
 bool CGovernanceObject::IsCollateralValid(std::string& strError, bool& fMissingConfirmations)
 {
+    /*
     strError = "";
     fMissingConfirmations = false;
     CAmount nMinFee = GetMinCollateralFee();
@@ -587,7 +588,7 @@ bool CGovernanceObject::IsCollateralValid(std::string& strError, bool& fMissingC
 
         return false;
     }
-
+*/
     strError = "valid";
     return true;
 }

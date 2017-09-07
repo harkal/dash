@@ -144,59 +144,10 @@ bool CBloomFilter::IsRelevantAndUpdate(const CTransaction& tx)
     if (contains(hash))
         fFound = true;
 
-    for (unsigned int i = 0; i < tx.vout.size(); i++)
-    {
-        const CTxOut& txout = tx.vout[i];
-        // Match if the filter contains any arbitrary script data element in any scriptPubKey in tx
-        // If this matches, also add the specific output that was matched.
-        // This means clients don't have to update the filter themselves when a new relevant tx 
-        // is discovered in order to find spending transactions, which avoids round-tripping and race conditions.
-        CScript::const_iterator pc = txout.scriptPubKey.begin();
-        vector<unsigned char> data;
-        while (pc < txout.scriptPubKey.end())
-        {
-            opcodetype opcode;
-            if (!txout.scriptPubKey.GetOp(pc, opcode, data))
-                break;
-            if (data.size() != 0 && contains(data))
-            {
-                fFound = true;
-                if ((nFlags & BLOOM_UPDATE_MASK) == BLOOM_UPDATE_ALL)
-                    insert(COutPoint(hash, i));
-                else if ((nFlags & BLOOM_UPDATE_MASK) == BLOOM_UPDATE_P2PUBKEY_ONLY)
-                {
-                    txnouttype type;
-                    vector<vector<unsigned char> > vSolutions;
-                    if (Solver(txout.scriptPubKey, type, vSolutions) &&
-                            (type == TX_PUBKEY || type == TX_MULTISIG))
-                        insert(COutPoint(hash, i));
-                }
-                break;
-            }
-        }
-    }
-
     if (fFound)
         return true;
 
-    BOOST_FOREACH(const CTxIn& txin, tx.vin)
-    {
-        // Match if the filter contains an outpoint tx spends
-        if (contains(txin.prevout))
-            return true;
-
-        // Match if the filter contains any arbitrary script data element in any scriptSig in tx
-        CScript::const_iterator pc = txin.scriptSig.begin();
-        vector<unsigned char> data;
-        while (pc < txin.scriptSig.end())
-        {
-            opcodetype opcode;
-            if (!txin.scriptSig.GetOp(pc, opcode, data))
-                break;
-            if (data.size() != 0 && contains(data))
-                return true;
-        }
-    }
+    // REMOVED TXCODE
 
     return false;
 }

@@ -50,14 +50,6 @@ enum
     ebakusconsensus_SCRIPT_FLAGS_VERIFY_CHECKLOCKTIMEVERIFY = (1U << 9), // enable CHECKLOCKTIMEVERIFY (BIP65)
 };
 
-/// Returns 1 if the input nIn of the serialized transaction pointed to by
-/// txTo correctly spends the scriptPubKey pointed to by scriptPubKey under
-/// the additional constraints specified by flags.
-/// If not NULL, err will contain an error/success code for the operation
-EXPORT_SYMBOL int ebakusconsensus_verify_script(const unsigned char *scriptPubKey, unsigned int scriptPubKeyLen,
-                                    const unsigned char *txTo        , unsigned int txToLen,
-                                    unsigned int nIn, unsigned int flags, ebakusconsensus_error* err);
-
 EXPORT_SYMBOL unsigned int ebakusconsensus_version();
 
 #ifdef __cplusplus

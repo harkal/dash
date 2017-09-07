@@ -88,7 +88,7 @@ public:
 
     void FromTx(const CTransaction &tx, int nHeightIn) {
         fCoinBase = tx.IsCoinBase();
-        vout = tx.vout;
+        // REMOVED TXCODE
         nHeight = nHeightIn;
         nVersion = tx.nVersion;
         ClearUnspendable();
@@ -101,7 +101,7 @@ public:
 
     void Clear() {
         fCoinBase = false;
-        std::vector<CTxOut>().swap(vout);
+        // REMOVED TXCODE
         nHeight = 0;
         nVersion = 0;
     }
@@ -118,16 +118,13 @@ public:
     }
 
     void ClearUnspendable() {
-        BOOST_FOREACH(CTxOut &txout, vout) {
-            if (txout.scriptPubKey.IsUnspendable())
-                txout.SetNull();
-        }
+        // REMOVED TXCODE
         Cleanup();
     }
 
     void swap(CCoins &to) {
         std::swap(to.fCoinBase, fCoinBase);
-        to.vout.swap(vout);
+        // REMOVED TXCODE
         std::swap(to.nHeight, nHeight);
         std::swap(to.nVersion, nVersion);
     }
@@ -139,8 +136,7 @@ public:
              return true;
          return a.fCoinBase == b.fCoinBase &&
                 a.nHeight == b.nHeight &&
-                a.nVersion == b.nVersion &&
-                a.vout == b.vout;
+                a.nVersion == b.nVersion;
     }
     friend bool operator!=(const CCoins &a, const CCoins &b) {
         return !(a == b);

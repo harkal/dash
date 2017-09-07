@@ -201,13 +201,7 @@ UniValue mempoolToJSON(bool fVerbose = false)
             info.push_back(Pair("descendantfees", e.GetModFeesWithDescendants()));
             const CTransaction& tx = e.GetTx();
             set<string> setDepends;
-            BOOST_FOREACH(const CTxIn& txin, tx.vin)
-            {
-                if (mempool.exists(txin.prevout.hash))
-                    setDepends.insert(txin.prevout.hash.ToString());
-            }
-
-            UniValue depends(UniValue::VARR);
+                        UniValue depends(UniValue::VARR);
             BOOST_FOREACH(const string& dep, setDepends)
             {
                 depends.push_back(dep);
