@@ -2379,62 +2379,7 @@ bool CWallet::FundTransaction(CMutableTransaction& tx, CAmount &nFeeRet, int& nC
 
 bool CWallet::SelectCoinsByDenominations(int nDenom, CAmount nValueMin, CAmount nValueMax, std::vector<CTxIn>& vecTxInRet, std::vector<COutput>& vCoinsRet, CAmount& nValueRet, int nPrivateSendRoundsMin, int nPrivateSendRoundsMax)
 {
-    vecTxInRet.clear();
-    vCoinsRet.clear();
-    nValueRet = 0;
-
-    vector<COutput> vCoins;
-    AvailableCoins(vCoins, true, NULL, false, ONLY_DENOMINATED);
-
-    std::random_shuffle(vCoins.rbegin(), vCoins.rend(), GetRandInt);
-
-    // ( bit on if present )
-    // bit 0 - 100EBAKUS+1
-    // bit 1 - 10EBAKUS+1
-    // bit 2 - 1EBAKUS+1
-    // bit 3 - .1EBAKUS+1
-
-    std::vector<int> vecBits;
-    if (!CPrivateSend::GetDenominationsBits(nDenom, vecBits)) {
-        return false;
-    }
-
-    int nDenomResult = 0;
-
-    std::vector<CAmount> vecPrivateSendDenominations = CPrivateSend::GetStandardDenominations();
-    InsecureRand insecureRand;
-    BOOST_FOREACH(const COutput& out, vCoins)
-    {
-        // masternode-like input should not be selected by AvailableCoins now anyway
-        //if(out.tx->vout[out.i].nValue == 1000*COIN) continue;
-        if(nValueRet + out.tx->vout[out.i].nValue <= nValueMax){
-
-            CTxIn txin = CTxIn(out.tx->GetHash(), out.i);
-
-            int nRounds = GetInputPrivateSendRounds(txin);
-            if(nRounds >= nPrivateSendRoundsMax) continue;
-            if(nRounds < nPrivateSendRoundsMin) continue;
-
-            BOOST_FOREACH(int nBit, vecBits) {
-                if(out.tx->vout[out.i].nValue == vecPrivateSendDenominations[nBit]) {
-                    if(nValueRet >= nValueMin) {
-                        //randomly reduce the max amount we'll submit (for anonymity)
-                        nValueMax -= insecureRand(nValueMax/5);
-                        //on average use 50% of the inputs or less
-                        int r = insecureRand(vCoins.size());
-                        if((int)vecTxInRet.size() > r) return true;
-                    }
-                    txin.prevPubKey = out.tx->vout[out.i].scriptPubKey; // the inputs PubKey
-                    nValueRet += out.tx->vout[out.i].nValue;
-                    vecTxInRet.push_back(txin);
-                    vCoinsRet.push_back(out);
-                    nDenomResult |= 1 << nBit;
-                }
-            }
-        }
-    }
-
-    return nValueRet >= nValueMin && nDenom == nDenomResult;
+    return false;
 }
 
 struct CompareByAmount
@@ -2467,13 +2412,6 @@ bool CWallet::SelectCoinsGrouppedByAddresses(std::vector<CompactTallyItem>& vecT
     }
 
     CAmount nSmallestDenom = CPrivateSend::GetSmallestDenomination();
-
-    // construct resulting vector
-    vecTallyRet.clear();
-    BOOST_FOREACH(const PAIRTYPE(CBitcoinAddress, CompactTallyItem)& item, mapTally) {
-        if(fAnonymizable && item.second.nAmount < nSmallestDenom) continue;
-        vecTallyRet.push_back(item.second);
-    }
 
     // order by amounts per address, from smallest to largest
     sort(vecTallyRet.rbegin(), vecTallyRet.rend(), CompareByAmount());
@@ -2558,9 +2496,6 @@ bool CWallet::GetVinAndKeysFromOutput(COutput out, CTxIn& txinRet, CPubKey& pubK
 
     CScript pubScript;
 
-    txinRet = CTxIn(out.tx->GetHash(), out.i);
-    pubScript = out.tx->vout[out.i].scriptPubKey; // the inputs PubKey
-
     CTxDestination address1;
     ExtractDestination(pubScript, address1);
     CBitcoinAddress address2(address1);
@@ -2583,27 +2518,6 @@ bool CWallet::GetVinAndKeysFromOutput(COutput out, CTxIn& txinRet, CPubKey& pubK
 int CWallet::CountInputsWithAmount(CAmount nInputAmount)
 {
     CAmount nTotal = 0;
-    {
-        LOCK2(cs_main, cs_wallet);
-        for (map<H256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it)
-        {
-            const CWalletTx* pcoin = &(*it).second;
-            if (pcoin->IsTrusted()){
-                int nDepth = pcoin->GetDepthInMainChain(false);
-
-                for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
-                    COutput out = COutput(pcoin, i, nDepth, true);
-                    CTxIn txin = CTxIn(out.tx->GetHash(), out.i);
-
-                    if(out.tx->vout[out.i].nValue != nInputAmount) continue;
-                    if(!IsDenominatedAmount(pcoin->vout[i].nValue)) continue;
-                    if(IsSpent(out.tx->GetHash(), i) || IsMine(pcoin->vout[i]) != ISMINE_SPENDABLE || !IsDenominated(txin)) continue;
-
-                    nTotal++;
-                }
-            }
-        }
-    }
 
     return nTotal;
 }
@@ -2697,16 +2611,7 @@ bool CWallet::GetBudgetSystemCollateralTX(CWalletTx& tx, H256 hash, CAmount amou
 
 bool CWallet::ConvertList(std::vector<CTxIn> vecTxIn, std::vector<CAmount>& vecAmounts)
 {
-    BOOST_FOREACH(CTxIn txin, vecTxIn) {
-        if (mapWallet.count(txin.prevout.hash)) {
-            CWalletTx& wtx = mapWallet[txin.prevout.hash];
-            if(txin.prevout.n < wtx.vout.size()){
-                vecAmounts.push_back(wtx.vout[txin.prevout.n].nValue);
-            }
-        } else {
-            LogPrintf("CWallet::ConvertList -- Couldn't find transaction\n");
-        }
-    }
+
     return true;
 }
 
@@ -3503,21 +3408,6 @@ std::map<CTxDestination, CAmount> CWallet::GetAddressBalances()
             int nDepth = pcoin->GetDepthInMainChain();
             if (nDepth < (pcoin->IsFromMe(ISMINE_ALL) ? 0 : 1))
                 continue;
-
-            for (unsigned int i = 0; i < pcoin->vout.size(); i++)
-            {
-                CTxDestination addr;
-                if (!IsMine(pcoin->vout[i]))
-                    continue;
-                if(!ExtractDestination(pcoin->vout[i].scriptPubKey, addr))
-                    continue;
-
-                CAmount n = IsSpent(walletEntry.first, i) ? 0 : pcoin->vout[i].nValue;
-
-                if (!balances.count(addr))
-                    balances[addr] = 0;
-                balances[addr] += n;
-            }
         }
     }
 
@@ -3534,51 +3424,9 @@ set< set<CTxDestination> > CWallet::GetAddressGroupings()
     {
         CWalletTx *pcoin = &walletEntry.second;
 
-        if (pcoin->vin.size() > 0)
-        {
-            bool any_mine = false;
-            // group all input addresses with each other
-            BOOST_FOREACH(CTxIn txin, pcoin->vin)
-            {
-                CTxDestination address;
-                if(!IsMine(txin)) /* If this input isn't mine, ignore it */
-                    continue;
-                if(!ExtractDestination(mapWallet[txin.prevout.hash].vout[txin.prevout.n].scriptPubKey, address))
-                    continue;
-                grouping.insert(address);
-                any_mine = true;
-            }
 
-            // group change with input addresses
-            if (any_mine)
-            {
-               BOOST_FOREACH(CTxOut txout, pcoin->vout)
-                   if (IsChange(txout))
-                   {
-                       CTxDestination txoutAddr;
-                       if(!ExtractDestination(txout.scriptPubKey, txoutAddr))
-                           continue;
-                       grouping.insert(txoutAddr);
-                   }
-            }
-            if (grouping.size() > 0)
-            {
-                groupings.insert(grouping);
-                grouping.clear();
-            }
-        }
 
-        // group lone addrs by themselves
-        for (unsigned int i = 0; i < pcoin->vout.size(); i++)
-            if (IsMine(pcoin->vout[i]))
-            {
-                CTxDestination address;
-                if(!ExtractDestination(pcoin->vout[i].scriptPubKey, address))
-                    continue;
-                grouping.insert(address);
-                groupings.insert(grouping);
-                grouping.clear();
-            }
+
     }
 
     set< set<CTxDestination>* > uniqueGroupings; // a set of pointers to groups of addresses
@@ -3836,17 +3684,7 @@ void CWallet::GetKeyBirthTimes(std::map<CKeyID, int64_t> &mapKeyBirth) const {
         if (blit != mapBlockIndex.end() && chainActive.Contains(blit->second)) {
             // ... which are already in a block
             int nHeight = blit->second->nHeight;
-            BOOST_FOREACH(const CTxOut &txout, wtx.vout) {
-                // iterate over all their outputs
-                CAffectedKeysVisitor(*this, vAffected).Process(txout.scriptPubKey);
-                BOOST_FOREACH(const CKeyID &keyid, vAffected) {
-                    // ... and all their affected keys
-                    std::map<CKeyID, CBlockIndex*>::iterator rit = mapKeyFirstBlock.find(keyid);
-                    if (rit != mapKeyFirstBlock.end() && nHeight < rit->second->nHeight)
-                        rit->second = blit->second;
-                }
-                vAffected.clear();
-            }
+
         }
     }
 

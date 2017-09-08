@@ -684,11 +684,12 @@ UniValue getreceivedbyaddress(const UniValue& params, bool fHelp)
         const CWalletTx& wtx = (*it).second;
         if (wtx.IsCoinBase() || !CheckFinalTx(wtx))
             continue;
-
+/*
         BOOST_FOREACH(const CTxOut& txout, wtx.vout)
             if (txout.scriptPubKey == scriptPubKey)
                 if (wtx.GetDepthInMainChain() >= nMinDepth)
                     nAmount += txout.nValue;
+                    */
     }
 
     return  ValueFromAmount(nAmount);
@@ -738,14 +739,14 @@ UniValue getreceivedbyaccount(const UniValue& params, bool fHelp)
         const CWalletTx& wtx = (*it).second;
         if (wtx.IsCoinBase() || !CheckFinalTx(wtx))
             continue;
-
+/*
         BOOST_FOREACH(const CTxOut& txout, wtx.vout)
         {
             CTxDestination address;
             if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*pwalletMain, address) && setAddress.count(address))
                 if (wtx.GetDepthInMainChain() >= nMinDepth)
                     nAmount += txout.nValue;
-        }
+        }*/
     }
 
     return ValueFromAmount(nAmount);
@@ -1232,7 +1233,7 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
         int nBCDepth = wtx.GetDepthInMainChain(false);
         if (nDepth < nMinDepth)
             continue;
-
+/*
         BOOST_FOREACH(const CTxOut& txout, wtx.vout)
         {
             CTxDestination address;
@@ -1250,7 +1251,7 @@ UniValue ListReceived(const UniValue& params, bool fByAccounts)
             item.txids.push_back(wtx.GetHash());
             if (mine & ISMINE_WATCH_ONLY)
                 item.fIsWatchonly = true;
-        }
+        }*/
     }
 
     // Reply
@@ -1441,7 +1442,7 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
             entry.push_back(Pair("amount", ValueFromAmount(-s.amount)));
             if (pwalletMain->mapAddressBook.count(s.destination))
                 entry.push_back(Pair("label", pwalletMain->mapAddressBook[s.destination].name));
-            entry.push_back(Pair("vout", s.vout));
+            //entry.push_back(Pair("vout", s.vout));
             entry.push_back(Pair("fee", ValueFromAmount(-nFee)));
             if (fLong)
                 WalletTxToJSON(wtx, entry);
@@ -1481,7 +1482,7 @@ void ListTransactions(const CWalletTx& wtx, const string& strAccount, int nMinDe
                 entry.push_back(Pair("amount", ValueFromAmount(r.amount)));
                 if (pwalletMain->mapAddressBook.count(r.destination))
                     entry.push_back(Pair("label", account));
-                entry.push_back(Pair("vout", r.vout));
+                //entry.push_back(Pair("vout", r.vout));
                 if (fLong)
                     WalletTxToJSON(wtx, entry);
                 ret.push_back(entry);
@@ -2600,13 +2601,15 @@ UniValue listunspent(const UniValue& params, bool fHelp)
 
         if (setAddress.size()) {
             CTxDestination address;
+            /*
             if (!ExtractDestination(out.tx->vout[out.i].scriptPubKey, address))
                 continue;
-
+*/
             if (!setAddress.count(address))
                 continue;
         }
 
+        /*
         CAmount nValue = out.tx->vout[out.i].nValue;
         const CScript& pk = out.tx->vout[out.i].scriptPubKey;
         UniValue entry(UniValue::VOBJ);
@@ -2628,6 +2631,10 @@ UniValue listunspent(const UniValue& params, bool fHelp)
                     entry.push_back(Pair("redeemScript", HexStr(redeemScript.begin(), redeemScript.end())));
             }
         }
+        */
+        UniValue entry(UniValue::VOBJ);
+        entry.push_back(Pair("txid", out.tx->GetHash().GetHex()));
+        CAmount nValue = 0;
         entry.push_back(Pair("amount",ValueFromAmount(nValue)));
         entry.push_back(Pair("confirmations",out.nDepth));
         entry.push_back(Pair("ps_rounds", pwalletMain->GetInputPrivateSendRounds(CTxIn(out.tx->GetHash(), out.i))));
@@ -2682,9 +2689,10 @@ UniValue fundrawtransaction(const UniValue& params, bool fHelp)
     if (!DecodeHexTx(origTx, params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "TX decode failed");
 
+    /*
     if (origTx.vout.size() == 0)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "TX must have at least one output");
-
+*/
     bool includeWatching = false;
     if (params.size() > 1)
         includeWatching = params[1].get_bool();

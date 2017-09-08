@@ -207,10 +207,6 @@ static void MutateTxAddInput(CMutableTransaction& tx, const string& strInput)
     int vout = atoi(strVout);
     if ((vout < 0) || (vout > (int)maxVout))
         throw runtime_error("invalid TX input vout");
-
-    // append to transaction input list
-    CTxIn txin(txid, vout);
-    tx.vin.push_back(txin);
 }
 
 static void MutateTxAddOutAddr(CMutableTransaction& tx, const string& strInput)
@@ -233,13 +229,6 @@ static void MutateTxAddOutAddr(CMutableTransaction& tx, const string& strInput)
     CBitcoinAddress addr(strAddr);
     if (!addr.IsValid())
         throw runtime_error("invalid TX output address");
-
-    // build standard output script via GetScriptForDestination()
-    CScript scriptPubKey = GetScriptForDestination(addr.Get());
-
-    // construct TxOut, append to transaction output list
-    CTxOut txout(value, scriptPubKey);
-    tx.vout.push_back(txout);
 }
 
 static void MutateTxAddOutData(CMutableTransaction& tx, const string& strInput)
@@ -266,9 +255,6 @@ static void MutateTxAddOutData(CMutableTransaction& tx, const string& strInput)
         throw runtime_error("invalid TX output data");
 
     std::vector<unsigned char> data = ParseHex(strData);
-
-    CTxOut txout(value, CScript() << OP_RETURN << data);
-    tx.vout.push_back(txout);
 }
 
 static void MutateTxAddOutScript(CMutableTransaction& tx, const string& strInput)
@@ -289,35 +275,16 @@ static void MutateTxAddOutScript(CMutableTransaction& tx, const string& strInput
     string strScript = strInput.substr(pos + 1, string::npos);
     CScript scriptPubKey = ParseScript(strScript); // throws on err
 
-    // construct TxOut, append to transaction output list
-    CTxOut txout(value, scriptPubKey);
-    tx.vout.push_back(txout);
 }
 
 static void MutateTxDelInput(CMutableTransaction& tx, const string& strInIdx)
 {
-    // parse requested deletion index
-    int inIdx = atoi(strInIdx);
-    if (inIdx < 0 || inIdx >= (int)tx.vin.size()) {
-        string strErr = "Invalid TX input index '" + strInIdx + "'";
-        throw runtime_error(strErr.c_str());
-    }
 
-    // delete input from transaction
-    tx.vin.erase(tx.vin.begin() + inIdx);
 }
 
 static void MutateTxDelOutput(CMutableTransaction& tx, const string& strOutIdx)
 {
-    // parse requested deletion index
-    int outIdx = atoi(strOutIdx);
-    if (outIdx < 0 || outIdx >= (int)tx.vout.size()) {
-        string strErr = "Invalid TX output index '" + strOutIdx + "'";
-        throw runtime_error(strErr.c_str());
-    }
 
-    // delete output from transaction
-    tx.vout.erase(tx.vout.begin() + outIdx);
 }
 
 static const unsigned int N_SIGHASH_OPTS = 6;
@@ -453,28 +420,6 @@ static void MutateTxSign(CMutableTransaction& tx, const string& flagStr)
 
     bool fHashSingle = ((nHashType & ~SIGHASH_ANYONECANPAY) == SIGHASH_SINGLE);
 
-    // Sign what we can:
-    for (unsigned int i = 0; i < mergedTx.vin.size(); i++) {
-        CTxIn& txin = mergedTx.vin[i];
-        const CCoins* coins = view.AccessCoins(txin.prevout.hash);
-        if (!coins || !coins->IsAvailable(txin.prevout.n)) {
-            fComplete = false;
-            continue;
-        }
-        const CScript& prevPubKey = coins->vout[txin.prevout.n].scriptPubKey;
-
-        txin.scriptSig.clear();
-        // Only sign SIGHASH_SINGLE if there's a corresponding output:
-        if (!fHashSingle || (i < mergedTx.vout.size()))
-            SignSignature(keystore, prevPubKey, mergedTx, i, nHashType);
-
-        // ... and merge in other signatures:
-        BOOST_FOREACH(const CTransaction& txv, txVariants) {
-            txin.scriptSig = CombineSignatures(prevPubKey, mergedTx, i, txin.scriptSig, txv.vin[i].scriptSig);
-        }
-        if (!VerifyScript(txin.scriptSig, prevPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, MutableTransactionSignatureChecker(&mergedTx, i)))
-            fComplete = false;
-    }
 
     if (fComplete) {
         // do nothing... for now
