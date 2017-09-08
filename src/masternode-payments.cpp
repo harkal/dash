@@ -284,12 +284,13 @@ void CMasternodePayments::FillBlockPayee(CMutableTransaction& txNew, int nBlockH
     // GET MASTERNODE PAYMENT VARIABLES SETUP
     CAmount masternodePayment = GetMasternodePayment(nBlockHeight, blockReward);
 
+    /*
     // split reward between miner ...
     txNew.vout[0].nValue -= masternodePayment;
     // ... and masternode
     txoutMasternodeRet = CTxOut(masternodePayment, payee);
     txNew.vout.push_back(txoutMasternodeRet);
-
+*/
     CTxDestination address1;
     ExtractDestination(payee, address1);
     CBitcoinAddress address2(address1);
@@ -562,13 +563,14 @@ bool CMasternodeBlockPayees::IsTransactionValid(const CTransaction& txNew)
 
     BOOST_FOREACH(CMasternodePayee& payee, vecPayees) {
         if (payee.GetVoteCount() >= MNPAYMENTS_SIGNATURES_REQUIRED) {
+            /*
             BOOST_FOREACH(CTxOut txout, txNew.vout) {
                 if (payee.GetPayee() == txout.scriptPubKey && nMasternodePayment == txout.nValue) {
                     LogPrint("mnpayments", "CMasternodeBlockPayees::IsTransactionValid -- Found required payment\n");
                     return true;
                 }
             }
-
+*/
             CTxDestination address1;
             ExtractDestination(payee.GetPayee(), address1);
             CBitcoinAddress address2(address1);
