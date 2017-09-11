@@ -962,7 +962,7 @@ public:
         }
     }
 
-    void GetScriptForMining(boost::shared_ptr<CReserveScript> &script);
+    void GetPubKeyForMining(CPubKey &pubkey);
     void ResetRequestCount(const H256 &hash)
     {
         LOCK(cs_wallet);

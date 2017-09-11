@@ -74,7 +74,7 @@ int64_t UpdateTime(CBlockHeader* pblock, const Consensus::Params& consensusParam
     return nNewTime - nOldTime;
 }
 
-CBlockTemplate* CreateNewBlock(const CChainParams& chainparams, const CScript& scriptPubKeyIn)
+CBlockTemplate* CreateNewBlock(const CChainParams& chainparams, const CPubKey& minerPubKey)
 {
     // Create new block
     std::unique_ptr<CBlockTemplate> pblocktemplate(new CBlockTemplate());
@@ -274,7 +274,7 @@ CBlockTemplate* CreateNewBlock(const CChainParams& chainparams, const CScript& s
 
         //FillBlockPayments(txNew, nHeight, blockReward, pblock->txoutMasternode, pblock->voutSuperblock);
         txNew.mAmount = blockReward;
-        txNew.mReceiver = H256();
+        txNew.mReceiver = minerPubKey;
         txNew.mData.clear();
 
         // LogPrintf("CreateNewBlock -- nBlockHeight %d blockReward %lld txoutMasternode %s txNew %s",
@@ -392,14 +392,14 @@ void static BitcoinMiner(const CChainParams& chainparams, CConnman& connman)
 
     unsigned int nExtraNonce = 0;
 
-    boost::shared_ptr<CReserveScript> coinbaseScript;
-    GetMainSignals().ScriptForMining(coinbaseScript);
+    CPubKey minerPubKey;
+    GetMainSignals().PubKeyForMining(minerPubKey);
 
     try {
         // Throw an error if no script was provided.  This can happen
         // due to some internal error but also if the keypool is empty.
         // In the latter case, already the pointer is NULL.
-        if (!coinbaseScript || coinbaseScript->reserveScript.empty())
+        if (!minerPubKey.IsValid())
             throw std::runtime_error("No coinbase script available (mining requires a wallet)");
 
         while (true) {
@@ -422,7 +422,7 @@ void static BitcoinMiner(const CChainParams& chainparams, CConnman& connman)
             CBlockIndex* pindexPrev = chainActive.Tip();
             if(!pindexPrev) break;
 
-            std::unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlock(chainparams, coinbaseScript->reserveScript));
+            std::unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlock(chainparams, minerPubKey));
             if (!pblocktemplate.get())
             {
                 LogPrintf("DashMiner -- Keypool ran out, please call keypoolrefill before restarting the mining thread\n");
@@ -455,7 +455,6 @@ void static BitcoinMiner(const CChainParams& chainparams, CConnman& connman)
                         LogPrintf("DashMiner:\n  proof-of-work found\n  hash: %s\n  target: %s\n", hash.GetHex(), hashTarget.GetHex());
                         ProcessBlockFound(pblock, chainparams);
                         SetThreadPriority(THREAD_PRIORITY_LOWEST);
-                        coinbaseScript->KeepScript();
 
                         // In regression test mode, stop mining after a block is found. This
                         // allows developers to controllably generate a block on demand.

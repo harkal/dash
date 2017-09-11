@@ -11,6 +11,7 @@
 #include "serialize.h"
 #include "uint256.h"
 #include "crypto/hash.h"
+#include "pubkey.h"
 #include "common.h"
 
 
@@ -235,8 +236,8 @@ public:
     const int32_t nVersion;
     const uint32_t nLockTime;
 
-    const H256      mSender;
-    const H256      mReceiver;
+    const CPubKey   mSender;
+    const CPubKey   mReceiver;
     const CAmount   mAmount;
     const Bytes     mData;
 
@@ -255,8 +256,8 @@ public:
         READWRITE(*const_cast<int32_t*>(&this->nVersion));
         nVersion = this->nVersion;
         READWRITE(*const_cast<uint32_t*>(&nLockTime));
-        READWRITE(*const_cast<H256 *>(&mSender));
-        READWRITE(*const_cast<H256 *>(&mReceiver));
+        READWRITE(*const_cast<CPubKey *>(&mSender));
+        READWRITE(*const_cast<CPubKey *>(&mReceiver));
         READWRITE(*const_cast<CAmount *>(&mAmount));
         READWRITE(*const_cast<Bytes *>(&mData));
 
@@ -310,8 +311,8 @@ struct CMutableTransaction
     uint32_t nLockTime;
 
     // Ebakus transaction
-    H256      mSender;
-    H256      mReceiver;
+    CPubKey   mSender;
+    CPubKey   mReceiver;
     CAmount   mAmount;
     Bytes     mData;
 

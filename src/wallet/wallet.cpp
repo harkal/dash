@@ -3560,15 +3560,11 @@ bool CWallet::UpdatedTransaction(const H256 &hashTx)
     return false;
 }
 
-void CWallet::GetScriptForMining(boost::shared_ptr<CReserveScript> &script)
+void CWallet::GetPubKeyForMining(CPubKey &pubkey)
 {
     boost::shared_ptr<CReserveKey> rKey(new CReserveKey(this));
-    CPubKey pubkey;
-    if (!rKey->GetReservedKey(pubkey, false))
-        return;
 
-    script = rKey;
-    script->reserveScript = CScript() << ToByteVector(pubkey) << OP_CHECKSIG;
+    rKey->GetReservedKey(pubkey, false);
 }
 
 void CWallet::LockCoin(COutPoint& output)
