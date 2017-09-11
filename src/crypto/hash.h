@@ -19,6 +19,8 @@
 template <unsigned int N>
 class CHash
 {
+protected:
+    std::array<Byte, N> mData;
 public:
     // The arithmetic type
     using Arith = boost::multiprecision::number<boost::multiprecision::cpp_int_backend<N * 8, N * 8, boost::multiprecision::unsigned_magnitude, boost::multiprecision::unchecked, void>>;
@@ -161,8 +163,7 @@ public:
     {
         s.read((char *)mData.data(), N);
     }
-private:
-    std::array<Byte, N> mData;
+
 };
 
 // Define hash types

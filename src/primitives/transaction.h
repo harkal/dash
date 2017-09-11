@@ -233,8 +233,6 @@ public:
     // and bypass the constness. This is safe, as they update the entire
     // structure, including the hash.
     const int32_t nVersion;
-//    const std::vector<CTxIn> vin;
-//    const std::vector<CTxOut> vout;
     const uint32_t nLockTime;
 
     const H256      mSender;
@@ -256,9 +254,12 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(*const_cast<int32_t*>(&this->nVersion));
         nVersion = this->nVersion;
-//        READWRITE(*const_cast<std::vector<CTxIn>*>(&vin));
-//        READWRITE(*const_cast<std::vector<CTxOut>*>(&vout));
         READWRITE(*const_cast<uint32_t*>(&nLockTime));
+        READWRITE(*const_cast<H256 *>(&mSender));
+        READWRITE(*const_cast<H256 *>(&mReceiver));
+        READWRITE(*const_cast<CAmount *>(&mAmount));
+        READWRITE(*const_cast<Bytes *>(&mData));
+
         if (ser_action.ForRead())
             UpdateHash();
     }
@@ -323,10 +324,11 @@ struct CMutableTransaction
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(this->nVersion);
         nVersion = this->nVersion;
-//        READWRITE(vin);
-//        READWRITE(vout);
         READWRITE(nLockTime);
         READWRITE(mSender);
+        READWRITE(mReceiver);
+        READWRITE(mAmount);
+        READWRITE(mData);
     }
 
     /** Compute the hash of this CMutableTransaction. This is computed on the
