@@ -524,10 +524,12 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
 
         if (amount > 0)
         {
+            /*
             CTxOut txout(amount, (CScript)std::vector<unsigned char>(24, 0));
             txDummy.vout.push_back(txout);
             if (txout.IsDust(::minRelayTxFee))
                fDust = true;
+               */
         }
     }
 
@@ -563,6 +565,7 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
         // Quantity
         nQuantity++;
 
+        /*
         // Amount
         nAmount += out.tx->vout[out.i].nValue;
 
@@ -589,6 +592,7 @@ void CoinControlDialog::updateLabels(WalletModel *model, QDialog* dialog)
         // Add inputs to calculate InstantSend Fee later
         if(coinControl->fUseInstantSend)
             txDummy.vin.push_back(CTxIn());
+            */
     }
 
     // calculation
@@ -793,7 +797,7 @@ void CoinControlDialog::updateView()
         int nInputSum = 0;
         BOOST_FOREACH(const COutput& out, coins.second) {
             int nInputSize = 0;
-            nSum += out.tx->vout[out.i].nValue;
+            //nSum += out.tx->vout[out.i].nValue;
             nChildren++;
 
             QTreeWidgetItem *itemOutput;
@@ -805,6 +809,7 @@ void CoinControlDialog::updateView()
             // address
             CTxDestination outputAddress;
             QString sAddress = "";
+            /*
             if(ExtractDestination(out.tx->vout[out.i].scriptPubKey, outputAddress))
             {
                 sAddress = QString::fromStdString(CBitcoinAddress(outputAddress).ToString());
@@ -820,7 +825,7 @@ void CoinControlDialog::updateView()
                 if (keyid && model->getPubKey(*keyid, pubkey) && !pubkey.IsCompressed())
                     nInputSize = 29; // 29 = 180 - 151 (public key is 180 bytes, priority free area is 151 bytes)
             }
-
+*/
             // label
             if (!(sAddress == sWalletAddress)) // change
             {
@@ -837,10 +842,11 @@ void CoinControlDialog::updateView()
             }
 
             // amount
+            /*
             itemOutput->setText(COLUMN_AMOUNT, BitcoinUnits::format(nDisplayUnit, out.tx->vout[out.i].nValue));
             itemOutput->setToolTip(COLUMN_AMOUNT, BitcoinUnits::format(nDisplayUnit, out.tx->vout[out.i].nValue));
             itemOutput->setText(COLUMN_AMOUNT_INT64, strPad(QString::number(out.tx->vout[out.i].nValue), 15, " ")); // padding so that sorting works correctly
-
+*/
             // date
             itemOutput->setText(COLUMN_DATE, GUIUtil::dateTimeStr(out.tx->GetTxTime()));
             itemOutput->setToolTip(COLUMN_DATE, GUIUtil::dateTimeStr(out.tx->GetTxTime()));
@@ -859,12 +865,13 @@ void CoinControlDialog::updateView()
             itemOutput->setText(COLUMN_CONFIRMATIONS, strPad(QString::number(out.nDepth), 8, " "));
 
             // priority
+            /*
             double dPriority = ((double)out.tx->vout[out.i].nValue  / (nInputSize + 78)) * (out.nDepth+1); // 78 = 2 * 34 + 10
             itemOutput->setText(COLUMN_PRIORITY, CoinControlDialog::getPriorityLabel(dPriority, mempoolEstimatePriority));
             itemOutput->setText(COLUMN_PRIORITY_INT64, strPad(QString::number((int64_t)dPriority), 20, " "));
             dPrioritySum += (double)out.tx->vout[out.i].nValue  * (out.nDepth+1);
             nInputSum    += nInputSize;
-
+*/
             // transaction hash
             H256 txhash = out.tx->GetHash();
             itemOutput->setText(COLUMN_TXHASH, QString::fromStdString(txhash.GetHex()));
