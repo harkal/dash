@@ -130,7 +130,6 @@ CBlockTemplate* CreateNewBlock(const CChainParams& chainparams, const CScript& s
         // Add our coinbase tx as first transaction
         pblock->vtx.push_back(txNew);
         pblocktemplate->vTxFees.push_back(-1); // updated at end
-        pblocktemplate->vTxSigOps.push_back(-1); // updated at end
         pblock->nVersion = ComputeBlockVersion(pindexPrev, chainparams.GetConsensus());
         // -regtest only: allow overriding block.nVersion with
         // -blockversion=N to test forking scenarios
@@ -226,22 +225,12 @@ CBlockTemplate* CreateNewBlock(const CChainParams& chainparams, const CScript& s
                 if (!IsFinalTx(tx, nHeight, nLockTimeCutoff))
                     continue;
 
-                unsigned int nTxSigOps = iter->GetSigOpCount();
-                if (nBlockSigOps + nTxSigOps >= MAX_BLOCK_SIGOPS) {
-                    if (nBlockSigOps > MAX_BLOCK_SIGOPS - 2) {
-                        break;
-                    }
-                    continue;
-                }
-
                 CAmount nTxFees = iter->GetFee();
                 // Added
                 pblock->vtx.push_back(tx);
                 pblocktemplate->vTxFees.push_back(nTxFees);
-                pblocktemplate->vTxSigOps.push_back(nTxSigOps);
                 nBlockSize += nTxSize;
                 ++nBlockTx;
-                nBlockSigOps += nTxSigOps;
                 nFees += nTxFees;
 
                 if (fPrintPriority)
@@ -282,9 +271,15 @@ CBlockTemplate* CreateNewBlock(const CChainParams& chainparams, const CScript& s
 
         // Update coinbase transaction with additional info about masternode and governance payments,
         // get some info back to pass to getblocktemplate
-        FillBlockPayments(txNew, nHeight, blockReward, pblock->txoutMasternode, pblock->voutSuperblock);
+
+        //FillBlockPayments(txNew, nHeight, blockReward, pblock->txoutMasternode, pblock->voutSuperblock);
+        txNew.mAmount = blockReward;
+        txNew.mReceiver = H256();
+        txNew.mData.clear();
+
         // LogPrintf("CreateNewBlock -- nBlockHeight %d blockReward %lld txoutMasternode %s txNew %s",
         //             nHeight, blockReward, pblock->txoutMasternode.ToString(), txNew.ToString());
+
 
         nLastBlockTx = nBlockTx;
         nLastBlockSize = nBlockSize;
