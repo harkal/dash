@@ -65,8 +65,16 @@ std::string CTxOut::ToString() const
     return strprintf("CTxOut(nValue=%d.%08d, scriptPubKey=%s)", nValue / COIN, nValue % COIN, HexStr(scriptPubKey).substr(0, 30));
 }
 
-CMutableTransaction::CMutableTransaction() : nVersion(CTransaction::CURRENT_VERSION), nLockTime(0) {}
-CMutableTransaction::CMutableTransaction(const CTransaction& tx) : nVersion(tx.nVersion), nLockTime(tx.nLockTime) {}
+CMutableTransaction::CMutableTransaction() : nVersion(CTransaction::CURRENT_VERSION), nLockTime(0), mAmount(0) {}
+CMutableTransaction::CMutableTransaction(const CTransaction& tx) :
+    nVersion(tx.nVersion),
+    mAmount(tx.mAmount),
+    mSender(tx.mSender),
+    mReceiver(tx.mReceiver),
+    mData(tx.mData),
+    nLockTime(tx.nLockTime)
+
+{}
 
 H256 CMutableTransaction::GetHash() const
 {
@@ -91,7 +99,13 @@ void CTransaction::UpdateHash() const
 
 CTransaction::CTransaction() : nVersion(CTransaction::CURRENT_VERSION), mAmount(0), nLockTime(0) { }
 
-CTransaction::CTransaction(const CMutableTransaction &tx) : nVersion(tx.nVersion), mAmount(0), nLockTime(tx.nLockTime) {
+CTransaction::CTransaction(const CMutableTransaction &tx) :
+    nVersion(tx.nVersion),
+    mAmount(tx.mAmount),
+    mSender(tx.mSender),
+    mReceiver(tx.mReceiver),
+    mData(tx.mData),
+    nLockTime(tx.nLockTime) {
     UpdateHash();
 }
 

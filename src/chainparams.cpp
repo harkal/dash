@@ -373,14 +373,14 @@ public:
         nDefaultPort = 19994;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1503656759, 1, 0x207fffff, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1503656759, 0, 0x207fffff, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        //assert(consensus.hashGenesisBlock == uint256S("0x30901a1d7fc9af593198124e8af3151c1cdeb85b922009a7c707e3f7a7879913"));
+        //assert(consensus.hashGenesisBlock == uint256S("0x03a1410a14175e1f9252c076a269909396d6f49abb2955e705f2686415f6d8d2"));
         //assert(genesis.hashMerkleRoot == uint256S("0xe8e6f87a39e00b70b3a7b53317bfe832b20a3d66b3e0c706b21d2a3fe0bc8f071"));
 
         if (true) {
-                H256 hh = CKeccak256().Write((const Byte*)"", 0).Finalize();
-                printf("block.GetHash = %s\n", hh.ToString().c_str());
+                //H256 hh = CKeccak256().Write((const Byte*)"", 0).Finalize();
+                //printf("block.GetHash = %s\n", hh.ToString().c_str());
 
                 printf("Searching for genesis block...\n");
                 // This will figure out a valid hash and Nonce if you're
@@ -424,7 +424,7 @@ public:
 
         checkpointData = (CCheckpointData){
             boost::assign::map_list_of
-            ( 0, uint256S("0x5b947a3d481adf77302916ee9089902148e389b43d40ab5c730681bf4f793d02")),
+            ( 0, uint256S("0x20ff69cfa8107bf8f117ea2c1a9d41bea9e74acfe45ee980e4f6c64676a96af2")),
             0,
             0,
             0
