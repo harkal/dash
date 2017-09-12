@@ -14,6 +14,7 @@
 #include "pubkey.h"
 #include "common.h"
 
+class CKey;
 
 /** An outpoint - a combination of a transaction hash and an index n into its vout */
 class COutPoint
@@ -216,8 +217,8 @@ class CTransaction
 private:
     /** Memory only. */
     const H256 hash;
+    const CPubKey mSender;
     void UpdateHash() const;
-
 public:
     // Default transaction version.
     static const int32_t CURRENT_VERSION=1;
@@ -235,11 +236,10 @@ public:
     // structure, including the hash.
     const int32_t nVersion;
     const uint32_t nLockTime;
-
-    const CPubKey   mSender;
     const CPubKey   mReceiver;
     const CAmount   mAmount;
     const Bytes     mData;
+    const Bytes     mSignature;
 
     /** Construct a CTransaction that qualifies as IsNull() */
     CTransaction();
@@ -256,13 +256,14 @@ public:
         READWRITE(*const_cast<int32_t*>(&this->nVersion));
         nVersion = this->nVersion;
         READWRITE(*const_cast<uint32_t*>(&nLockTime));
-        READWRITE(*const_cast<CPubKey *>(&mSender));
         READWRITE(*const_cast<CPubKey *>(&mReceiver));
         READWRITE(*const_cast<CAmount *>(&mAmount));
         READWRITE(*const_cast<Bytes *>(&mData));
+        READWRITE(*const_cast<Bytes *>(&mSignature));
 
-        if (ser_action.ForRead())
+        if (ser_action.ForRead()) {
             UpdateHash();
+        }
     }
 
     bool IsNull() const {
@@ -311,7 +312,6 @@ struct CMutableTransaction
     uint32_t nLockTime;
 
     // Ebakus transaction
-    CPubKey   mSender;
     CPubKey   mReceiver;
     CAmount   mAmount;
     Bytes     mData;
@@ -326,7 +326,6 @@ struct CMutableTransaction
         READWRITE(this->nVersion);
         nVersion = this->nVersion;
         READWRITE(nLockTime);
-        READWRITE(mSender);
         READWRITE(mReceiver);
         READWRITE(mAmount);
         READWRITE(mData);
@@ -336,6 +335,9 @@ struct CMutableTransaction
      * fly, as opposed to GetHash() in CTransaction, which uses a cached result.
      */
     H256 GetHash() const;
+    Bytes GetSignature() const;
+    Bytes GetSignature(const CKey &key) const;
+    bool VerifySignature(const Bytes& vchSig, CPubKey &senderPubKey) const;
 
     std::string ToString() const;
 

@@ -4,7 +4,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "primitives/transaction.h"
-
+#include "key.h"
 #include "hash.h"
 #include "tinyformat.h"
 #include "utilstrencodings.h"
@@ -69,7 +69,6 @@ CMutableTransaction::CMutableTransaction() : nVersion(CTransaction::CURRENT_VERS
 CMutableTransaction::CMutableTransaction(const CTransaction& tx) :
     nVersion(tx.nVersion),
     mAmount(tx.mAmount),
-    mSender(tx.mSender),
     mReceiver(tx.mReceiver),
     mData(tx.mData),
     nLockTime(tx.nLockTime)
@@ -79,6 +78,24 @@ CMutableTransaction::CMutableTransaction(const CTransaction& tx) :
 H256 CMutableTransaction::GetHash() const
 {
     return SerializeHash(*this);
+}
+
+Bytes CMutableTransaction::GetSignature(const CKey &key) const {
+    Bytes signature;
+    key.SignCompact(GetHash(), signature);
+    return signature;
+}
+
+Bytes CMutableTransaction::GetSignature() const {
+    Bytes signature;
+    key.SignCompact(GetHash(), signature);
+    return signature;
+}
+
+bool CMutableTransaction::VerifySignature(const Bytes& vchSig, CPubKey &senderPubKey) const {
+    H256 hash = GetHash();
+
+    return senderPubKey.RecoverCompact(hash, vchSig);
 }
 
 std::string CMutableTransaction::ToString() const
@@ -102,10 +119,10 @@ CTransaction::CTransaction() : nVersion(CTransaction::CURRENT_VERSION), mAmount(
 CTransaction::CTransaction(const CMutableTransaction &tx) :
     nVersion(tx.nVersion),
     mAmount(tx.mAmount),
-    mSender(tx.mSender),
     mReceiver(tx.mReceiver),
     mData(tx.mData),
-    nLockTime(tx.nLockTime) {
+    nLockTime(tx.nLockTime)
+{
     UpdateHash();
 }
 
