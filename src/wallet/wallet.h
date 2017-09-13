@@ -977,6 +977,8 @@ public:
 
     bool SetDefaultKey(const CPubKey &vchPubKey);
 
+    bool GetDefaultKey(CKey &key);
+
     //! signify that a particular wallet feature is now used. this may change nWalletVersion and nWalletMaxVersion if those are lower
     bool SetMinVersion(enum WalletFeature, CWalletDB* pwalletdbIn = NULL, bool fExplicit = false);
 

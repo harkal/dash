@@ -249,6 +249,12 @@ public:
 
     CTransaction& operator=(const CTransaction& tx);
 
+    Bytes GetSignature() const;
+    Bytes GetSignature(const CKey &key) const;
+
+    void Sign();
+    void Sign(const CKey &key);
+
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
@@ -259,7 +265,9 @@ public:
         READWRITE(*const_cast<CPubKey *>(&mReceiver));
         READWRITE(*const_cast<CAmount *>(&mAmount));
         READWRITE(*const_cast<Bytes *>(&mData));
-        READWRITE(*const_cast<Bytes *>(&mSignature));
+
+        if(!(nType & SER_GETHASH))
+            READWRITE(*const_cast<Bytes *>(&mSignature));
 
         if (ser_action.ForRead()) {
             UpdateHash();
@@ -315,6 +323,7 @@ struct CMutableTransaction
     CPubKey   mReceiver;
     CAmount   mAmount;
     Bytes     mData;
+    Bytes     mSignature;
 
     CMutableTransaction();
     CMutableTransaction(const CTransaction& tx);
@@ -329,6 +338,9 @@ struct CMutableTransaction
         READWRITE(mReceiver);
         READWRITE(mAmount);
         READWRITE(mData);
+
+        if(!(nType & SER_GETHASH))
+            READWRITE(*const_cast<Bytes *>(&mSignature));
     }
 
     /** Compute the hash of this CMutableTransaction. This is computed on the
@@ -337,6 +349,10 @@ struct CMutableTransaction
     H256 GetHash() const;
     Bytes GetSignature() const;
     Bytes GetSignature(const CKey &key) const;
+
+    void Sign();
+    void Sign(const CKey &key);
+
     bool VerifySignature(const Bytes& vchSig, CPubKey &senderPubKey) const;
 
     std::string ToString() const;

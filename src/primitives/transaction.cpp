@@ -8,6 +8,9 @@
 #include "hash.h"
 #include "tinyformat.h"
 #include "utilstrencodings.h"
+#include "wallet/wallet.h"
+
+extern CWallet* pwalletMain;
 
 std::string COutPoint::ToString() const
 {
@@ -80,16 +83,32 @@ H256 CMutableTransaction::GetHash() const
     return SerializeHash(*this);
 }
 
+Bytes CMutableTransaction::GetSignature() const {
+    Bytes signature;
+    CKey privateKey;
+    if(!pwalletMain->GetDefaultKey(privateKey)) {
+        return signature;
+    }
+
+    privateKey.SignCompact(GetHash(), signature);
+
+    return signature;
+}
+
 Bytes CMutableTransaction::GetSignature(const CKey &key) const {
     Bytes signature;
     key.SignCompact(GetHash(), signature);
     return signature;
 }
 
-Bytes CMutableTransaction::GetSignature() const {
-    Bytes signature;
-    key.SignCompact(GetHash(), signature);
-    return signature;
+void CMutableTransaction::Sign()
+{
+    mSignature = GetSignature();
+}
+
+void CMutableTransaction::Sign(const CKey &key)
+{
+    mSignature = GetSignature(key);
 }
 
 bool CMutableTransaction::VerifySignature(const Bytes& vchSig, CPubKey &senderPubKey) const {
@@ -121,9 +140,38 @@ CTransaction::CTransaction(const CMutableTransaction &tx) :
     mAmount(tx.mAmount),
     mReceiver(tx.mReceiver),
     mData(tx.mData),
+    mSignature(tx.mSignature),
     nLockTime(tx.nLockTime)
 {
     UpdateHash();
+}
+
+Bytes CTransaction::GetSignature() const {
+    Bytes signature;
+    CKey privateKey;
+    if(!pwalletMain->GetDefaultKey(privateKey)) {
+        return signature;
+    }
+
+    privateKey.SignCompact(GetHash(), signature);
+
+    return signature;
+}
+
+Bytes CTransaction::GetSignature(const CKey &key) const {
+    Bytes signature;
+    key.SignCompact(GetHash(), signature);
+    return signature;
+}
+
+void CTransaction::Sign()
+{
+    *const_cast<Bytes *>(&mSignature) = GetSignature();
+}
+
+void CTransaction::Sign(const CKey &key)
+{
+    *const_cast<Bytes *>(&mSignature) = GetSignature(key);
 }
 
 CTransaction& CTransaction::operator=(const CTransaction &tx) {

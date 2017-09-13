@@ -3174,6 +3174,13 @@ bool CWallet::SetDefaultKey(const CPubKey &vchPubKey)
     return true;
 }
 
+bool CWallet::GetDefaultKey(CKey &key)
+{
+    CPubKey pubkey = vchDefaultKey;
+
+    return GetKey(pubkey.GetID(), key);
+}
+
 /**
  * Mark old keypool keys as used,
  * and generate all new keys 

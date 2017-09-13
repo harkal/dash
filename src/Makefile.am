@@ -505,14 +505,15 @@ libebakusconsensus_la_SOURCES = \
   script/interpreter.cpp \
   script/script.cpp \
   uint256.cpp \
-  utilstrencodings.cpp
+  utilstrencodings.cpp 
+
 
 if GLIBC_BACK_COMPAT
   libebakusconsensus_la_SOURCES += compat/glibc_compat.cpp
 endif
 
 libebakusconsensus_la_LDFLAGS = $(AM_LDFLAGS) -no-undefined $(RELDFLAGS)
-libebakusconsensus_la_LIBADD = $(LIBSECP256K1)
+libebakusconsensus_la_LIBADD = $(BOOST_LIBS) $(LIBSECP256K1)
 libebakusconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
 libebakusconsensus_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 

@@ -276,6 +276,7 @@ CBlockTemplate* CreateNewBlock(const CChainParams& chainparams, const CPubKey& m
         txNew.mAmount = blockReward;
         txNew.mReceiver = minerPubKey;
         txNew.mData.clear();
+        txNew.Sign();
 
         // LogPrintf("CreateNewBlock -- nBlockHeight %d blockReward %lld txoutMasternode %s txNew %s",
         //             nHeight, blockReward, pblock->txoutMasternode.ToString(), txNew.ToString());
