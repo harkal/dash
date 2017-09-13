@@ -285,11 +285,8 @@ CBlockTemplate* CreateNewBlock(const CChainParams& chainparams, const CPubKey& m
             // Handle error
         }
 
+        // Sign the transaction
         txNew.Sign(privateKey);
-
-        // LogPrintf("CreateNewBlock -- nBlockHeight %d blockReward %lld txoutMasternode %s txNew %s",
-        //             nHeight, blockReward, pblock->txoutMasternode.ToString(), txNew.ToString());
-
 
         nLastBlockTx = nBlockTx;
         nLastBlockSize = nBlockSize;

@@ -92,10 +92,19 @@ void CMutableTransaction::Sign(const CKey &key)
     mSignature = GetSignature(key);
 }
 
-bool CMutableTransaction::VerifySignature(const Bytes& vchSig, CPubKey &senderPubKey) const {
+bool CMutableTransaction::VerifySignature(const Bytes& vchSig, const CPubKey &senderPubKey) const {
     H256 hash = GetHash();
 
-    return senderPubKey.RecoverCompact(hash, vchSig);
+
+    CPubKey sigPubKey;;
+
+    if(sigPubKey.RecoverCompact(hash, vchSig)) {
+        if(sigPubKey.GetID() == senderPubKey.GetID()) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 std::string CMutableTransaction::ToString() const

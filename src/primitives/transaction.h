@@ -349,7 +349,7 @@ struct CMutableTransaction
 
     void Sign(const CKey &key);
 
-    bool VerifySignature(const Bytes& vchSig, CPubKey &senderPubKey) const;
+    bool VerifySignature(const Bytes& vchSig, const CPubKey &senderPubKey) const;
 
     std::string ToString() const;
 
