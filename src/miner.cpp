@@ -27,10 +27,13 @@
 #include "masternode-payments.h"
 #include "masternode-sync.h"
 #include "validationinterface.h"
+#include "wallet/wallet.h"
 
 #include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <queue>
+
+extern CWallet* pwalletMain;
 
 using namespace std;
 
@@ -276,7 +279,13 @@ CBlockTemplate* CreateNewBlock(const CChainParams& chainparams, const CPubKey& m
         txNew.mAmount = blockReward;
         txNew.mReceiver = minerPubKey;
         txNew.mData.clear();
-        txNew.Sign();
+
+        CKey privateKey;
+        if(!pwalletMain->GetDefaultKey(privateKey)) {
+            // Handle error
+        }
+
+        txNew.Sign(privateKey);
 
         // LogPrintf("CreateNewBlock -- nBlockHeight %d blockReward %lld txoutMasternode %s txNew %s",
         //             nHeight, blockReward, pblock->txoutMasternode.ToString(), txNew.ToString());

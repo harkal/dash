@@ -249,10 +249,8 @@ public:
 
     CTransaction& operator=(const CTransaction& tx);
 
-    Bytes GetSignature() const;
     Bytes GetSignature(const CKey &key) const;
 
-    void Sign();
     void Sign(const CKey &key);
 
     ADD_SERIALIZE_METHODS;
@@ -347,10 +345,8 @@ struct CMutableTransaction
      * fly, as opposed to GetHash() in CTransaction, which uses a cached result.
      */
     H256 GetHash() const;
-    Bytes GetSignature() const;
     Bytes GetSignature(const CKey &key) const;
 
-    void Sign();
     void Sign(const CKey &key);
 
     bool VerifySignature(const Bytes& vchSig, CPubKey &senderPubKey) const;

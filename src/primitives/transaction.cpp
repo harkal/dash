@@ -10,8 +10,6 @@
 #include "utilstrencodings.h"
 #include "wallet/wallet.h"
 
-extern CWallet* pwalletMain;
-
 std::string COutPoint::ToString() const
 {
     return strprintf("COutPoint(%s, %u)", hash.ToString()/*.substr(0,10)*/, n);
@@ -83,27 +81,10 @@ H256 CMutableTransaction::GetHash() const
     return SerializeHash(*this);
 }
 
-Bytes CMutableTransaction::GetSignature() const {
-    Bytes signature;
-    CKey privateKey;
-    if(!pwalletMain->GetDefaultKey(privateKey)) {
-        return signature;
-    }
-
-    privateKey.SignCompact(GetHash(), signature);
-
-    return signature;
-}
-
 Bytes CMutableTransaction::GetSignature(const CKey &key) const {
     Bytes signature;
     key.SignCompact(GetHash(), signature);
     return signature;
-}
-
-void CMutableTransaction::Sign()
-{
-    mSignature = GetSignature();
 }
 
 void CMutableTransaction::Sign(const CKey &key)
@@ -146,27 +127,10 @@ CTransaction::CTransaction(const CMutableTransaction &tx) :
     UpdateHash();
 }
 
-Bytes CTransaction::GetSignature() const {
-    Bytes signature;
-    CKey privateKey;
-    if(!pwalletMain->GetDefaultKey(privateKey)) {
-        return signature;
-    }
-
-    privateKey.SignCompact(GetHash(), signature);
-
-    return signature;
-}
-
 Bytes CTransaction::GetSignature(const CKey &key) const {
     Bytes signature;
     key.SignCompact(GetHash(), signature);
     return signature;
-}
-
-void CTransaction::Sign()
-{
-    *const_cast<Bytes *>(&mSignature) = GetSignature();
 }
 
 void CTransaction::Sign(const CKey &key)

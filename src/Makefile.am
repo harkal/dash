@@ -505,7 +505,9 @@ libebakusconsensus_la_SOURCES = \
   script/interpreter.cpp \
   script/script.cpp \
   uint256.cpp \
-  utilstrencodings.cpp 
+  utilstrencodings.cpp \ 
+  key.cpp \
+  chainparamsbase.cpp
 
 
 if GLIBC_BACK_COMPAT
@@ -513,8 +515,8 @@ if GLIBC_BACK_COMPAT
 endif
 
 libebakusconsensus_la_LDFLAGS = $(AM_LDFLAGS) -no-undefined $(RELDFLAGS)
-libebakusconsensus_la_LIBADD = $(BOOST_LIBS) $(LIBSECP256K1)
-libebakusconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
+libebakusconsensus_la_LIBADD = $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(LIBSECP256K1) $(LIBBITCOIN_UTIL)
+libebakusconsensus_la_CPPFLAGS = $(AM_CPPFLAGS) $(BOOST_CPPFLAGS) $(SSL_CFLAGS) -I$(builddir)/obj -I$(srcdir)/secp256k1/include -DBUILD_BITCOIN_INTERNAL
 libebakusconsensus_la_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 
 endif
