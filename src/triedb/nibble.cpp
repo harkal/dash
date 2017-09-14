@@ -41,24 +41,25 @@ Bytes hexPrefixEncode(Bytes const& hex, bool leaf, int begin, int end)
     return ret;
 }
 
-Bytes hexPrefixEncode(Bytes const& _data, bool _leaf, int _beginNibble, int _endNibble, unsigned _offset)
+Bytes hexPrefixEncode(Bytes const& data, bool leaf, int beginNibble, int endNibble, unsigned offset)
 {
-    unsigned begin = _beginNibble + _offset;
-    unsigned end = (_endNibble < 0 ? ((int)(_data.size() * 2 - _offset) + 1) + _endNibble : _endNibble) + _offset;
+    unsigned begin = beginNibble + offset;
+    unsigned end = (endNibble < 0 ? ((int)(data.size() * 2 - offset) + 1) + endNibble : endNibble) + offset;
     bool odd = (end - begin) & 1;
 
-    Bytes ret(1, ((_leaf ? 2 : 0) | (odd ? 1 : 0)) * 16);
+    Bytes ret(1, ((leaf ? 2 : 0) | (odd ? 1 : 0)) * 16);
     ret.reserve((end - begin) / 2 + 1);
 
     unsigned d = odd ? 1 : 2;
-    for (auto i = begin; i < end; ++i, ++d)
-    {
-        Byte n = nibble(_data, i);
+
+    for (auto i = begin ; i < end ; ++i, ++d) {
+        Byte n = nibble(data, i);
         if (d & 1)	// odd
             ret.back() |= n;		// or the nibble onto the back
         else
             ret.push_back(n << 4);	// push the nibble on to the back << 4
     }
+
     return ret;
 }
 
@@ -75,22 +76,22 @@ Bytes hexPrefixEncode(Bytes const& _d1, unsigned _o1, Bytes const& _d2, unsigned
     ret.reserve((end1 - begin1 + end2 - begin2) / 2 + 1);
 
     unsigned d = odd ? 1 : 2;
-    for (auto i = begin1; i < end1; ++i, ++d)
-    {
+    for (auto i = begin1 ; i < end1 ; ++i, ++d) {
         Byte n = nibble(_d1, i);
         if (d & 1)	// odd
             ret.back() |= n;		// or the nibble onto the back
         else
             ret.push_back(n << 4);	// push the nibble on to the back << 4
     }
-    for (auto i = begin2; i < end2; ++i, ++d)
-    {
+
+    for (auto i = begin2 ; i < end2 ; ++i, ++d) {
         Byte n = nibble(_d2, i);
         if (d & 1)	// odd
             ret.back() |= n;		// or the nibble onto the back
         else
             ret.push_back(n << 4);	// push the nibble on to the back << 4
     }
+
     return ret;
 }
 /*
