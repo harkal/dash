@@ -3,8 +3,6 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "triedb.h"
+#include "crypto/keccak256.h"
 
-CTrieDB::CTrieDB()
-{
-
-}
+H256 const EmptyTrieDBNode = CKeccak256::hash("");

@@ -23,6 +23,10 @@ public:
     H256 Finalize();
     CKeccak256& Reset();
 
+    static H256 hash(const char* cstr) {
+        return CKeccak256().Write((const Byte*)cstr, strlen(cstr)).Finalize();
+    }
+
 private:
     sph_keccak256_context cc;
 };
