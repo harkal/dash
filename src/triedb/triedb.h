@@ -12,6 +12,8 @@
 
 extern const H256 EmptyTrieDBNode;
 
+using Node = std::list<Bytes>;
+
 template <class DB>
 class CTrieDB
 {
@@ -44,8 +46,14 @@ protected:
 };
 
 template <class DB>
-Bytes CTrieDB<DB>::atAux(const RLP& _here, CNibbleView key) const
+Bytes CTrieDB<DB>::atAux(const Node& here, CNibbleView key) const
 {
+    if(here.count() == 0) {
+        return Bytes();
+    }
+
+    /*
+
     if (_here.isEmpty() || _here.isNull())
         // not found.
         return Bytes();
@@ -74,6 +82,7 @@ Bytes CTrieDB<DB>::atAux(const RLP& _here, CNibbleView key) const
         else
             return atAux(n.isList() ? n : RLP(node(n.toHash<h256>())), key.mid(1));
     }
-}
+*/
 
+}
 #endif // TRIEDB_H

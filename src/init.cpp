@@ -938,6 +938,9 @@ void InitLogging()
 /** Initialize Ebakus Core.
  *  @pre Parameters should be parsed and config file should be read.
  */
+
+#include "triedb/triedb.h"
+
 bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 {
     // ********************************************************* Step 1: setup
@@ -963,6 +966,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     PSETPROCDEPPOL setProcDEPPol = (PSETPROCDEPPOL)GetProcAddress(GetModuleHandleA("Kernel32.dll"), "SetProcessDEPPolicy");
     if (setProcDEPPol != NULL) setProcDEPPol(PROCESS_DEP_ENABLE);
 #endif
+
+    CDBWrapper db(GetDataDir() / "worldstate", 1 << 20);
+    CTrieDB<CDBWrapper> trie(&db);
 
     if (!SetupNetworking())
         return InitError("Initializing networking failed");
