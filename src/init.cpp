@@ -970,6 +970,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     CDBWrapper db(GetDataDir() / "worldstate", 1 << 20);
     CTrieDB<CDBWrapper> trie(&db);
 
+    H256 h = uint256S("0x000007d91d1254d60e2dd1ae580383070a4ddffa4c64c2eeb4a2f9ecc0414343");
+    trie.insert(h.AsBytes(), Bytes());
+
     if (!SetupNetworking())
         return InitError("Initializing networking failed");
 
