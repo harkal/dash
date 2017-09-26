@@ -6,6 +6,27 @@
 #define NIBBLE_H
 
 #include "common.h"
+#include "crypto/hash.h"
+#include "serialize.h"
+#include "hash.h"
+
+
+class CTrieNode : public std::vector<Bytes> {
+public:
+    CTrieNode(Bytes const& n1, Bytes const& n2) {
+        push_back(n1);
+        push_back(n2);
+    }
+
+    H256 GetHash() {
+        std::vector<Bytes> const &tmp = *this;
+        return (CHashWriter(SER_GETHASH, 0) << tmp).GetHash();
+    }
+
+    bool IsEmpty() const {
+        return size() == 0;
+    }
+};
 
 inline Byte nibble(const Bytes &data, unsigned i)
 {
@@ -69,14 +90,12 @@ inline std::ostream& operator<<(std::ostream& o, CNibbleView const& nv)
     return o;
 }
 
-/*
-inline bool isLeaf(RLP const& _twoItem)
+inline bool isLeaf(CTrieNode const& node)
 {
-    assert(_twoItem.isList() && _twoItem.itemCount() == 2);
-    auto pl = _twoItem[0].payload();
+    ///assert(node.count() == 2);
+    auto pl = node[0];
     return (pl[0] & 0x20) != 0;
 }
-*/
 
 inline CNibbleView keyOf(Bytes const& hexpe)
 {
@@ -86,6 +105,10 @@ inline CNibbleView keyOf(Bytes const& hexpe)
         return CNibbleView(hexpe, 1);
     else
         return CNibbleView(hexpe, 2);
+}
+
+inline CNibbleView keyOf(CTrieNode const& node) {
+    return keyOf(node[0]);
 }
 
 template <typename T>

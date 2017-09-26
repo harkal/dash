@@ -9,10 +9,9 @@
 #include "exceptions.h"
 
 #include "nibble.h"
+#include "streams.h"
 
 extern const H256 EmptyTrieDBNode;
-
-using Node = std::list<Bytes>;
 
 template <class DB>
 class CTrieDB
@@ -21,7 +20,13 @@ public:
     CTrieDB(DB* db) : mDB(db) {}
     ~CTrieDB() {}
 
-    Bytes node(H256 const& hash) const { return mDB->lookup(hash); }
+    CTrieNode node(H256 const& hash) const {
+        Bytes data = mDB->lookup(hash);
+        CDataStream s(data, SER_NETWORK, 0);
+        CTrieNode n;
+        s >> n;
+        return n;
+    }
 
     void setRoot(const H256& root)
     {
@@ -38,51 +43,102 @@ public:
         return mRoot;
     }
 
+    Bytes mergeAt(CTrieNode const& orig, H256 const& origHash, NibbleSlice k, Bytes const& v, bool inLine);
+
     Bytes at(const Bytes& key) const;
 
+    Bytes atAux(const CTrieNode& here, CNibbleView key) const;
+
+    void insert(Bytes const& key, Bytes const& value);
+
+private:
+    Bytes place(CTrieNode const& orig, CNibbleView k, Bytes const& s);
+
+    void killNode(CTrieNode const& d) { mDB->kill( d.GetHash() ); }
 protected:
     H256 mRoot;
     DB* mDB = nullptr;
 };
 
 template <class DB>
-Bytes CTrieDB<DB>::atAux(const Node& here, CNibbleView key) const
+Bytes CTrieDB<DB>::at(const Bytes& key) const
 {
-    if(here.count() == 0) {
+    return atAux(node(mRoot), key);
+}
+
+template <class DB>
+Bytes CTrieDB<DB>::atAux(const CTrieNode& here, CNibbleView key) const
+{
+    unsigned listSize = here.size();
+
+    assert(listSize == 0 || listSize == 1 || listSize == 2 || listSize == 17);
+
+    if(listSize == 0) {
         return Bytes();
     }
 
-    /*
-
-    if (_here.isEmpty() || _here.isNull())
-        // not found.
-        return Bytes();
-    unsigned itemCount = _here.itemCount();
-    assert(_here.isList() && (itemCount == 2 || itemCount == 17));
-    if (itemCount == 2)
-    {
-        auto k = keyOf(_here);
-        if (key == k && isLeaf(_here))
-            // reached leaf and it's us
-            return _here[1].toString();
-        else if (key.contains(k) && !isLeaf(_here))
-            // not yet at leaf and it might yet be us. onwards...
-            return atAux(_here[1].isList() ? _here[1] : RLP(node(_here[1].toHash<h256>())), key.mid(k.size()));
-        else
-            // not us.
+    if (listSize == 2) {
+        auto k = keyOf(here);
+        if (key == k && isLeaf(here)) {
+            return here[1];
+        }
+        else if (key.contains(k) && !isLeaf(here)) {
+            auto midKey = key.mid(k.size());
+            return atAux(node(here[1]), midKey);
+        } else {
             return Bytes();
-    }
-    else
-    {
+        }
+    } else {
         if (key.size() == 0)
-            return _here[16].toString();
-        auto n = _here[key[0]];
-        if (n.isEmpty())
+            return here[16];
+
+        Bytes n = here[key[0]];
+        if (n.size() == 0)
             return Bytes();
         else
-            return atAux(n.isList() ? n : RLP(node(n.toHash<h256>())), key.mid(1));
+            return atAux(node(n), key.mid(1));
     }
-*/
+}
+
+template <class DB>
+Bytes CTrieDB<DB>::place(CTrieNode const& orig, CNibbleView k, Bytes const& s)
+{
+    killNode(orig);
+    if (orig.IsEmpty())
+        return CTrieNode(hexPrefixEncode(k, true), s);
+
+    assert(_orig.isList() && (_orig.itemCount() == 2 || _orig.itemCount() == 17));
+    if (_orig.itemCount() == 2)
+        return rlpList(_orig[0], _s);
+
+    auto s = RLPStream(17);
+    for (unsigned i = 0; i < 16; ++i)
+        s << _orig[i];
+    s << _s;
+    return s.out();
+}
+
+template <class DB>
+Bytes CTrieDB<DB>::mergeAt(CTrieNode const& orig, H256 const& origHash, NibbleSlice k, Bytes const& v, bool inLine)
+{
 
 }
+
+template <class DB>
+void CTrieDB<DB>::insert(Bytes const& key, Bytes const& value)
+{
+    /*
+    Bytes rootValue = node(mRoot);
+    assert(rootValue.size());
+    bytes b = mergeAt(RLP(rootValue), m_root, NibbleSlice(_key), _value);
+
+    // mergeAt won't attempt to delete the node if it's less than 32 bytes
+    // However, we know it's the root node and thus always hashed.
+    // So, if it's less than 32 (and thus should have been deleted but wasn't) then we delete it here.
+    if (rootValue.size() < 32)
+        forceKillNode(m_root);
+    m_root = forceInsertNode(&b);
+    */
+}
+
 #endif // TRIEDB_H
