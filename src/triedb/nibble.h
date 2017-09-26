@@ -9,18 +9,30 @@
 #include "crypto/hash.h"
 #include "serialize.h"
 #include "hash.h"
+#include "streams.h"
 
 
 class CTrieNode : public std::vector<Bytes> {
 public:
+    CTrieNode() {
+
+    }
+
     CTrieNode(Bytes const& n1, Bytes const& n2) {
         push_back(n1);
         push_back(n2);
     }
 
-    H256 GetHash() {
+    H256 GetHash() const {
         std::vector<Bytes> const &tmp = *this;
-        return (CHashWriter(SER_GETHASH, 0) << tmp).GetHash();
+        return (CHashWriter(SER_NETWORK, 0) << tmp).GetHash();
+    }
+
+    Bytes GetBytes() const {
+        CDataStream stream(SER_NETWORK, 0);
+        std::vector<Bytes> const &tmp = *this;
+        ::Serialize(stream, tmp, SER_NETWORK, 0);
+        return Bytes(stream.begin(), stream.end());
     }
 
     bool IsEmpty() const {

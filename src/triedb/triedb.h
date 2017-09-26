@@ -43,7 +43,8 @@ public:
         return mRoot;
     }
 
-    Bytes mergeAt(CTrieNode const& orig, H256 const& origHash, NibbleSlice k, Bytes const& v, bool inLine);
+    CTrieNode mergeAt(CTrieNode const& orig, H256 const& origHash, CNibbleView k, Bytes const& v, bool inLine);
+    void mergeAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k, Bytes const& v);
 
     Bytes at(const Bytes& key) const;
 
@@ -52,7 +53,10 @@ public:
     void insert(Bytes const& key, Bytes const& value);
 
 private:
-    Bytes place(CTrieNode const& orig, CNibbleView k, Bytes const& s);
+    CTrieNode place(CTrieNode const& orig, CNibbleView k, Bytes const& s);
+
+    H256 rawInsertNode(CTrieNode const& v) { auto h = v.GetHash(); rawInsertNode(h, v); return h; }
+    void rawInsertNode(H256 const& h, CTrieNode v) { mDB->insert(h, v.GetBytes()); }
 
     void killNode(CTrieNode const& d) { mDB->kill( d.GetHash() ); }
 protected:
@@ -101,27 +105,77 @@ Bytes CTrieDB<DB>::atAux(const CTrieNode& here, CNibbleView key) const
 }
 
 template <class DB>
-Bytes CTrieDB<DB>::place(CTrieNode const& orig, CNibbleView k, Bytes const& s)
+CTrieNode CTrieDB<DB>::place(CTrieNode const& orig, CNibbleView k, Bytes const& s)
 {
     killNode(orig);
     if (orig.IsEmpty())
         return CTrieNode(hexPrefixEncode(k, true), s);
 
-    assert(_orig.isList() && (_orig.itemCount() == 2 || _orig.itemCount() == 17));
-    if (_orig.itemCount() == 2)
-        return rlpList(_orig[0], _s);
+    if (orig.size() == 2)
+        return CTrieNode(orig[0], s);
 
-    auto s = RLPStream(17);
-    for (unsigned i = 0; i < 16; ++i)
-        s << _orig[i];
-    s << _s;
-    return s.out();
+    auto n = CTrieNode();
+    n = orig;
+    n[17] = s;
+
+    return n;
 }
 
 template <class DB>
-Bytes CTrieDB<DB>::mergeAt(CTrieNode const& orig, H256 const& origHash, NibbleSlice k, Bytes const& v, bool inLine)
+void CTrieDB<DB>::mergeAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k, Bytes const& v)
 {
+    CTrieNode r = orig;
+    // _orig is always a segment of a node's RLP - removing it alone is pointless. However, if may be a hash, in which case we deref and we know it is removable.
+    bool isRemovable = false;
+    if (!r.IsEmpty())
+    {
+        r = node(orig.GetHash());
+        isRemovable = true;
+    }
+    CTrieNode b = mergeAt(r, k, v, !isRemovable);
+    out.push_back(rawInsertNode(b).AsBytes());
+}
 
+template <class DB>
+CTrieNode CTrieDB<DB>::mergeAt(CTrieNode const& orig, H256 const& origHash, CNibbleView k, Bytes const& v, bool inLine)
+{
+    if(orig.IsEmpty()) {
+        return place(orig, k, v);
+    }
+
+    unsigned count = orig.size();
+
+    if (count == 2) {
+        // pair...
+        CNibbleView nk = keyOf(orig);
+
+        // exactly our node - place value in directly.
+        if (nk == k && isLeaf(orig))
+            return place(orig, k, v);
+
+        // partial key is our key - move down.
+        if (k.contains(nk) && !isLeaf(orig)) {
+            if (!inLine)
+                killNode(orig, origHash);
+
+            CTrieNode s;
+            s.push_back(orig[0]);
+            mergeAtAux(s, orig[1], k.mid(k.size()), v);
+            return s;
+        }
+
+        /*
+        auto sh = k.shared(nk);
+        if (sh) {
+            // shared stuff - cleve at disagreement.
+            auto cleved = cleve(_orig, sh);
+            return mergeAt(RLP(cleved), _k, _v, true);
+        } else {
+            // nothing shared - branch
+            auto branched = branch(_orig);
+            return mergeAt(RLP(branched), _k, _v, true);
+        }*/
+    }
 }
 
 template <class DB>
