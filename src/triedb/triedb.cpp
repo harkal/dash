@@ -5,4 +5,4 @@
 #include "triedb.h"
 #include "crypto/keccak256.h"
 
-H256 const EmptyTrieDBNode = CKeccak256::hash("");
+H256 const NullTrieDBNode = CKeccak256::hash("");

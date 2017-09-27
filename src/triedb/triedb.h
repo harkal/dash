@@ -11,13 +11,13 @@
 #include "nibble.h"
 #include "streams.h"
 
-extern const H256 EmptyTrieDBNode;
+extern const H256 NullTrieDBNode;
 
 template <class DB>
 class CTrieDB
 {
 public:
-    CTrieDB(DB* db) : mDB(db) {}
+    CTrieDB(DB* db) :  mRoot(NullTrieDBNode), mDB(db) {}
     ~CTrieDB() {}
 
     CTrieNode node(Bytes const& b) const {
@@ -31,13 +31,18 @@ public:
         return data;
     }
 
+    void init() {
+        CTrieNode root = CTrieNode();
+        setRoot(rawInsertNode(root));
+    }
+
     void setRoot(const H256& root)
     {
         mRoot = root;
     }
 
-    bool isNull() const { return node(mRoot).size() == 0; }
-    bool isEmpty() const { return mRoot == EmptyTrieDBNode && node(mRoot).size(); }
+    bool isNull() const { return mRoot == NullTrieDBNode; }
+    bool isEmpty() const { return node(mRoot).size() == 1; }
 
     const H256& root() const
     {
@@ -50,11 +55,16 @@ public:
     CTrieNode mergeAt(CTrieNode const& orig, H256 const& origHash, CNibbleView k, Bytes const& v, bool inLine = false);
     void mergeAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k, Bytes const& v);
 
-    Bytes at(const Bytes& key) const;
+    H256 at(const Bytes& key) const;
 
-    Bytes atAux(const CTrieNode& here, CNibbleView key) const;
+    H256 atAux(const CTrieNode& here, CNibbleView key) const;
 
     void insert(Bytes const& key, Bytes const& value);
+
+    bool contains(const Bytes& key) const { return !at(key).IsNull(); }
+
+    void remove(const Bytes& key);
+
 
 private:
     CTrieNode place(CTrieNode const& orig, CNibbleView k, Bytes const& s);
@@ -71,40 +81,40 @@ protected:
 };
 
 template <class DB>
-Bytes CTrieDB<DB>::at(const Bytes& key) const
+H256 CTrieDB<DB>::at(const Bytes& key) const
 {
     return atAux(node(mRoot), key);
 }
 
 template <class DB>
-Bytes CTrieDB<DB>::atAux(const CTrieNode& here, CNibbleView key) const
+H256 CTrieDB<DB>::atAux(const CTrieNode& here, CNibbleView key) const
 {
     unsigned listSize = here.size();
 
     assert(listSize == 0 || listSize == 1 || listSize == 2 || listSize == 17);
 
     if(listSize == 0) {
-        return Bytes();
+        return H256();
     }
 
     if (listSize == 2) {
         auto k = keyOf(here);
         if (key == k && isLeaf(here)) {
-            return here[1];
+            return H256(here[1]);
         }
         else if (key.contains(k) && !isLeaf(here)) {
             auto midKey = key.mid(k.size());
             return atAux(node(here[1]), midKey);
         } else {
-            return Bytes();
+            return H256();
         }
     } else {
         if (key.size() == 0)
-            return here[16];
+            return H256(here[16]);
 
         Bytes n = here[key[0]];
         if (n.size() == 0)
-            return Bytes();
+            return H256();
         else
             return atAux(node(n), key.mid(1));
     }
@@ -266,8 +276,143 @@ template <class DB>
 void CTrieDB<DB>::insert(Bytes const& key, Bytes const& value)
 {
     CTrieNode rootValue = node(mRoot);
-    assert(rootValue.size());
     CTrieNode b = mergeAt(rootValue, mRoot, CNibbleView(key), value);
+    mRoot = rawInsertNode(b);
+}
+
+template <class DB>
+void CTrieDB<DB>::remove(const Bytes& key)
+{
+    CTrieNode n = node(m_root);
+    CTrieNode b = deleteAt(n, CNibbleView(key));
+
+    if (b.size()) {
+        mRoot = forceInsertNode(&b);
+    }
+}
+
+
+template <class DB>
+CTrieNode CTrieDB<DB>::deleteAt(CTrieNode const& orig, CNibbleView k)
+{
+    // The caller will make sure that the bytes are inserted properly.
+    // - This might mean inserting an entry into m_over
+    // We will take care to ensure that (our reference to) _orig is killed.
+
+    // Empty - not found - no change.
+    if (_orig.isEmpty())
+        return bytes();
+
+    assert(_orig.isList() && (_orig.itemCount() == 2 || _orig.itemCount() == 17));
+    if (_orig.itemCount() == 2)
+    {
+        // pair...
+        NibbleSlice k = keyOf(_orig);
+
+        // exactly our node - return null.
+        if (k == _k && isLeaf(_orig))
+        {
+            killNode(_orig);
+            return RLPNull;
+        }
+
+        // partial key is our key - move down.
+        if (_k.contains(k))
+        {
+            RLPStream s;
+            s.appendList(2) << _orig[0];
+            if (!deleteAtAux(s, _orig[1], _k.mid(k.size())))
+                return bytes();
+            killNode(_orig);
+            RLP r(s.out());
+            if (isTwoItemNode(r[1]))
+                return graft(r);
+            return s.out();
+        }
+        else
+            // not found - no change.
+            return bytes();
+    }
+    else
+    {
+        // branch...
+
+        // exactly our node - remove and rejig.
+        if (_k.size() == 0 && !_orig[16].isEmpty())
+        {
+            // Kill the node.
+            killNode(_orig);
+
+            byte used = uniqueInUse(_orig, 16);
+            if (used != 255)
+                if (isTwoItemNode(_orig[used]))
+                {
+                    auto merged = merge(_orig, used);
+                    return graft(RLP(merged));
+                }
+                else
+                    return merge(_orig, used);
+            else
+            {
+                RLPStream r(17);
+                for (byte i = 0; i < 16; ++i)
+                    r << _orig[i];
+                r << "";
+                return r.out();
+            }
+        }
+        else
+        {
+            // not exactly our node - delve to next level at the correct index.
+            RLPStream r(17);
+            byte n = _k[0];
+            for (byte i = 0; i < 17; ++i)
+                if (i == n)
+                    if (!deleteAtAux(r, _orig[i], _k.mid(1)))	// bomb out if the key didn't turn up.
+                        return bytes();
+                    else {}
+                else
+                    r << _orig[i];
+
+            // Kill the node.
+            killNode(_orig);
+
+            // check if we ended up leaving the node invalid.
+            RLP rlp(r.out());
+            byte used = uniqueInUse(rlp, 255);
+            if (used == 255)	// no - all ok.
+                return r.out();
+
+            // yes; merge
+            if (isTwoItemNode(rlp[used]))
+            {
+                auto merged = merge(rlp, used);
+                return graft(RLP(merged));
+            }
+            else
+                return merge(rlp, used);
+        }
+    }
+
+}
+
+template <class DB>
+bool CTrieDB<DB>::deleteAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k)
+{
+
+    bytes b = orig.IsEmpty() ? orig : deleteAt(orig, k);
+
+    if (!b.size())	// not found - no change.
+        return false;
+
+/*	if (_orig.isList())
+        killNode(_orig);
+    else
+        killNode(_orig.toHash<h256>());*/
+
+    out.push_back(rawInsertNode(b));
+
+    return true;
 }
 
 #endif // TRIEDB_H
