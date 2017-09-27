@@ -33,16 +33,16 @@ public:
 
     void init() {
         CTrieNode root = CTrieNode();
-        setRoot(rawInsertNode(root));
+        SetRoot(RawInsertNode(root));
     }
 
-    void setRoot(const H256& root)
+    void SetRoot(const H256& root)
     {
         mRoot = root;
     }
 
-    bool isNull() const { return mRoot == NullTrieDBNode; }
-    bool isEmpty() const { return node(mRoot).size() == 1; }
+    bool IsNull() const { return mRoot == NullTrieDBNode; }
+    bool IsEmpty() const { return node(mRoot).size() == 1; }
 
     const H256& root() const
     {
@@ -51,37 +51,37 @@ public:
         return mRoot;
     }
 
-    CTrieNode mergeAt(CTrieNode const& orig, CNibbleView k, Bytes const& v, bool inLine = false);
-    CTrieNode mergeAt(CTrieNode const& orig, H256 const& origHash, CNibbleView k, Bytes const& v, bool inLine = false);
-    void mergeAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k, Bytes const& v);
+    CTrieNode MergeAt(CTrieNode const& orig, CNibbleView k, Bytes const& v, bool inLine = false);
+    CTrieNode MergeAt(CTrieNode const& orig, H256 const& origHash, CNibbleView k, Bytes const& v, bool inLine = false);
+    void MergeAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k, Bytes const& v);
 
-    H256 at(const Bytes& key) const;
+    H256 At(const Bytes& key) const;
 
-    H256 atAux(const CTrieNode& here, CNibbleView key) const;
+    H256 AtAux(const CTrieNode& here, CNibbleView key) const;
 
-    void insert(Bytes const& key, Bytes const& value);
+    void Insert(Bytes const& key, Bytes const& value);
 
-    bool contains(const Bytes& key) const { return !at(key).IsNull(); }
+    bool Contains(const Bytes& key) const { return !At(key).IsNull(); }
 
-    void remove(const Bytes& key);
+    void Remove(const Bytes& key);
 
-    CTrieNode deleteAt(CTrieNode const& orig, CNibbleView k);
-    bool deleteAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k);
+    CTrieNode DeleteAt(CTrieNode const& orig, CNibbleView k);
+    bool DeleteAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k);
 
 private:
-    CTrieNode place(CTrieNode const& orig, CNibbleView k, Bytes const& s);
-    CTrieNode cleve(CTrieNode const& orig, unsigned s);
-    CTrieNode branch(CTrieNode const& orig);
-    CTrieNode graft(CTrieNode const& orig);
-    CTrieNode merge(CTrieNode const& orig, Byte i);
+    CTrieNode Place(CTrieNode const& orig, CNibbleView k, Bytes const& s);
+    CTrieNode Cleve(CTrieNode const& orig, unsigned s);
+    CTrieNode Branch(CTrieNode const& orig);
+    CTrieNode Graft(CTrieNode const& orig);
+    CTrieNode Merge(CTrieNode const& orig, Byte i);
 
-    H256 rawInsertNode(CTrieNode const& v) { auto h = v.GetHash(); rawInsertNode(h, v); return h; }
-    void rawInsertNode(H256 const& h, CTrieNode v) { mDB->Write(h, *(std::vector<Bytes> *)&v); }
+    H256 RawInsertNode(CTrieNode const& v) { auto h = v.GetHash(); RawInsertNode(h, v); return h; }
+    void RawInsertNode(H256 const& h, CTrieNode v) { mDB->Write(h, *(std::vector<Bytes> *)&v); }
 
-    void killNode(H256 const& hash) { mDB->Erase(hash); }
-    void killNode(CTrieNode const& d) { mDB->Erase( d.GetHash() ); }
+    void KillNode(H256 const& hash) { mDB->Erase(hash); }
+    void KillNode(CTrieNode const& d) { mDB->Erase( d.GetHash() ); }
 
-    Byte uniqueInUse(CTrieNode const& orig, Byte except)
+    Byte UniqueInUse(CTrieNode const& orig, Byte except)
     {
         Byte used = 255;
 
@@ -104,13 +104,13 @@ protected:
 };
 
 template <class DB>
-H256 CTrieDB<DB>::at(const Bytes& key) const
+H256 CTrieDB<DB>::At(const Bytes& key) const
 {
-    return atAux(node(mRoot), key);
+    return AtAux(node(mRoot), key);
 }
 
 template <class DB>
-H256 CTrieDB<DB>::atAux(const CTrieNode& here, CNibbleView key) const
+H256 CTrieDB<DB>::AtAux(const CTrieNode& here, CNibbleView key) const
 {
     unsigned listSize = here.size();
 
@@ -127,7 +127,7 @@ H256 CTrieDB<DB>::atAux(const CTrieNode& here, CNibbleView key) const
         }
         else if (key.contains(k) && !isLeaf(here)) {
             auto midKey = key.mid(k.size());
-            return atAux(node(here[1]), midKey);
+            return AtAux(node(here[1]), midKey);
         } else {
             return H256();
         }
@@ -139,14 +139,14 @@ H256 CTrieDB<DB>::atAux(const CTrieNode& here, CNibbleView key) const
         if (n.size() == 0)
             return H256();
         else
-            return atAux(node(n), key.mid(1));
+            return AtAux(node(n), key.mid(1));
     }
 }
 
 template <class DB>
-CTrieNode CTrieDB<DB>::place(CTrieNode const& orig, CNibbleView k, Bytes const& s)
+CTrieNode CTrieDB<DB>::Place(CTrieNode const& orig, CNibbleView k, Bytes const& s)
 {
-    killNode(orig);
+    KillNode(orig);
     if (orig.IsEmpty())
         return CTrieNode(hexPrefixEncode(k, true), s);
 
@@ -161,9 +161,9 @@ CTrieNode CTrieDB<DB>::place(CTrieNode const& orig, CNibbleView k, Bytes const& 
 }
 
 template <class DB>
-CTrieNode CTrieDB<DB>::cleve(CTrieNode const& orig, unsigned s)
+CTrieNode CTrieDB<DB>::Cleve(CTrieNode const& orig, unsigned s)
 {
-    killNode(orig);
+    KillNode(orig);
     assert(orig.size() == 2);
 
     auto k = keyOf(orig);
@@ -171,16 +171,16 @@ CTrieNode CTrieDB<DB>::cleve(CTrieNode const& orig, unsigned s)
 
     CTrieNode bottom(hexPrefixEncode(k, isLeaf(orig), (int)s), orig[1]);
 
-    CTrieNode top(hexPrefixEncode(k, false, 0, (int)s), rawInsertNode(bottom).AsBytes());
+    CTrieNode top(hexPrefixEncode(k, false, 0, (int)s), RawInsertNode(bottom).AsBytes());
 
     return top;
 }
 
 template <class DB>
-CTrieNode CTrieDB<DB>::branch(CTrieNode const& orig)
+CTrieNode CTrieDB<DB>::Branch(CTrieNode const& orig)
 {
     assert(orig.size() == 2);
-    killNode(orig);
+    KillNode(orig);
 
     auto k = keyOf(orig);
 
@@ -198,7 +198,7 @@ CTrieNode CTrieDB<DB>::branch(CTrieNode const& orig)
         for (unsigned i = 0; i < 16; ++i)
             if (i == b)
                 if (isLeaf(orig) || k.size() > 1)
-                    r.push_back( rawInsertNode(CTrieNode(hexPrefixEncode(k.mid(1), isLeaf(orig)), orig[1])).AsBytes()  );
+                    r.push_back( RawInsertNode(CTrieNode(hexPrefixEncode(k.mid(1), isLeaf(orig)), orig[1])).AsBytes()  );
                 else
                     r.push_back(orig[1]);
             else
@@ -209,7 +209,7 @@ CTrieNode CTrieDB<DB>::branch(CTrieNode const& orig)
 }
 
 template <class DB>
-CTrieNode CTrieDB<DB>::graft(CTrieNode const& orig)
+CTrieNode CTrieDB<DB>::Graft(CTrieNode const& orig)
 {
     assert(orig.size() == 2);
 
@@ -218,7 +218,7 @@ CTrieNode CTrieDB<DB>::graft(CTrieNode const& orig)
 
     // remove second item from the trie after derefrencing it into s & n.
     s = node(orig[1]);
-    killNode(H256(orig[1]));
+    KillNode(H256(orig[1]));
     n = CTrieNode(s);
 
     assert(n.size() == 2);
@@ -227,7 +227,7 @@ CTrieNode CTrieDB<DB>::graft(CTrieNode const& orig)
 }
 
 template <class DB>
-CTrieNode CTrieDB<DB>::merge(CTrieNode const& orig, Byte i)
+CTrieNode CTrieDB<DB>::Merge(CTrieNode const& orig, Byte i)
 {
     assert(orig.size() == 17);
 
@@ -247,7 +247,7 @@ CTrieNode CTrieDB<DB>::merge(CTrieNode const& orig, Byte i)
 }
 
 template <class DB>
-void CTrieDB<DB>::mergeAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k, Bytes const& v)
+void CTrieDB<DB>::MergeAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k, Bytes const& v)
 {
     CTrieNode r = orig;
     // _orig is always a segment of a node's RLP - removing it alone is pointless. However, if may be a hash, in which case we deref and we know it is removable.
@@ -257,22 +257,22 @@ void CTrieDB<DB>::mergeAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView 
         r = node(orig.GetHash());
         isRemovable = true;
     }
-    CTrieNode b = mergeAt(r, k, v, !isRemovable);
-    out.push_back(rawInsertNode(b).AsBytes());
+    CTrieNode b = MergeAt(r, k, v, !isRemovable);
+    out.push_back(RawInsertNode(b).AsBytes());
 }
 
 template <class DB>
-CTrieNode CTrieDB<DB>::mergeAt(CTrieNode const& orig, CNibbleView k, Bytes const& v, bool inLine)
+CTrieNode CTrieDB<DB>::MergeAt(CTrieNode const& orig, CNibbleView k, Bytes const& v, bool inLine)
 {
-    return mergeAt(orig, orig.GetHash(), k, v, inLine);
+    return MergeAt(orig, orig.GetHash(), k, v, inLine);
 }
 
 
 template <class DB>
-CTrieNode CTrieDB<DB>::mergeAt(CTrieNode const& orig, H256 const& origHash, CNibbleView k, Bytes const& v, bool inLine)
+CTrieNode CTrieDB<DB>::MergeAt(CTrieNode const& orig, H256 const& origHash, CNibbleView k, Bytes const& v, bool inLine)
 {
     if(orig.IsEmpty()) {
-        return place(orig, k, v);
+        return Place(orig, k, v);
     }
 
     unsigned count = orig.size();
@@ -283,16 +283,16 @@ CTrieNode CTrieDB<DB>::mergeAt(CTrieNode const& orig, H256 const& origHash, CNib
 
         // exactly our node - place value in directly.
         if (nk == k && isLeaf(orig))
-            return place(orig, k, v);
+            return Place(orig, k, v);
 
         // partial key is our key - move down.
         if (k.contains(nk) && !isLeaf(orig)) {
             if (!inLine)
-                killNode(orig);
+                KillNode(orig);
 
             CTrieNode s;
             s.push_back(orig[0]);
-            mergeAtAux(s, node(orig[1]), k.mid(k.size()), v);
+            MergeAtAux(s, node(orig[1]), k.mid(k.size()), v);
             return s;
         }
 
@@ -300,23 +300,23 @@ CTrieNode CTrieDB<DB>::mergeAt(CTrieNode const& orig, H256 const& origHash, CNib
 
         if (sh) {
             // shared stuff - cleve at disagreement.
-            auto cleved = cleve(orig, sh);
-            return mergeAt(cleved, k, v, true);
+            auto cleved = Cleve(orig, sh);
+            return MergeAt(cleved, k, v, true);
         } else {
             // nothing shared - branch
-            auto branched = branch(orig);
-            return mergeAt(branched, k, v, true);
+            auto branched = Branch(orig);
+            return MergeAt(branched, k, v, true);
         }
     } else {
         // branch...
 
         // exactly our node - place value.
         if (k.size() == 0)
-            return place(orig, k, v);
+            return Place(orig, k, v);
 
         // Kill the node.
         if (!inLine)
-            killNode(orig);
+            KillNode(orig);
 
         // not exactly our node - delve to next level at the correct index.
         Byte n = k[0];
@@ -324,7 +324,7 @@ CTrieNode CTrieDB<DB>::mergeAt(CTrieNode const& orig, H256 const& origHash, CNib
         CTrieNode r;
         for (Byte i = 0; i < 17; ++i) {
             if (i == n)
-                mergeAtAux(r, node(orig[i]), k.mid(1), v);
+                MergeAtAux(r, node(orig[i]), k.mid(1), v);
             else
                 r.push_back(orig[i]);
         }
@@ -334,27 +334,27 @@ CTrieNode CTrieDB<DB>::mergeAt(CTrieNode const& orig, H256 const& origHash, CNib
 }
 
 template <class DB>
-void CTrieDB<DB>::insert(Bytes const& key, Bytes const& value)
+void CTrieDB<DB>::Insert(Bytes const& key, Bytes const& value)
 {
     CTrieNode rootValue = node(mRoot);
-    CTrieNode b = mergeAt(rootValue, mRoot, CNibbleView(key), value);
-    mRoot = rawInsertNode(b);
+    CTrieNode b = MergeAt(rootValue, mRoot, CNibbleView(key), value);
+    mRoot = RawInsertNode(b);
 }
 
 template <class DB>
-void CTrieDB<DB>::remove(const Bytes& key)
+void CTrieDB<DB>::Remove(const Bytes& key)
 {
     CTrieNode n = node(mRoot);
-    CTrieNode b = deleteAt(n, CNibbleView(key));
+    CTrieNode b = DeleteAt(n, CNibbleView(key));
 
     if (b.size()) {
-        mRoot = rawInsertNode(b);
+        mRoot = RawInsertNode(b);
     }
 }
 
 
 template <class DB>
-CTrieNode CTrieDB<DB>::deleteAt(CTrieNode const& orig, CNibbleView k)
+CTrieNode CTrieDB<DB>::DeleteAt(CTrieNode const& orig, CNibbleView k)
 {
     // The caller will make sure that the bytes are inserted properly.
     // - This might mean inserting an entry into m_over
@@ -371,7 +371,7 @@ CTrieNode CTrieDB<DB>::deleteAt(CTrieNode const& orig, CNibbleView k)
         // exactly our node - return null.
         if (nk == k && isLeaf(orig))
         {
-            killNode(orig);
+            KillNode(orig);
             return CTrieNode(); // CHECK IT : returned RLPNull;
         }
 
@@ -380,15 +380,15 @@ CTrieNode CTrieDB<DB>::deleteAt(CTrieNode const& orig, CNibbleView k)
             CTrieNode s;
             s.push_back(orig[0]);
 
-            if (!deleteAtAux(s, node(orig[1]), k.mid(nk.size())))
+            if (!DeleteAtAux(s, node(orig[1]), k.mid(nk.size())))
                 return CTrieNode();
 
-            killNode(orig);
+            KillNode(orig);
 
             CTrieNode r(s);
 
             if (node(r[1]).size() == 2) {
-                return graft(r);
+                return Graft(r);
             }
 
             return s;
@@ -404,16 +404,16 @@ CTrieNode CTrieDB<DB>::deleteAt(CTrieNode const& orig, CNibbleView k)
         if (k.size() == 0 && orig[16].size())
         {
             // Kill the node.
-            killNode(orig);
+            KillNode(orig);
 
-            Byte used = uniqueInUse(orig, 16);
+            Byte used = UniqueInUse(orig, 16);
 
             if (used != 255) {
                 if (node(orig[used]).size() == 2) {
-                    auto merged = merge(orig, used);
-                    return graft(merged);
+                    auto merged = Merge(orig, used);
+                    return Graft(merged);
                 } else {
-                    return merge(orig, used);
+                    return Merge(orig, used);
                 }
             } else {
                 CTrieNode r(orig);
@@ -429,7 +429,7 @@ CTrieNode CTrieDB<DB>::deleteAt(CTrieNode const& orig, CNibbleView k)
 
             for (unsigned i = 0 ; i < 17 ; ++i) {
                 if (i == n) {
-                    if (!deleteAtAux(r, node(orig[i]), k.mid(1))) {	// bomb out if the key didn't turn up.
+                    if (!DeleteAtAux(r, node(orig[i]), k.mid(1))) {	// bomb out if the key didn't turn up.
                         return CTrieNode();
                     } else {
 
@@ -440,20 +440,20 @@ CTrieNode CTrieDB<DB>::deleteAt(CTrieNode const& orig, CNibbleView k)
             }
 
             // Kill the node.
-            killNode(orig);
+            KillNode(orig);
 
             // check if we ended up leaving the node invalid.
             CTrieNode ret(r);
-            Byte used = uniqueInUse(ret, 255);
+            Byte used = UniqueInUse(ret, 255);
             if (used == 255)	// no - all ok.
                 return r;
 
             // yes; merge
             if (node(ret[used]).size() == 2) {
-                CTrieNode merged = merge(ret, used);
-                return graft(merged);
+                CTrieNode merged = Merge(ret, used);
+                return Graft(merged);
             } else {
-                return merge(ret, used);
+                return Merge(ret, used);
             }
         }
     }
@@ -461,10 +461,10 @@ CTrieNode CTrieDB<DB>::deleteAt(CTrieNode const& orig, CNibbleView k)
 }
 
 template <class DB>
-bool CTrieDB<DB>::deleteAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k)
+bool CTrieDB<DB>::DeleteAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k)
 {
 
-    CTrieNode b = orig.IsEmpty() ? orig : deleteAt(orig, k);
+    CTrieNode b = orig.IsEmpty() ? orig : DeleteAt(orig, k);
 
     if (!b.size())	// not found - no change.
         return false;
@@ -474,7 +474,7 @@ bool CTrieDB<DB>::deleteAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView
     else
         killNode(_orig.toHash<h256>());*/
 
-    out.push_back(rawInsertNode(b).AsBytes());
+    out.push_back(RawInsertNode(b).AsBytes());
 
     return true;
 }

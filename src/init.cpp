@@ -973,23 +973,23 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     trie.init();
 
     H256 h = uint256S("0x000007d91d1254d60e2dd1ae580383070a4ddffa4c64c2eeb4a2f9ecc0414343");
-    trie.insert(h.AsBytes(), Bytes());
+    trie.Insert(h.AsBytes(), Bytes());
 
     H256 h2 = uint256S("0x120007d91d1254d60e2dd1ae580383070a4ddffa4c64c2eeb4a2f9ecc0414343");
     H256 h3 = uint256S("0x122007d91d1254d60e2dd1ae580383070a4ddffa4c64c2eeb4a2f9ecc0414343");
 
-    H256 a = H256(trie.at(h2.AsBytes()));
+    H256 a = H256(trie.At(h2.AsBytes()));
 
-    trie.insert(h2.AsBytes(), Bytes(2));
+    trie.Insert(h2.AsBytes(), Bytes(2));
 
-    bool gg = trie.contains(h2.AsBytes());
+    bool gg = trie.Contains(h2.AsBytes());
 
-    trie.remove(h2.AsBytes());
+    trie.Remove(h2.AsBytes());
 
-    bool g = trie.contains(h2.AsBytes());
+    bool g = trie.Contains(h2.AsBytes());
 
-    H256 b = H256(trie.at(h2.AsBytes()));
-    H256 c = H256(trie.at(h3.AsBytes()));
+    H256 b = H256(trie.At(h2.AsBytes()));
+    H256 c = H256(trie.At(h3.AsBytes()));
 
     if (!SetupNetworking())
         return InitError("Initializing networking failed");
