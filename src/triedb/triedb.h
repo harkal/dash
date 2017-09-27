@@ -216,7 +216,6 @@ CTrieNode CTrieDB<DB>::Graft(CTrieNode const& orig)
     CTrieNode s;
     CTrieNode n;
 
-    // remove second item from the trie after derefrencing it into s & n.
     s = node(orig[1]);
     KillNode(H256(orig[1]));
     n = CTrieNode(s);
@@ -250,13 +249,13 @@ template <class DB>
 void CTrieDB<DB>::MergeAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k, Bytes const& v)
 {
     CTrieNode r = orig;
-    // _orig is always a segment of a node's RLP - removing it alone is pointless. However, if may be a hash, in which case we deref and we know it is removable.
+
     bool isRemovable = false;
-    if (!r.IsEmpty())
-    {
+    if (!r.IsEmpty()) {
         r = node(orig.GetHash());
         isRemovable = true;
     }
+
     CTrieNode b = MergeAt(r, k, v, !isRemovable);
     out.push_back(RawInsertNode(b).AsBytes());
 }
@@ -271,21 +270,18 @@ CTrieNode CTrieDB<DB>::MergeAt(CTrieNode const& orig, CNibbleView k, Bytes const
 template <class DB>
 CTrieNode CTrieDB<DB>::MergeAt(CTrieNode const& orig, H256 const& origHash, CNibbleView k, Bytes const& v, bool inLine)
 {
-    if(orig.IsEmpty()) {
+    if (orig.IsEmpty()) {
         return Place(orig, k, v);
     }
 
     unsigned count = orig.size();
 
     if (count == 2) {
-        // pair...
         CNibbleView nk = keyOf(orig);
 
-        // exactly our node - place value in directly.
         if (nk == k && isLeaf(orig))
             return Place(orig, k, v);
 
-        // partial key is our key - move down.
         if (k.contains(nk) && !isLeaf(orig)) {
             if (!inLine)
                 KillNode(orig);
@@ -299,26 +295,19 @@ CTrieNode CTrieDB<DB>::MergeAt(CTrieNode const& orig, H256 const& origHash, CNib
         auto sh = k.shared(nk);
 
         if (sh) {
-            // shared stuff - cleve at disagreement.
-            auto cleved = Cleve(orig, sh);
+            CNibbleView cleved = Cleve(orig, sh);
             return MergeAt(cleved, k, v, true);
         } else {
-            // nothing shared - branch
-            auto branched = Branch(orig);
+            CNibbleView branched = Branch(orig);
             return MergeAt(branched, k, v, true);
         }
     } else {
-        // branch...
-
-        // exactly our node - place value.
         if (k.size() == 0)
             return Place(orig, k, v);
 
-        // Kill the node.
         if (!inLine)
             KillNode(orig);
 
-        // not exactly our node - delve to next level at the correct index.
         Byte n = k[0];
 
         CTrieNode r;
@@ -356,26 +345,17 @@ void CTrieDB<DB>::Remove(const Bytes& key)
 template <class DB>
 CTrieNode CTrieDB<DB>::DeleteAt(CTrieNode const& orig, CNibbleView k)
 {
-    // The caller will make sure that the bytes are inserted properly.
-    // - This might mean inserting an entry into m_over
-    // We will take care to ensure that (our reference to) _orig is killed.
-
-    // Empty - not found - no change.
     if (orig.IsEmpty())
         return CTrieNode();
 
     if (orig.size() == 2) {
-        // pair...
         CNibbleView nk = keyOf(orig);
 
-        // exactly our node - return null.
-        if (nk == k && isLeaf(orig))
-        {
+        if (nk == k && isLeaf(orig)) {
             KillNode(orig);
-            return CTrieNode(); // CHECK IT : returned RLPNull;
+            return CTrieNode();
         }
 
-        // partial key is our key - move down.
         if (k.contains(nk)) {
             CTrieNode s;
             s.push_back(orig[0]);
@@ -392,17 +372,11 @@ CTrieNode CTrieDB<DB>::DeleteAt(CTrieNode const& orig, CNibbleView k)
             }
 
             return s;
-        }
-        else
-            // not found - no change.
+        } else {
             return CTrieNode();
+        }
     } else {
-
-        // branch...
-
-        // exactly our node - remove and rejig.
-        if (k.size() == 0 && orig[16].size())
-        {
+        if (k.size() == 0 && orig[16].size()) {
             // Kill the node.
             KillNode(orig);
 
@@ -420,11 +394,8 @@ CTrieNode CTrieDB<DB>::DeleteAt(CTrieNode const& orig, CNibbleView k)
                 r[17] = Bytes();
                 return r;
             }
-        }
-        else
-        {
-            // not exactly our node - delve to next level at the correct index.
-            CTrieNode r; //17
+        } else {
+            CTrieNode r;
             Byte n = k[0];
 
             for (unsigned i = 0 ; i < 17 ; ++i) {
@@ -439,16 +410,13 @@ CTrieNode CTrieDB<DB>::DeleteAt(CTrieNode const& orig, CNibbleView k)
                 }
             }
 
-            // Kill the node.
             KillNode(orig);
 
-            // check if we ended up leaving the node invalid.
             CTrieNode ret(r);
             Byte used = UniqueInUse(ret, 255);
             if (used == 255)	// no - all ok.
                 return r;
 
-            // yes; merge
             if (node(ret[used]).size() == 2) {
                 CTrieNode merged = Merge(ret, used);
                 return Graft(merged);
@@ -466,13 +434,8 @@ bool CTrieDB<DB>::DeleteAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView
 
     CTrieNode b = orig.IsEmpty() ? orig : DeleteAt(orig, k);
 
-    if (!b.size())	// not found - no change.
+    if (!b.size())
         return false;
-
-/*	if (_orig.isList())
-        killNode(_orig);
-    else
-        killNode(_orig.toHash<h256>());*/
 
     out.push_back(RawInsertNode(b).AsBytes());
 
