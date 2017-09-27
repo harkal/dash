@@ -18,6 +18,10 @@ public:
 
     }
 
+    CTrieNode(const CTrieNode& o) {
+        *this = o;
+    }
+
     CTrieNode(Bytes const& n1, Bytes const& n2) {
         push_back(n1);
         push_back(n2);
