@@ -78,6 +78,7 @@ private:
     H256 rawInsertNode(CTrieNode const& v) { auto h = v.GetHash(); rawInsertNode(h, v); return h; }
     void rawInsertNode(H256 const& h, CTrieNode v) { mDB->Write(h, *(std::vector<Bytes> *)&v); }
 
+    void killNode(H256 const& hash) { mDB->Erase(hash); }
     void killNode(CTrieNode const& d) { mDB->Erase( d.GetHash() ); }
 
     Byte uniqueInUse(CTrieNode const& orig, Byte except)
@@ -217,7 +218,7 @@ CTrieNode CTrieDB<DB>::graft(CTrieNode const& orig)
 
     // remove second item from the trie after derefrencing it into s & n.
     s = node(orig[1]);
-    killNode(orig[1]);
+    killNode(H256(orig[1]));
     n = CTrieNode(s);
 
     assert(n.size() == 2);
@@ -347,7 +348,7 @@ void CTrieDB<DB>::remove(const Bytes& key)
     CTrieNode b = deleteAt(n, CNibbleView(key));
 
     if (b.size()) {
-        mRoot = rawInsertNode(&b);
+        mRoot = rawInsertNode(b);
     }
 }
 
@@ -422,35 +423,38 @@ CTrieNode CTrieDB<DB>::deleteAt(CTrieNode const& orig, CNibbleView k)
         }
         else
         {
-        /*
             // not exactly our node - delve to next level at the correct index.
-            RLPStream r(17);
-            byte n = _k[0];
-            for (byte i = 0; i < 17; ++i)
-                if (i == n)
-                    if (!deleteAtAux(r, _orig[i], _k.mid(1)))	// bomb out if the key didn't turn up.
-                        return bytes();
-                    else {}
-                else
-                    r << _orig[i];
+            CTrieNode r; //17
+            Byte n = k[0];
+
+            for (unsigned i = 0 ; i < 17 ; ++i) {
+                if (i == n) {
+                    if (!deleteAtAux(r, node(orig[i]), k.mid(1))) {	// bomb out if the key didn't turn up.
+                        return CTrieNode();
+                    } else {
+
+                    }
+                } else {
+                    r.push_back( orig[i] );
+                }
+            }
 
             // Kill the node.
-            killNode(_orig);
+            killNode(orig);
 
             // check if we ended up leaving the node invalid.
-            RLP rlp(r.out());
-            byte used = uniqueInUse(rlp, 255);
+            CTrieNode ret(r);
+            Byte used = uniqueInUse(ret, 255);
             if (used == 255)	// no - all ok.
-                return r.out();
+                return r;
 
             // yes; merge
-            if (isTwoItemNode(rlp[used]))
-            {
-                auto merged = merge(rlp, used);
-                return graft(RLP(merged));
+            if (node(ret[used]).size() == 2) {
+                CTrieNode merged = merge(ret, used);
+                return graft(merged);
+            } else {
+                return merge(ret, used);
             }
-            else
-                return merge(rlp, used);*/
         }
     }
 
@@ -460,7 +464,7 @@ template <class DB>
 bool CTrieDB<DB>::deleteAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k)
 {
 
-    Bytes b = orig.IsEmpty() ? orig : deleteAt(orig, k);
+    CTrieNode b = orig.IsEmpty() ? orig : deleteAt(orig, k);
 
     if (!b.size())	// not found - no change.
         return false;
@@ -470,7 +474,7 @@ bool CTrieDB<DB>::deleteAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView
     else
         killNode(_orig.toHash<h256>());*/
 
-    out.push_back(rawInsertNode(b));
+    out.push_back(rawInsertNode(b).AsBytes());
 
     return true;
 }

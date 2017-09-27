@@ -982,7 +982,13 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     trie.insert(h2.AsBytes(), Bytes(2));
 
-    H256 b = H256(trie.at(h.AsBytes()));
+    bool gg = trie.contains(h2.AsBytes());
+
+    trie.remove(h2.AsBytes());
+
+    bool g = trie.contains(h2.AsBytes());
+
+    H256 b = H256(trie.at(h2.AsBytes()));
     H256 c = H256(trie.at(h3.AsBytes()));
 
     if (!SetupNetworking())
