@@ -58,13 +58,18 @@ public:
     CTrieNode MergeAt(CTrieNode const& orig, H256 const& origHash, CNibbleView k, Bytes const& v, bool inLine = false);
     void MergeAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k, Bytes const& v);
 
-    CTrieNode At(const Bytes& key) const;
+    template <typename V>
+    bool GetValue(const H256& key, V& value) const {
+        return mDB->Read(key, value);
+    }
+
+    H256 At(const Bytes& key) const;
 
     H256 AtAux(const CTrieNode& here, CNibbleView key) const;
 
     void Insert(Bytes const& key, Bytes const& value);
 
-    bool Contains(const Bytes& key) const { return !At(key).IsEmpty(); }
+    bool Contains(const Bytes& key) const { return !At(key).IsNull(); }
 
     void Remove(const Bytes& key);
 
@@ -107,9 +112,9 @@ protected:
 };
 
 template <class DB>
-CTrieNode CTrieDB<DB>::At(const Bytes& key) const
+H256 CTrieDB<DB>::At(const Bytes& key) const
 {
-    return node(AtAux(node(mRoot), key));
+    return AtAux(node(mRoot), key);
 }
 
 template <class DB>
