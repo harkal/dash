@@ -939,7 +939,7 @@ void InitLogging()
  *  @pre Parameters should be parsed and config file should be read.
  */
 
-#include "triedb/triedb.h"
+#include "state.h"
 
 bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 {
@@ -967,6 +967,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     if (setProcDEPPol != NULL) setProcDEPPol(PROCESS_DEP_ENABLE);
 #endif
 
+    /*
     CDBWrapper db(GetDataDir() / "worldstate", 1 << 20);
     CTrieDB<CDBWrapper> trie(&db);
 
@@ -990,6 +991,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
     H256 b = H256(trie.At(h2.AsBytes()));
     H256 c = H256(trie.At(h3.AsBytes()));
+*/
+
+    CState state(GetDataDir() / "worldstate");
 
     if (!SetupNetworking())
         return InitError("Initializing networking failed");
