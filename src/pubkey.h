@@ -31,9 +31,9 @@ public:
     CKeyID(const H160& in) : H160(in) {}
 
     operator Bytes() const { return AsBytes(); }
-};
 
-extern CKeyID const MaxKeyID;
+    static CKeyID const MaxKeyID;
+};
 
 typedef H256 ChainCode;
 
