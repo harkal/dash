@@ -165,6 +165,7 @@ BITCOIN_CORE_H = \
   serialize.h \
   spork.h \
   streams.h \
+  state.h \
   support/allocators/secure.h \
   support/allocators/zeroafterfree.h \
   support/cleanse.h \
@@ -250,6 +251,7 @@ libbitcoin_server_a_SOURCES = \
   rpc/server.cpp \
   script/sigcache.cpp \
   sendalert.cpp \
+  state.cpp \
   timedata.cpp \
   torcontrol.cpp \
   txdb.cpp \
