@@ -9,15 +9,12 @@
 class CState
 {
 public:
-    CState(const boost::filesystem::path& path);
-
-    void reset();
+    CState(CTrieDB<CDBWrapper>* statedb);
 
     void SetRoot(const H256& root);
-    bool IsAddressInUse(const CPubKey& address) const;
+    bool IsAddressInUse(const CKeyID& address) const;
 private:
-    CDBWrapper *mDB = 0;
-    CTrieDB<CDBWrapper> *mState = 0;
+    CTrieDB<CDBWrapper> *mStateTrie = 0;
 };
 
 #endif // STATE_H

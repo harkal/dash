@@ -1,21 +1,16 @@
 #include "state.h"
 
-CState::CState(const boost::filesystem::path& path) : mDB(path, 1 << 22), mState(&mDB)
+CState::CState(CTrieDB<CDBWrapper>* statedb) : mStateTrie(statedb)
 {
 
-}
-
-void CState::reset()
-{
-    mState.init();
 }
 
 void CState::SetRoot(const H256& root)
 {
-    mState.SetRoot(root);
+    mStateTrie->SetRoot(root);
 }
 
-bool CState::IsAddressInUse(const CPubKey& address) const
+bool CState::IsAddressInUse(const CKeyID& address) const
 {
-    return mState.Contains(address);
+    return mStateTrie->Contains(address);
 }
