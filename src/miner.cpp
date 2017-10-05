@@ -277,7 +277,7 @@ CBlockTemplate* CreateNewBlock(const CChainParams& chainparams, const CPubKey& m
 
         //FillBlockPayments(txNew, nHeight, blockReward, pblock->txoutMasternode, pblock->voutSuperblock);
         txNew.mAmount = blockReward;
-        txNew.mReceiver = minerPubKey;
+        txNew.mReceiver = minerPubKey.GetID();
         txNew.mData.clear();
 
         CKey privateKey;

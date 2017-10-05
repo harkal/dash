@@ -236,7 +236,7 @@ public:
     // structure, including the hash.
     const int32_t nVersion;
     const uint32_t nLockTime;
-    const CPubKey   mReceiver;
+    const CKeyID    mReceiver;
     const CAmount   mAmount;
     const Bytes     mData;
     const Bytes     mSignature;
@@ -260,7 +260,7 @@ public:
         READWRITE(*const_cast<int32_t*>(&this->nVersion));
         nVersion = this->nVersion;
         READWRITE(*const_cast<uint32_t*>(&nLockTime));
-        READWRITE(*const_cast<CPubKey *>(&mReceiver));
+        READWRITE(*const_cast<CKeyID *>(&mReceiver));
         READWRITE(*const_cast<CAmount *>(&mAmount));
         READWRITE(*const_cast<Bytes *>(&mData));
 
@@ -313,12 +313,10 @@ public:
 struct CMutableTransaction
 {
     int32_t nVersion;
-//    std::vector<CTxIn> vin;
-//    std::vector<CTxOut> vout;
     uint32_t nLockTime;
 
     // Ebakus transaction
-    CPubKey   mReceiver;
+    CKeyID    mReceiver;
     CAmount   mAmount;
     Bytes     mData;
     Bytes     mSignature;
