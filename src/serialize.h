@@ -359,7 +359,7 @@ void WriteVarInt(Stream& os, I n)
     unsigned char tmp[(sizeof(n)*8+6)/7];
     int len=0;
     while(true) {
-        tmp[len] = (n & 0x7F) | (len ? 0x80 : 0x00);
+        tmp[len] = static_cast<unsigned char>((n & 0x7F) | (len ? 0x80 : 0x00));
         if (n <= 0x7F)
             break;
         n = (n >> 7) - 1;
