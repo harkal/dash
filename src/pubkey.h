@@ -152,6 +152,14 @@ public:
         return Hash(vch, vch + size());
     }
 
+    Bytes GetBytes() const {
+        return Bytes(begin(), end());
+    }
+
+    operator Bytes() const {
+        return GetBytes();
+    }
+
     /*
      * Check syntactic correctness.
      * 
