@@ -164,6 +164,8 @@ static int ecdsa_signature_parse_der_lax(const secp256k1_context* ctx, secp256k1
     return 1;
 }
 
+CKeyID const MaxKeyID { std::string("0xffffffffffffffffffffffffffffffffffffffff") };
+
 bool CPubKey::Verify(const H256 &hash, const std::vector<unsigned char>& vchSig) const {
     if (!IsValid())
         return false;
