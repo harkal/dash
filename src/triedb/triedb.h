@@ -27,8 +27,11 @@ public:
 
     CTrieNode node(H256 const& hash) const {
         CTrieNode data;
-        mDB->Read(hash, *(std::vector<Bytes> *)&data);
-        return data;
+        if(mDB->Read(hash, *(std::vector<Bytes> *)&data)) {
+            return data;
+        }
+
+        return CTrieNode();
     }
 
     void init() {
@@ -55,13 +58,13 @@ public:
     CTrieNode MergeAt(CTrieNode const& orig, H256 const& origHash, CNibbleView k, Bytes const& v, bool inLine = false);
     void MergeAtAux(CTrieNode& out, CTrieNode const& orig, CNibbleView k, Bytes const& v);
 
-    H256 At(const Bytes& key) const;
+    CTrieNode At(const Bytes& key) const;
 
     H256 AtAux(const CTrieNode& here, CNibbleView key) const;
 
     void Insert(Bytes const& key, Bytes const& value);
 
-    bool Contains(const Bytes& key) const { return !At(key).IsNull(); }
+    bool Contains(const Bytes& key) const { return !At(key).IsEmpty(); }
 
     void Remove(const Bytes& key);
 
@@ -104,9 +107,9 @@ protected:
 };
 
 template <class DB>
-H256 CTrieDB<DB>::At(const Bytes& key) const
+CTrieNode CTrieDB<DB>::At(const Bytes& key) const
 {
-    return AtAux(node(mRoot), key);
+    return node(AtAux(node(mRoot), key));
 }
 
 template <class DB>
@@ -295,10 +298,10 @@ CTrieNode CTrieDB<DB>::MergeAt(CTrieNode const& orig, H256 const& origHash, CNib
         auto sh = k.shared(nk);
 
         if (sh) {
-            CNibbleView cleved = Cleve(orig, sh);
+            CTrieNode cleved = Cleve(orig, sh);
             return MergeAt(cleved, k, v, true);
         } else {
-            CNibbleView branched = Branch(orig);
+            CTrieNode branched = Branch(orig);
             return MergeAt(branched, k, v, true);
         }
     } else {
