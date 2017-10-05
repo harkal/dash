@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(rpc_wallet)
         string strPurpose = "receive";
         BOOST_CHECK_NO_THROW({ /*Initialize Wallet with an account */
             CWalletDB walletdb(pwalletMain->strWalletFile);
-            CAccount account;
+            CAccountBTC account;
             account.vchPubKey = demoPubkey;
             pwalletMain->SetAddressBook(account.vchPubKey.GetID(), strAccount, strPurpose);
             walletdb.WriteAccount(strAccount, account);

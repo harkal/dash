@@ -1073,12 +1073,12 @@ public:
  * Account information.
  * Stored in wallet with key "acc"+string account name.
  */
-class CAccount
+class CAccountBTC
 {
 public:
     CPubKey vchPubKey;
 
-    CAccount()
+    CAccountBTC()
     {
         SetNull();
     }

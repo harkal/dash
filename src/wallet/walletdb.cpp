@@ -176,13 +176,13 @@ bool CWalletDB::WriteMinVersion(int nVersion)
     return Write(std::string("minversion"), nVersion);
 }
 
-bool CWalletDB::ReadAccount(const string& strAccount, CAccount& account)
+bool CWalletDB::ReadAccount(const string& strAccount, CAccountBTC& account)
 {
     account.SetNull();
     return Read(make_pair(string("acc"), strAccount), account);
 }
 
-bool CWalletDB::WriteAccount(const string& strAccount, const CAccount& account)
+bool CWalletDB::WriteAccount(const string& strAccount, const CAccountBTC& account)
 {
     return Write(make_pair(string("acc"), strAccount), account);
 }

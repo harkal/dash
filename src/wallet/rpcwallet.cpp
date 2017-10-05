@@ -157,7 +157,7 @@ CBitcoinAddress GetAccountAddress(string strAccount, bool bForceNew=false)
 {
     CWalletDB walletdb(pwalletMain->strWalletFile);
 
-    CAccount account;
+    CAccountBTC account;
     walletdb.ReadAccount(strAccount, account);
 
     bool bKeyUsed = false;
