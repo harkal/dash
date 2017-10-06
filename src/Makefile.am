@@ -167,6 +167,7 @@ BITCOIN_CORE_H = \
   streams.h \
   state.h \
   account.h \
+  executor.h \
   support/allocators/secure.h \
   support/allocators/zeroafterfree.h \
   support/cleanse.h \
@@ -254,6 +255,7 @@ libbitcoin_server_a_SOURCES = \
   sendalert.cpp \
   state.cpp \
   account.cpp \
+  executor.cpp \
   timedata.cpp \
   torcontrol.cpp \
   txdb.cpp \
