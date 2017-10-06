@@ -1,4 +1,5 @@
 #include "state.h"
+#include "executor.h"
 
 CState::CState(CTrieDB<CDBWrapper>* statedb) : mStateTrie(statedb)
 {
@@ -26,3 +27,20 @@ CAccount CState::GetAccount(const CKeyID& address) const
 
     return CAccount();
 }
+
+void CState::ApplyTransaction(const CTransaction& tx)
+{
+    CExecutor executor(*this, tx);
+
+    if (executor.Execute()) {
+
+    }
+}
+
+void CState::AdvaceState(const CBlock& block)
+{
+    for(auto tx : block.vtx) {
+        ApplyTransaction(tx);
+    }
+}
+

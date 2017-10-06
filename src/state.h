@@ -6,6 +6,8 @@
 #include "triedb/triedb.h"
 #include "key.h"
 #include "account.h"
+#include "primitives/block.h"
+#include "primitives/transaction.h"
 
 class CState
 {
@@ -16,6 +18,9 @@ public:
     bool IsAddressInUse(const CKeyID& address) const;
 
     CAccount GetAccount(const CKeyID& address) const;
+
+    void ApplyTransaction(const CTransaction& tx);
+    void AdvaceState(const CBlock& block);
 private:
     CTrieDB<CDBWrapper> *mStateTrie = 0;
 };
