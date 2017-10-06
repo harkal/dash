@@ -7,7 +7,7 @@
 class CExecutor
 {
 public:
-    CExecutor(CState &state, CTransaction &tx) : mState(state), mTx(tx) {};
+    CExecutor(CState &state, const CTransaction &tx) : mState(state), mTx(tx) {};
 
     bool Execute();
 private:
