@@ -166,6 +166,10 @@ public:
         s.read((char *)mData.data(), N);
     }
 
+    struct hash
+    {
+        size_t operator()(const CHash& value) const { return boost::hash_range(value.mData.cbegin(), value.mData.cend()); }
+    };
 };
 
 // Define hash types
