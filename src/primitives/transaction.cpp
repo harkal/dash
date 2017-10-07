@@ -96,7 +96,7 @@ bool CMutableTransaction::VerifySignature(const Bytes& vchSig, const CPubKey &se
     H256 hash = GetHash();
 
 
-    CPubKey sigPubKey;;
+    CPubKey sigPubKey;
 
     if(sigPubKey.RecoverCompact(hash, vchSig)) {
         if(sigPubKey.GetID() == senderPubKey.GetID()) {
@@ -182,4 +182,31 @@ std::string CTransaction::ToString() const
         nVersion,
         nLockTime);
     return str;
+}
+
+bool CTransaction::VerifySignature(const Bytes& vchSig, const CPubKey &senderPubKey) const {
+    H256 hash = GetHash();
+
+    CPubKey sigPubKey;
+
+    if(sigPubKey.RecoverCompact(hash, vchSig)) {
+        if(sigPubKey.GetID() == senderPubKey.GetID()) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+CPubKey CTransaction::GetSenderPubKey() const
+{
+    H256 hash = GetHash();
+
+    CPubKey sigPubKey;
+
+    if(sigPubKey.RecoverCompact(hash, mSignature)) {
+        return sigPubKey;
+    }
+
+    return CPubKey();
 }

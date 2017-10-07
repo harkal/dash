@@ -217,7 +217,7 @@ class CTransaction
 private:
     /** Memory only. */
     const H256 hash;
-    const CPubKey mSender;
+    const CKeyID mSender;
     void UpdateHash() const;
 public:
     // Default transaction version.
@@ -290,6 +290,10 @@ public:
 
     // Compute modified tx size for priority calculation (optionally given tx size)
     unsigned int CalculateModifiedSize(unsigned int nTxSize=0) const;
+
+    bool VerifySignature(const Bytes& vchSig, const CPubKey &senderPubKey) const;
+
+    CPubKey GetSenderPubKey() const;
 
     bool IsCoinBase() const
     {
