@@ -18,6 +18,11 @@ bool CState::IsAddressInUse(const CKeyID& address) const
 
 CAccount CState::GetAccount(const CKeyID& address) const
 {
+    auto i = mAccountCache.find(address);
+    if (i != mAccountCache.end()) {
+        return i->second;
+    }
+
     CAccount acc;
     H256 hash = mStateTrie->At(address.AsBytes());
 
@@ -44,3 +49,7 @@ void CState::AdvaceState(const CBlock& block)
     }
 }
 
+void CState::commit()
+{
+
+}

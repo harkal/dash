@@ -19,10 +19,14 @@ public:
 
     CAccount GetAccount(const CKeyID& address) const;
 
+    void commit();
+
     void ApplyTransaction(const CTransaction& tx);
     void AdvaceState(const CBlock& block);
 private:
     CTrieDB<CDBWrapper> *mStateTrie = 0;
+
+    CAccountMap mAccountCache;
 };
 
 #endif // STATE_H
