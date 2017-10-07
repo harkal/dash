@@ -43,6 +43,6 @@ private:
     Bytes mCode;
 };
 
-using CAccountMap = std::unordered_map<CKeyID, CAccount>;
+using CAccountMap = std::unordered_map<CKeyID, CAccount, CKeyID::hash>;
 
 #endif // ACCOUNT_H
