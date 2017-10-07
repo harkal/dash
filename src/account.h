@@ -1,10 +1,13 @@
 #ifndef ACCOUNT_H
 #define ACCOUNT_H
 
+#include <unordered_map>
+
 #include "common.h"
 #include "serialize.h"
 #include "pubkey.h"
 #include "crypto/hash.h"
+#include "amount.h"
 
 class CAccount
 {
@@ -13,6 +16,9 @@ public:
 
     U256 GetBalance() const { return mBalance; }
     void SetBalance(U256 balance) { mBalance = balance; }
+
+    void AddBalance(CAmount amount) { mBalance += amount; }
+    void SubBalance(CAmount amount) { mBalance -= amount; }
 
     U256 GetSequence() const { return mSequence; }
     void IncSequence() { ++mSequence; }
