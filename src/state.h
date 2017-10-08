@@ -18,6 +18,7 @@ public:
     bool IsAddressInUse(const CKeyID& address) const;
 
     CAccount GetAccount(const CKeyID& address) const;
+    bool SetAccount(const CAccount& account);
 
     void commit();
 

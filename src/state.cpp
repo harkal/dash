@@ -33,6 +33,11 @@ CAccount CState::GetAccount(const CKeyID& address) const
     return CAccount();
 }
 
+bool CState::SetAccount(const CAccount& account)
+{
+
+}
+
 void CState::ApplyTransaction(const CTransaction& tx)
 {
     CExecutor executor(*this, tx);
@@ -51,5 +56,8 @@ void CState::AdvaceState(const CBlock& block)
 
 void CState::commit()
 {
+    for ( auto const& i : mAccountCache ) {
 
+        mStateTrie->Insert(i.first, i.second);
+    }
 }
