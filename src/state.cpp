@@ -33,9 +33,9 @@ CAccount CState::GetAccount(const CKeyID& address) const
     return CAccount();
 }
 
-bool CState::SetAccount(const CAccount& account)
+bool CState::SetAccount(const CKeyID& address, const CAccount& account)
 {
-
+    mAccountCache[address] = account;
 }
 
 void CState::ApplyTransaction(const CTransaction& tx)
@@ -58,6 +58,6 @@ void CState::commit()
 {
     for ( auto const& i : mAccountCache ) {
 
-        mStateTrie->Insert(i.first, i.second);
+        mStateTrie->InsertValue(i.first, i.second);
     }
 }

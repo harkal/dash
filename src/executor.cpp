@@ -19,5 +19,8 @@ bool CExecutor::Execute()
     receiver.AddBalance(mTx.mAmount);
     sender.SubBalance(mTx.mAmount);
 
+    mState.SetAccount(mTx.mReceiver, receiver);
+    mState.SetAccount(senderPubKey.GetID(), sender);
+
     return true;
 }

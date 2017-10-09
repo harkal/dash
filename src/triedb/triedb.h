@@ -69,6 +69,9 @@ public:
 
     void Insert(Bytes const& key, Bytes const& value);
 
+    template <typename V>
+    void InsertValue(Bytes const&key, V const& value);
+
     bool Contains(const Bytes& key) const { return !At(key).IsNull(); }
 
     void Remove(const Bytes& key);
@@ -349,6 +352,15 @@ void CTrieDB<DB>::Remove(const Bytes& key)
     }
 }
 
+template <class DB>
+template <typename V>
+void CTrieDB<DB>::InsertValue(Bytes const&key, V const& value)
+{
+    H256 hash = (CHashWriter(SER_NETWORK, 0) << value).GetHash();
+    mDB->Write(hash, value);
+
+    Insert(key, hash.AsBytes());
+}
 
 template <class DB>
 CTrieNode CTrieDB<DB>::DeleteAt(CTrieNode const& orig, CNibbleView k)

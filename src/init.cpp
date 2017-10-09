@@ -272,6 +272,9 @@ void PrepareShutdown()
         pcoinsdbview = NULL;
         delete pblocktree;
         pblocktree = NULL;
+
+        delete pstate;
+        pstate = NULL;
     }
 #ifdef ENABLE_WALLET
     if (pwalletMain)
@@ -1667,6 +1670,10 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     if (!est_filein.IsNull())
         mempool.ReadFeeEstimates(est_filein);
     fFeeEstimatesInitialized = true;
+
+    CDBWrapper db(GetDataDir() / "worldstate", 1 << 20);
+    CTrieDB<CDBWrapper> stateTrieDB(&db);
+    pstate = new CState(stateTrieDB);
 
     // ********************************************************* Step 8: load wallet
 #ifdef ENABLE_WALLET

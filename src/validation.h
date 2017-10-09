@@ -44,6 +44,7 @@ class CScriptCheck;
 class CTxMemPool;
 class CValidationInterface;
 class CValidationState;
+class CState;
 
 struct LockPoints;
 
@@ -792,6 +793,9 @@ extern CCoinsViewCache *pcoinsTip;
 
 /** Global variable that points to the active block tree (protected by cs_main) */
 extern CBlockTreeDB *pblocktree;
+
+/** Global variable that point to the active state (protected by cs_main) */
+extern CState *pstate;
 
 /**
  * Return the spend height, which is one more than the inputs.GetBestBlock().
