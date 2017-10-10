@@ -12,7 +12,7 @@
 class CState
 {
 public:
-    CState(CTrieDB<CDBWrapper>* statedb);
+    CState(const CTrieDB<CDBWrapper>& statedb);
 
     void SetRoot(const H256& root);
     bool IsAddressInUse(const CKeyID& address) const;
@@ -25,7 +25,7 @@ public:
     void ApplyTransaction(const CTransaction& tx);
     void AdvaceState(const CBlock& block);
 private:
-    CTrieDB<CDBWrapper> *mStateTrie = 0;
+    CTrieDB<CDBWrapper> mStateTrie;
 
     CAccountMap mAccountCache;
 };
