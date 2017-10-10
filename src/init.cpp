@@ -272,9 +272,6 @@ void PrepareShutdown()
         pcoinsdbview = NULL;
         delete pblocktree;
         pblocktree = NULL;
-
-        delete pstate;
-        pstate = NULL;
     }
 #ifdef ENABLE_WALLET
     if (pwalletMain)
@@ -970,36 +967,6 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
     if (setProcDEPPol != NULL) setProcDEPPol(PROCESS_DEP_ENABLE);
 #endif
 
-
-    CDBWrapper db(GetDataDir() / "worldstate", 1 << 20);
-    CTrieDB<CDBWrapper> trie(&db);
-/*
-    trie.init();
-
-    H256 h = uint256S("0x000007d91d1254d60e2dd1ae580383070a4ddffa4c64c2eeb4a2f9ecc0414343");
-    trie.Insert(h.AsBytes(), Bytes());
-
-    H256 h2 = uint256S("0x120007d91d1254d60e2dd1ae580383070a4ddffa4c64c2eeb4a2f9ecc0414343");
-    H256 h3 = uint256S("0x122007d91d1254d60e2dd1ae580383070a4ddffa4c64c2eeb4a2f9ecc0414343");
-
-    H256 a = H256(trie.At(h2.AsBytes()));
-
-    trie.Insert(h2.AsBytes(), Bytes(2));
-
-    bool gg = trie.Contains(h2.AsBytes());
-
-    trie.Remove(h2.AsBytes());
-
-    bool g = trie.Contains(h2.AsBytes());
-
-    H256 b = H256(trie.At(h2.AsBytes()));
-    H256 c = H256(trie.At(h3.AsBytes()));
-*/
-
-    CState state(&trie);
-
-    bool b = state.IsAddressInUse(CKeyID::MaxKeyID);
-
     if (!SetupNetworking())
         return InitError("Initializing networking failed");
 
@@ -1671,9 +1638,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         mempool.ReadFeeEstimates(est_filein);
     fFeeEstimatesInitialized = true;
 
-    CDBWrapper db(GetDataDir() / "worldstate", 1 << 20);
-    CTrieDB<CDBWrapper> stateTrieDB(&db);
-    pstate = new CState(stateTrieDB);
+    // Initialize worldstate database : FIXME: No error handling whatsoever
+    CDBWrapper *db = new CDBWrapper(GetDataDir() / "worldstate", 1 << 20);
+    pstateTrieDB = CTrieDB<CDBWrapper>(db);
 
     // ********************************************************* Step 8: load wallet
 #ifdef ENABLE_WALLET
