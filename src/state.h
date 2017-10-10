@@ -1,10 +1,6 @@
 #ifndef STATE_H
 #define STATE_H
 
-#if defined(HAVE_CONFIG_H)
-#include "config/ebakus-config.h"
-#endif
-
 #include <boost/filesystem.hpp>
 #include "triedb/triedb.h"
 #include "key.h"
