@@ -17,6 +17,7 @@ template <class DB>
 class CTrieDB
 {
 public:
+    CTrieDB() : mRoot(NullTrieDBNode), mDB(nullptr) {}
     CTrieDB(DB* db) :  mRoot(NullTrieDBNode), mDB(db) {}
     ~CTrieDB() {}
 

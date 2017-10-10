@@ -1,17 +1,24 @@
 #ifndef STATE_H
 #define STATE_H
 
+#if defined(HAVE_CONFIG_H)
+#include "config/ebakus-config.h"
+#endif
+
 #include <boost/filesystem.hpp>
-#include "dbwrapper.h"
 #include "triedb/triedb.h"
 #include "key.h"
 #include "account.h"
-#include "primitives/block.h"
 #include "primitives/transaction.h"
+#include "dbwrapper.h"
+
+class CBlock;
 
 class CState
 {
 public:
+    CState() {}
+
     CState(const CTrieDB<CDBWrapper>& statedb);
 
     void SetRoot(const H256& root);

@@ -9,6 +9,7 @@
 #include "primitives/transaction.h"
 #include "serialize.h"
 #include "uint256.h"
+#include "state.h"
 
 /** Nodes collect new transactions into a block, hash them into a hash tree,
  * and scan through nonce values to make the block's hash satisfy proof-of-work
@@ -71,7 +72,7 @@ public:
 
 
 class CBlock : public CBlockHeader
-{
+{    
 public:
     // network and disk
     std::vector<CTransaction> vtx;
@@ -80,7 +81,10 @@ public:
     mutable CTxOut txoutMasternode; // masternode payment
     mutable std::vector<CTxOut> voutSuperblock; // superblock payment
     mutable bool fChecked;
+private:
+    CState mState;
 
+public:
     CBlock()
     {
         SetNull();
@@ -90,6 +94,13 @@ public:
     {
         SetNull();
         *((CBlockHeader*)this) = header;
+    }
+
+    CBlock(const CBlockHeader &header, const CState& state)
+    {
+        SetNull();
+        *((CBlockHeader*)this) = header;
+        mState = state;
     }
 
     ADD_SERIALIZE_METHODS;

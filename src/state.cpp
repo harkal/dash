@@ -1,4 +1,5 @@
 #include "state.h"
+#include "primitives/block.h"
 #include "executor.h"
 
 CState::CState(const CTrieDB<CDBWrapper>& statedb) : mStateTrie(statedb)
