@@ -19,6 +19,8 @@
 #include "sync.h"
 #include "versionbits.h"
 #include "spentindex.h"
+#include "dbwrapper.h"
+#include "triedb/triedb.h"
 
 #include <algorithm>
 #include <exception>
@@ -44,7 +46,6 @@ class CScriptCheck;
 class CTxMemPool;
 class CValidationInterface;
 class CValidationState;
-class CState;
 
 struct LockPoints;
 
@@ -795,7 +796,7 @@ extern CCoinsViewCache *pcoinsTip;
 extern CBlockTreeDB *pblocktree;
 
 /** Global variable that point to the active state (protected by cs_main) */
-extern CState *pstate;
+extern CTrieDB<CDBWrapper> pstateTrieDB;
 
 /**
  * Return the spend height, which is one more than the inputs.GetBestBlock().

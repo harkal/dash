@@ -182,7 +182,6 @@ CBlockIndex* FindForkInGlobalIndex(const CChain& chain, const CBlockLocator& loc
 
 CCoinsViewCache *pcoinsTip = NULL;
 CBlockTreeDB *pblocktree = NULL;
-CState *pstate = NULL;
 
 enum FlushStateMode {
     FLUSH_STATE_NONE,
