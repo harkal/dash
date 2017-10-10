@@ -120,6 +120,9 @@ public:
         fChecked = false;
     }
 
+    void SetState(const CState &state) { mState = state; }
+    const CState& GetState() const { return mState; }
+
     CBlockHeader GetBlockHeader() const
     {
         CBlockHeader block;
