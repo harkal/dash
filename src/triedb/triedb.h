@@ -111,7 +111,7 @@ private:
 
 protected:
     H256 mRoot;
-    DB* mDB = nullptr;
+    std::shared_ptr<DB> mDB = nullptr;
 };
 
 template <class DB>
