@@ -60,152 +60,153 @@ public:
  * transaction's output that it claims and a signature that matches the
  * output's public key.
  */
-class CTxIn
-{
-public:
-    COutPoint prevout;
-    CScript scriptSig;
-    uint32_t nSequence;
-    CScript prevPubKey;
 
-    /* Setting nSequence to this value for every input in a transaction
-     * disables nLockTime. */
-    static const uint32_t SEQUENCE_FINAL = 0xffffffff;
+//class CTxIn
+//{
+//public:
+//    COutPoint prevout;
+//    CScript scriptSig;
+//    uint32_t nSequence;
+//    CScript prevPubKey;
 
-    /* Below flags apply in the context of BIP 68*/
-    /* If this flag set, CTxIn::nSequence is NOT interpreted as a
-     * relative lock-time. */
-    static const uint32_t SEQUENCE_LOCKTIME_DISABLE_FLAG = (1 << 31);
+//    /* Setting nSequence to this value for every input in a transaction
+//     * disables nLockTime. */
+//    static const uint32_t SEQUENCE_FINAL = 0xffffffff;
 
-    /* If CTxIn::nSequence encodes a relative lock-time and this flag
-     * is set, the relative lock-time has units of 512 seconds,
-     * otherwise it specifies blocks with a granularity of 1. */
-    static const uint32_t SEQUENCE_LOCKTIME_TYPE_FLAG = (1 << 22);
+//    /* Below flags apply in the context of BIP 68*/
+//    /* If this flag set, CTxIn::nSequence is NOT interpreted as a
+//     * relative lock-time. */
+//    static const uint32_t SEQUENCE_LOCKTIME_DISABLE_FLAG = (1 << 31);
 
-    /* If CTxIn::nSequence encodes a relative lock-time, this mask is
-     * applied to extract that lock-time from the sequence field. */
-    static const uint32_t SEQUENCE_LOCKTIME_MASK = 0x0000ffff;
+//    /* If CTxIn::nSequence encodes a relative lock-time and this flag
+//     * is set, the relative lock-time has units of 512 seconds,
+//     * otherwise it specifies blocks with a granularity of 1. */
+//    static const uint32_t SEQUENCE_LOCKTIME_TYPE_FLAG = (1 << 22);
 
-    /* In order to use the same number of bits to encode roughly the
-     * same wall-clock duration, and because blocks are naturally
-     * limited to occur every 600s on average, the minimum granularity
-     * for time-based relative lock-time is fixed at 512 seconds.
-     * Converting from CTxIn::nSequence to seconds is performed by
-     * multiplying by 512 = 2^9, or equivalently shifting up by
-     * 9 bits. */
-    static const int SEQUENCE_LOCKTIME_GRANULARITY = 9;
+//    /* If CTxIn::nSequence encodes a relative lock-time, this mask is
+//     * applied to extract that lock-time from the sequence field. */
+//    static const uint32_t SEQUENCE_LOCKTIME_MASK = 0x0000ffff;
 
-    CTxIn()
-    {
-        nSequence = SEQUENCE_FINAL;
-    }
+//    /* In order to use the same number of bits to encode roughly the
+//     * same wall-clock duration, and because blocks are naturally
+//     * limited to occur every 600s on average, the minimum granularity
+//     * for time-based relative lock-time is fixed at 512 seconds.
+//     * Converting from CTxIn::nSequence to seconds is performed by
+//     * multiplying by 512 = 2^9, or equivalently shifting up by
+//     * 9 bits. */
+//    static const int SEQUENCE_LOCKTIME_GRANULARITY = 9;
 
-    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
-    CTxIn(H256 hashPrevTx, uint32_t nOut, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
+//    CTxIn()
+//    {
+//        nSequence = SEQUENCE_FINAL;
+//    }
 
-    ADD_SERIALIZE_METHODS;
+//    explicit CTxIn(COutPoint prevoutIn, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
+//    CTxIn(H256 hashPrevTx, uint32_t nOut, CScript scriptSigIn=CScript(), uint32_t nSequenceIn=SEQUENCE_FINAL);
 
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
-        READWRITE(prevout);
-        READWRITE(*(CScriptBase*)(&scriptSig));
-        READWRITE(nSequence);
-    }
+//    ADD_SERIALIZE_METHODS;
 
-    friend bool operator==(const CTxIn& a, const CTxIn& b)
-    {
-        return (a.prevout   == b.prevout &&
-                a.scriptSig == b.scriptSig &&
-                a.nSequence == b.nSequence);
-    }
+//    template <typename Stream, typename Operation>
+//    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+//        READWRITE(prevout);
+//        READWRITE(*(CScriptBase*)(&scriptSig));
+//        READWRITE(nSequence);
+//    }
 
-    friend bool operator!=(const CTxIn& a, const CTxIn& b)
-    {
-        return !(a == b);
-    }
+//    friend bool operator==(const CTxIn& a, const CTxIn& b)
+//    {
+//        return (a.prevout   == b.prevout &&
+//                a.scriptSig == b.scriptSig &&
+//                a.nSequence == b.nSequence);
+//    }
 
-    friend bool operator<(const CTxIn& a, const CTxIn& b)
-    {
-        return a.prevout<b.prevout;
-    }
+//    friend bool operator!=(const CTxIn& a, const CTxIn& b)
+//    {
+//        return !(a == b);
+//    }
 
-    std::string ToString() const;
-};
+//    friend bool operator<(const CTxIn& a, const CTxIn& b)
+//    {
+//        return a.prevout<b.prevout;
+//    }
 
-/** An output of a transaction.  It contains the public key that the next input
- * must be able to sign with to claim it.
- */
-class CTxOut
-{
-public:
-    CAmount nValue;
-    CScript scriptPubKey;
-    int nRounds;
+//    std::string ToString() const;
+//};
 
-    CTxOut()
-    {
-        SetNull();
-    }
+///** An output of a transaction.  It contains the public key that the next input
+// * must be able to sign with to claim it.
+// */
+//class CTxOut
+//{
+//public:
+//    CAmount nValue;
+//    CScript scriptPubKey;
+//    int nRounds;
 
-    CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn);
+//    CTxOut()
+//    {
+//        SetNull();
+//    }
 
-    ADD_SERIALIZE_METHODS;
+//    CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn);
 
-    template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
-        READWRITE(nValue);
-        READWRITE(*(CScriptBase*)(&scriptPubKey));
-    }
+//    ADD_SERIALIZE_METHODS;
 
-    void SetNull()
-    {
-        nValue = -1;
-        scriptPubKey.clear();
-        nRounds = -10; // an initial value, should be no way to get this by calculations
-    }
+//    template <typename Stream, typename Operation>
+//    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+//        READWRITE(nValue);
+//        READWRITE(*(CScriptBase*)(&scriptPubKey));
+//    }
 
-    bool IsNull() const
-    {
-        return (nValue == -1);
-    }
+//    void SetNull()
+//    {
+//        nValue = -1;
+//        scriptPubKey.clear();
+//        nRounds = -10; // an initial value, should be no way to get this by calculations
+//    }
 
-    H256 GetHash() const;
+//    bool IsNull() const
+//    {
+//        return (nValue == -1);
+//    }
 
-    CAmount GetDustThreshold(const CFeeRate &minRelayTxFee) const
-    {
-        // "Dust" is defined in terms of CTransaction::minRelayTxFee, which has units duffs-per-kilobyte.
-        // If you'd pay more than 1/3 in fees to spend something, then we consider it dust.
-        // A typical spendable txout is 34 bytes big, and will need a CTxIn of at least 148 bytes to spend
-        // i.e. total is 148 + 32 = 182 bytes. Default -minrelaytxfee is 10000 duffs per kB
-        // and that means that fee per spendable txout is 182 * 10000 / 1000 = 1820 duffs.
-        // So dust is a spendable txout less than 546 * minRelayTxFee / 1000 (in duffs)
-        // i.e. 1820 * 3 = 5460 duffs with default -minrelaytxfee = minRelayTxFee = 10000 duffs per kB.
-        if (scriptPubKey.IsUnspendable())
-            return 0;
+//    H256 GetHash() const;
 
-        size_t nSize = GetSerializeSize(SER_DISK,0)+148u;
-        return 3*minRelayTxFee.GetFee(nSize);
-    }
+//    CAmount GetDustThreshold(const CFeeRate &minRelayTxFee) const
+//    {
+//        // "Dust" is defined in terms of CTransaction::minRelayTxFee, which has units duffs-per-kilobyte.
+//        // If you'd pay more than 1/3 in fees to spend something, then we consider it dust.
+//        // A typical spendable txout is 34 bytes big, and will need a CTxIn of at least 148 bytes to spend
+//        // i.e. total is 148 + 32 = 182 bytes. Default -minrelaytxfee is 10000 duffs per kB
+//        // and that means that fee per spendable txout is 182 * 10000 / 1000 = 1820 duffs.
+//        // So dust is a spendable txout less than 546 * minRelayTxFee / 1000 (in duffs)
+//        // i.e. 1820 * 3 = 5460 duffs with default -minrelaytxfee = minRelayTxFee = 10000 duffs per kB.
+//        if (scriptPubKey.IsUnspendable())
+//            return 0;
 
-    bool IsDust(const CFeeRate &minRelayTxFee) const
-    {
-        return (nValue < GetDustThreshold(minRelayTxFee));
-    }
+//        size_t nSize = GetSerializeSize(SER_DISK,0)+148u;
+//        return 3*minRelayTxFee.GetFee(nSize);
+//    }
 
-    friend bool operator==(const CTxOut& a, const CTxOut& b)
-    {
-        return (a.nValue       == b.nValue &&
-                a.scriptPubKey == b.scriptPubKey &&
-                a.nRounds      == b.nRounds);
-    }
+//    bool IsDust(const CFeeRate &minRelayTxFee) const
+//    {
+//        return (nValue < GetDustThreshold(minRelayTxFee));
+//    }
 
-    friend bool operator!=(const CTxOut& a, const CTxOut& b)
-    {
-        return !(a == b);
-    }
+//    friend bool operator==(const CTxOut& a, const CTxOut& b)
+//    {
+//        return (a.nValue       == b.nValue &&
+//                a.scriptPubKey == b.scriptPubKey &&
+//                a.nRounds      == b.nRounds);
+//    }
 
-    std::string ToString() const;
-};
+//    friend bool operator!=(const CTxOut& a, const CTxOut& b)
+//    {
+//        return !(a == b);
+//    }
+
+//    std::string ToString() const;
+//};
 
 struct CMutableTransaction;
 
